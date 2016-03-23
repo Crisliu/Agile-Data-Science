@@ -6,11 +6,15 @@
 export PROJECT_HOME=`pwd`"/.."
 
 if [ "$(uname)" == "Darwin" ]; then
-    ANADONCA_OS_NAME='MacOSX'      
+    ANADONCA_OS_NAME='MacOSX'
+    MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/osx/mongodb-osx-x86_64-3.2.4.tgz'
+    MONGO_FILE=''
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     ANADONCA_OS_NAME='Linux'
+    MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.2.4.tgz'
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
     ANADONCA_OS_NAME='Windows'
+    MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-3.2.4-signed.msi'
 fi
 
 # Download and install Anaconda
@@ -48,7 +52,9 @@ cd ch03
 
 # May need to update this link... see http://spark.apache.org/downloads.html
 wget -P /tmp/ http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-without-hadoop.tgz
+
 cd ..
+
 mkdir spark
 tar -xvf /tmp/spark-1.6.1-bin-without-hadoop.tgz -C spark --strip-components=1
 echo "" >> ~/.bash_profile
@@ -68,3 +74,18 @@ echo 'spark.io.compression.codec org.apache.spark.io.LZ4CompressionCodec' >> ../
 
 cd ch03
 
+#
+# Install MongoDB in the mongo directory in the root of our project. Also, get the jar for the MongoDB driver.
+#
+cd ..
+
+wget -P /tmp/ $MONGO_DOWNLOAD_URL
+MONGO_FILE_NAME=${MONGO_DOWNLOAD_URL##*/}
+mkdir mongodb
+tar -xvf /tmp/$MONGO_FILE_NAME -C mongodb --strip-components=1
+export PATH=$PATH:$PROJECT_HOME/mongodb/bin
+echo 'export PATH=$PATH:$PROJECT_HOME/mongodb/bin' >> ~/.bash_profile
+mkdir -p mongodb/data/db
+mongodb/bin/mongod --dbpath mongodb/data/db & # re-run if you shutdown your computer
+
+cd ch03
