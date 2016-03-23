@@ -4,3 +4,5 @@ mongodb
 spark
 hadoop
 data
+mongo-hadoop
+lib/mongo*
