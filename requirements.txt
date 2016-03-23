@@ -1,3 +1,4 @@
 Flask
 kafka-python
+pymongo
 
