@@ -75,7 +75,8 @@ echo 'spark.io.compression.codec org.apache.spark.io.LZ4CompressionCodec' >> ../
 cd ch03
 
 #
-# Install MongoDB in the mongo directory in the root of our project. Also, get the jar for the MongoDB driver.
+# Install MongoDB in the mongo directory in the root of our project. Also, get the jar for the MongoDB driver
+# and the mongo-hadoop project.
 #
 cd ..
 
@@ -88,4 +89,29 @@ echo 'export PATH=$PATH:$PROJECT_HOME/mongodb/bin' >> ~/.bash_profile
 mkdir -p mongodb/data/db
 mongodb/bin/mongod --dbpath mongodb/data/db & # re-run if you shutdown your computer
 
-cd ch03
+# Get the MongoDB Java Driver
+wget -P lib/ http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.2.2/mongo-java-driver-3.2.2.jar
+
+# Install the mongo-hadoop project in the mongo-hadoop directory in the root of our project.
+wget -P /tmp/ https://github.com/mongodb/mongo-hadoop/archive/r1.5.1.tar.gz
+mkdir mongo-hadoop
+tar -xvzf /tmp/r1.5.1.tar.gz -C mongo-hadoop --strip-components=1
+
+# Now build the mongo-hadoop-spark jars
+cd mongo-hadoop
+./gradlew jar
+cd ..
+cp mongo-hadoop/spark/build/libs/mongo-hadoop-spark-*.jar lib/
+cp mongo-hadoop/build/libs/mongo-hadoop-*.jar lib/
+
+# Now build the pymongo_spark package
+# pip install py4j # add sudo if needed
+# pip install pymongo-spark # add sudo if needed
+cd mongo-hadoop/spark/src/main/python
+python setup.py install
+cd ../../../../../ # to $PROJECT_HOME
+cp mongo-hadoop/spark/src/main/python/pymongo_spark.py lib/
+export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib
+echo 'export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib' >> ~/.bash_profile
+echo "spark.driver.extraClassPath $PROJECT_HOME/lib/mongo-java-driver-3.2.2.jar:$PROJECT_HOME/lib/mongo-hadoop-1.5.1.jar:$PROJECT_HOME/lib/mongo-hadoop-spark-1.5.1.jar" \
+  >> ../spark/conf/spark-defaults.conf 

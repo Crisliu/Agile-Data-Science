@@ -1,4 +1,5 @@
 Flask
 kafka-python
 pymongo
-
+py4j
+pymongo-spark
