@@ -128,18 +128,6 @@ elasticsearch/bin/elasticsearch & # re-run if you shutdown your computer
 wget -P /tmp/ http://download.elastic.co/hadoop/elasticsearch-hadoop-2.2.0.zip
 unzip /tmp/elasticsearch-hadoop-2.2.0.zip
 mv elasticsearch-hadoop-2.2.0 elasticsearch-hadoop
-
-# Install sbt to build PySpark Elasticsearch
-wget -P lib/ https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.11/sbt-launch.jar
-mkdir bin
-IFS= read -d '' -r sbt_text <<"EOF"
-#!/bin/bash
-SBT_OPTS="-Xms512M -Xmx1536M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M";
-java $SBT_OPTS -jar `dirname $0`/sbt-launch.jar "$@"
-EOF
-
-echo "$sbt_text" > bin/sbt
-chmod +x bin/sbt
-
-git clone https://github.com/TargetHolding/pyspark-elastic
-cd pyspark-elastic
+cp elasticsearch-hadoop/elasticsearch-spark-1.2_2.10-2.2.0.jar lib/
+echo "spark.driver.extraClassPath $PROJECT_HOME/lib/elasticsearch-spark-1.2_2.10-2.2.0.jar" \
+  >> ../spark/conf/spark-defaults.conf
