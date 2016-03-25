@@ -10,3 +10,4 @@ lib/pymongo_spark.py
 elasticsearch
 elasticsearch-hadoop
 lib
+ch03/static
