@@ -114,4 +114,32 @@ cp mongo-hadoop/spark/src/main/python/pymongo_spark.py lib/
 export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib
 echo 'export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib' >> ~/.bash_profile
 echo "spark.driver.extraClassPath $PROJECT_HOME/lib/mongo-java-driver-3.2.2.jar:$PROJECT_HOME/lib/mongo-hadoop-1.5.1.jar:$PROJECT_HOME/lib/mongo-hadoop-spark-1.5.1.jar" \
-  >> ../spark/conf/spark-defaults.conf 
+  >> ../spark/conf/spark-defaults.conf
+
+#
+# Install ElasticSearch in the elasticsearch directory in the root of our project, and the Elasticsearch for Hadoop package
+#
+wget -P /tmp/ https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.1/elasticsearch-2.2.1.tar.gz
+mkdir elasticsearch
+tar -xvzf /tmp/elasticsearch-2.2.1.tar.gz -C elasticsearch --strip-components=1
+elasticsearch/bin/elasticsearch & # re-run if you shutdown your computer
+
+# Install Elasticsearch for Hadoop
+wget -P /tmp/ http://download.elastic.co/hadoop/elasticsearch-hadoop-2.2.0.zip
+unzip /tmp/elasticsearch-hadoop-2.2.0.zip
+mv elasticsearch-hadoop-2.2.0 elasticsearch-hadoop
+
+# Install sbt to build PySpark Elasticsearch
+wget -P lib/ https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.11/sbt-launch.jar
+mkdir bin
+IFS= read -d '' -r sbt_text <<"EOF"
+#!/bin/bash
+SBT_OPTS="-Xms512M -Xmx1536M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M";
+java $SBT_OPTS -jar `dirname $0`/sbt-launch.jar "$@"
+EOF
+
+echo "$sbt_text" > bin/sbt
+chmod +x bin/sbt
+
+git clone https://github.com/TargetHolding/pyspark-elastic
+cd pyspark-elastic
