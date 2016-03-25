@@ -7,3 +7,6 @@ data
 mongo-hadoop
 lib/mongo*
 lib/pymongo_spark.py
+elasticsearch
+elasticsearch-hadoop
+lib
