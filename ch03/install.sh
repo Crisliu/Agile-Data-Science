@@ -106,6 +106,7 @@ cp mongo-hadoop/build/libs/mongo-hadoop-*.jar lib/
 
 # Now build the pymongo_spark package
 # pip install py4j # add sudo if needed
+# pip install pymongo # add sudo if needed
 # pip install pymongo-spark # add sudo if needed
 cd mongo-hadoop/spark/src/main/python
 python setup.py install
@@ -132,5 +133,14 @@ cp elasticsearch-hadoop/elasticsearch-spark-1.2_2.10-2.2.0.jar lib/
 echo "spark.driver.extraClassPath $PROJECT_HOME/lib/elasticsearch-spark-1.2_2.10-2.2.0.jar" \
   >> ../spark/conf/spark-defaults.conf
 
-# Install pyelasticsearch
+# Install pyelasticsearch and p
 # pip install pyelasticsearch
+
+# Get bootstrap
+mkdir static
+cd static
+wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
+wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css'
+wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'
+
+cd ..
