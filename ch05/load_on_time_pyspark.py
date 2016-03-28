@@ -14,3 +14,4 @@ airport_pair_totals = sqlContext.sql("SELECT Origin, Dest, COUNT(*) AS total FRO
 airport_pair_totals.limit(10).collect()
 
 # We can go back and forth as we see fit!
+
