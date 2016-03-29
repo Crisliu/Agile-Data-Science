@@ -3,7 +3,7 @@
 on_time_dataframe = sqlContext.read.format('com.databricks.spark.csv').options(header='true', inferschema='true')\
 .load('../data/On_Time_On_Time_Performance_2015.csv.gz')
 
-# Save records as json
+# Save records as gzipped json lines
 on_time_dataframe.toJSON().saveAsTextFile('../data/On_Time_On_Time_Performance_2015.jsonl.gz', 'org.apache.hadoop.io.compress.GzipCodec')
 
 # View records on filesystem
@@ -12,3 +12,9 @@ on_time_dataframe.toJSON().saveAsTextFile('../data/On_Time_On_Time_Performance_2
 # Load JSON records back
 on_time_dataframe = sqlContext.read.json('../data/On_Time_On_Time_Performance_2015.jsonl.gz')
 on_time_dataframe.show()
+
+# Save records using Parquet
+on_time_dataframe.write.parquet("../data/on_time_performance.parquet")
+
+# Load the parquet file
+on_time_dataframe = sqlContext.read.parquet('../data/on_time_performance.parquet')
