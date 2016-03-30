@@ -93,9 +93,9 @@ mongodb/bin/mongod --dbpath mongodb/data/db & # re-run if you shutdown your comp
 wget -P lib/ http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.2.2/mongo-java-driver-3.2.2.jar
 
 # Install the mongo-hadoop project in the mongo-hadoop directory in the root of our project.
-wget -P /tmp/ https://github.com/mongodb/mongo-hadoop/archive/r1.5.1.tar.gz
+wget -P /tmp/ https://github.com/mongodb/mongo-hadoop/archive/r1.5.2.tar.gz
 mkdir mongo-hadoop
-tar -xvzf /tmp/r1.5.1.tar.gz -C mongo-hadoop --strip-components=1
+tar -xvzf /tmp/r1.5.2.tar.gz -C mongo-hadoop --strip-components=1
 
 # Now build the mongo-hadoop-spark jars
 cd mongo-hadoop
