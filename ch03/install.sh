@@ -137,10 +137,10 @@ echo "spark.driver.extraClassPath $PROJECT_HOME/lib/elasticsearch-spark-1.2_2.10
 # pip install pyelasticsearch
 
 # Get bootstrap
-mkdir static
-cd static
+mkdir web/static
+cd web/static
 wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
 wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css'
 wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'
 wget 'http://d3js.org/d3.v3.min.js'
-cd ..
+cd ../..
