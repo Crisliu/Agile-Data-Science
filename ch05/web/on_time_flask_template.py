@@ -6,7 +6,7 @@ from bson import json_util
 app = Flask(__name__)
 client = MongoClient()
 
-# Controller: Fetch an email and display it
+# Controller: Fetch a flight and display it
 @app.route("/on_time_performance")
 def on_time_performance():
   
@@ -21,6 +21,28 @@ def on_time_performance():
   })
   
   return render_template('flight.html', flight=flight)
+
+# Controller: Fetch all flights between cities on a given day and display them
+@app.route("/flights/<origin>/<dest>/<flight_date>")
+def list_flights(origin, dest, flight_date):
+  
+  print origin, dest, flight_date
+  
+  flights = client.agile_data_science.on_time_performance.find(
+    {
+      'Origin': origin,
+      'Dest': dest,
+      'FlightDate': flight_date
+    }
+  )# .sort(
+#     {
+#       'DepTime': 1,
+#       'ArrTime': 1,
+#     }
+#   )
+  
+  print flights
+  return render_template('flights.html', flights=flights)
 
 if __name__ == "__main__":
   app.run(debug=True)
