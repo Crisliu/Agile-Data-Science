@@ -5,6 +5,7 @@
     <table class="table table-condensed table-striped">
       <thead>
         <th>Airline</th>
+        <th>Flight Number</th>
         <th>Origin</th>
         <th>Destination</th>
         <th>Departure Time</th>
@@ -16,6 +17,7 @@
         {% for flight in flights %}
         <tr>
           <td>{{flight.Carrier}}</td>
+          <td><a href="/on_time_performance?Carrier={{flight.Carrier}}&FlightDate={{flight.FlightDate}}&FlightNum={{flight.FlightNum}}">{{flight.FlightNum}}</a></td>
           <td>{{flight.Origin}}</td>
           <td>{{flight.Dest}}</td>
           <td>{{flight.DepTime}}</td>
