@@ -33,16 +33,15 @@ def list_flights(origin, dest, flight_date):
       'Origin': origin,
       'Dest': dest,
       'FlightDate': flight_date
-    }
-  )# .sort(
-#     {
-#       'DepTime': 1,
-#       'ArrTime': 1,
-#     }
-#   )
+    },
+    sort = [
+      ('DepTime', 1),
+      ('ArrTime', 1),
+    ]
+  )
+  flight_count = flights.count()
   
-  print flights
-  return render_template('flights.html', flights=flights)
+  return render_template('flights.html', flights=flights, flight_date=flight_date, flight_count=flight_count)
 
 if __name__ == "__main__":
   app.run(debug=True)
