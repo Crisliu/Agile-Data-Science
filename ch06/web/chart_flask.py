@@ -36,5 +36,11 @@ def total_flights_chart():
     ])
   return render_template('total_flights_chart.html', total_flights=total_flights)
 
+# Controller: Fetch a flight and display it
+@app.route("/airplane/flights/<tail_number>")
+def flights_per_airplane(tail_number):
+  flights = client.agile_data_science.flights_per_airplane.find_one({'TailNum': tail_number})
+  return render_template('flights_per_airplane.html', flights=flights, tail_number=tail_number)
+
 if __name__ == "__main__":
   app.run(debug=True)
