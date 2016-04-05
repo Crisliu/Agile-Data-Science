@@ -1,60 +1,33 @@
-var data = [
-  {
-    key: "Cumulative Return",
-    values: [
-      { 
-        "label" : "A" ,
-        "value" : -29.765957771107
-      } , 
-      { 
-        "label" : "B" , 
-        "value" : 0
-      } , 
-      { 
-        "label" : "C" , 
-        "value" : 32.807804682612
-      } , 
-      { 
-        "label" : "D" , 
-        "value" : 196.45946739256
-      } , 
-      { 
-        "label" : "E" ,
-        "value" : 0.19434030906893
-      } , 
-      { 
-        "label" : "F" , 
-        "value" : -98.079782601442
-      } , 
-      { 
-        "label" : "G" , 
-        "value" : -13.925743130903
-      } , 
-      { 
-        "label" : "H" , 
-        "value" : -5.1387322875705
-      }
-    ]
-  }
-];
+var width = 960,
+    height = 500;
 
-nv.addGraph(function() {
-  var chart = nv.models.discreteBarChart()
-    .x(function(d) { return d.label })
-    .y(function(d) { return d.value })
-    .staggerLabels(true)
-    .tooltips(false)
-    .showValues(true)
+var y = d3.scale.linear()
+    .range([height, 0]);
+    // We define the domain once we get our data in d3.json, below
 
-  d3.select('#chart')
-    .append("svg")
-    .datum(data)
-    .transition().duration(500)
-    .call(chart)
-    ;
+var chart = d3.select(".chart")
+    .attr("width", width)
+    .attr("height", height);
 
-  nv.utils.windowResize(chart.update);
+d3.json("/total_flights.json", function(data) {
+  y.domain([0, d3.max(data, function(d) { return d.total_flights; })]);
 
-  return chart;
+  var barWidth = width / data.length;
+
+  var bar = chart.selectAll("g")
+      .data(data)
+      .enter()
+      .append("g")
+      .attr("transform", function(d, i) { return "translate(" + i * barWidth + ",0)"; });
+
+  bar.append("rect")
+      .attr("y", function(d) { return y(d.total_flights); })
+      .attr("height", function(d) { return height - y(d.total_flights); })
+      .attr("width", barWidth - 1);
+
+  bar.append("text")
+      .attr("x", barWidth / 2)
+      .attr("y", function(d) { return y(d.total_flights) + 3; })
+      .attr("dy", ".75em")
+      .text(function(d) { return d.total_flights; });
 });
-
