@@ -6,7 +6,7 @@
       <thead>
         <th>Carrier</th>
         <th>Date</th>
-        <th>Miles</th>
+        <th>Flight Number</th>
         <th>Origin</th>
         <th>Destination</th>
       </thead>
@@ -15,7 +15,7 @@
         <tr>
           <td>{{flight[0]}}</td>
           <td>{{flight[1]}}</td>
-          <td>{{flight[2]}}</td>
+          <td><a href="/on_time_performance?Carrier={{flight[0]}}&FlightDate={{flight[1]}}&FlightNum={{flight[2]}}">{{flight[2]}}</a></td>
           <td>{{flight[3]}}</td>
           <td>{{flight[4]}}</td>
         </tr>

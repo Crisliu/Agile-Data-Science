@@ -26,8 +26,6 @@ def on_time_performance():
 @app.route("/flights/<origin>/<dest>/<flight_date>")
 def list_flights(origin, dest, flight_date):
   
-  print origin, dest, flight_date
-  
   flights = client.agile_data_science.on_time_performance.find(
     {
       'Origin': origin,
