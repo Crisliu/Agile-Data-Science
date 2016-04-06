@@ -91,6 +91,7 @@ def list_flights(origin, dest, flight_date):
     )
 
 @app.route("/flights/search")
+@app.route("/flights/search/")
 def search_flights():
   
   # Search parameters
@@ -107,10 +108,11 @@ def search_flights():
   end = request.args.get('end') or config.RECORDS_PER_PAGE
   end = int(end)
   
+  # Navigation path and offset setup
   nav_path = strip_place(request.url)
   nav_offsets = get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
   
-  # Build our elasticsearch query
+  # Build the base of our elasticsearch query
   query = {
     'query': {
       'bool': {
@@ -125,6 +127,7 @@ def search_flights():
       'from': start, 
       'size': config.RECORDS_PER_PAGE}
   
+  # Add any search parameters present
   if carrier: 
     query['query']['bool']['must'].append({'match': {'Carrier': carrier}})
   if flight_date: 
@@ -138,6 +141,7 @@ def search_flights():
   if flight_number: 
     query['query']['bool']['must'].append({'match': {'FlightNum': flight_number}})
   
+  # Query elasticsearch, process to get records and count
   results = elastic.search(query)
   flights, flight_count = process_search(results)
   
