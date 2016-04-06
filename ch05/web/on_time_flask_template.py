@@ -3,6 +3,20 @@ from pymongo import MongoClient
 from bson import json_util
 import config
 
+from pyelasticsearch import ElasticSearch
+elastic = ElasticSearch(config.ELASTIC_URL)
+
+# Process elasticsearch hits and return flights records
+def process_search(results):
+  records = []
+  if results['hits'] and results['hits']['hits']:
+    total = results['hits']['total']
+    hits = results['hits']['hits']
+    for hit in hits:
+      record = hit['_source']
+      records.append(record)
+  return records, total
+
 # Calculate offsets for fetching lists of flights from MongoDB
 def get_navigation_offsets(offset1, offset2, increment):
   offsets = {}
@@ -38,7 +52,7 @@ def list_flights(origin, dest, flight_date):
   
   start = request.args.get('start') or 0
   start = int(start)
-  end = request.args.get('end') or 20
+  end = request.args.get('end') or config.RECORDS_PER_PAGE
   end = int(end)
   width = end - start
   
@@ -52,7 +66,7 @@ def list_flights(origin, dest, flight_date):
     },
     sort = [
       ('DepTime', 1),
-      ('ArrTime', 1),
+      ('ArrTime', 1)
     ]
   )
   flight_count = flights.count()
@@ -65,6 +79,64 @@ def list_flights(origin, dest, flight_date):
     flight_count=flight_count,
     nav_path=request.path,
     nav_offsets=nav_offsets
+    )
+
+@app.route("/flights/search")
+def search_flights():
+  
+  # Search parameters
+  carrier = request.args.get('Carrier')
+  flight_date = request.args.get('FlightDate')
+  origin = request.args.get('Origin')
+  dest = request.args.get('Dest')
+  tail_number = request.args.get('TailNum')
+  flight_number = request.args.get('FlightNum')
+  
+  # Pagination parameters
+  start = request.args.get('start') or 0
+  start = int(start)
+  end = request.args.get('end') or config.RECORDS_PER_PAGE
+  end = int(end)
+  
+  nav_offsets = get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
+  
+  # Build our elasticsearch query
+  query = {
+    'query': {
+      'bool': {
+        'must': []}}, 
+      'sort': [{'FlightDate': 'asc'}, {'DepTime': 'asc'}, {'Carrier': 'asc'}, {'FlightNum': 'asc'}, '_score'], 
+      'from': start, 
+      'size': config.RECORDS_PER_PAGE}
+  if carrier: 
+    query['query']['bool']['must'].append({'match': {'Carrier': carrier}})
+  if flight_date: 
+    query['query']['bool']['must'].append({'match': {'FlightDate': flight_date}})
+  if origin: 
+    query['query']['bool']['must'].append({'match': {'Origin': origin}})
+  if dest: 
+    query['query']['bool']['must'].append({'match': {'Dest': dest}})
+  if tail_number: 
+    query['query']['bool']['must'].append({'match': {'TailNum': tail_number}})
+  if flight_number: 
+    query['query']['bool']['must'].append({'match': {'FlightNum': flight_number}})
+  
+  results = elastic.search(query)
+  flights, flight_count = process_search(results)
+  
+  # Persist search parameters in the form template
+  return render_template(
+    'search.html', 
+    flights=flights, 
+    flight_date=flight_date, 
+    flight_count=flight_count,
+    nav_path=request.path,
+    nav_offsets=nav_offsets,
+    carrier=carrier,
+    origin=origin,
+    dest=dest,
+    tail_number=tail_number,
+    flight_number=flight_number
     )
 
 if __name__ == "__main__":
