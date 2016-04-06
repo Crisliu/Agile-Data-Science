@@ -27,6 +27,7 @@ def get_navigation_offsets(offset1, offset2, increment):
  'bottom_offset': max(offset1 - increment, 0)} # Don't go < 0
   return offsets
 
+# Strip the existing start and end parameters from the query string
 def strip_place(url):
   try:
     p = re.match('(.+)&start=.+&end=.+', url).group(1)
