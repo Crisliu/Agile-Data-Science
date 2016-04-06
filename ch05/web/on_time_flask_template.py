@@ -1,3 +1,4 @@
+import sys, os, re
 from flask import Flask, render_template, request
 from pymongo import MongoClient
 from bson import json_util
@@ -25,6 +26,13 @@ def get_navigation_offsets(offset1, offset2, increment):
   offsets['Previous'] = {'top_offset': max(offset2 - increment, 0), 
  'bottom_offset': max(offset1 - increment, 0)} # Don't go < 0
   return offsets
+
+def strip_place(url):
+  try:
+    p = re.match('(.+)&start=.+&end=.+', url).group(1)
+  except AttributeError, e:
+    return url
+  return p
 
 # Set up Flask and Mongo
 app = Flask(__name__)
@@ -98,6 +106,7 @@ def search_flights():
   end = request.args.get('end') or config.RECORDS_PER_PAGE
   end = int(end)
   
+  nav_path = strip_place(request.url)
   nav_offsets = get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
   
   # Build our elasticsearch query
@@ -105,9 +114,16 @@ def search_flights():
     'query': {
       'bool': {
         'must': []}}, 
-      'sort': [{'FlightDate': 'asc'}, {'DepTime': 'asc'}, {'Carrier': 'asc'}, {'FlightNum': 'asc'}, '_score'], 
+      'sort': [
+        {'FlightDate': {'order': 'asc', 'ignore_unmapped' : True} }, 
+        {'DepTime': {'order': 'asc', 'ignore_unmapped' : True} }, 
+        {'Carrier': {'order': 'asc', 'ignore_unmapped' : True} }, 
+        {'FlightNum': {'order': 'asc', 'ignore_unmapped' : True}}, 
+        '_score'
+      ], 
       'from': start, 
       'size': config.RECORDS_PER_PAGE}
+  
   if carrier: 
     query['query']['bool']['must'].append({'match': {'Carrier': carrier}})
   if flight_date: 
@@ -130,7 +146,7 @@ def search_flights():
     flights=flights, 
     flight_date=flight_date, 
     flight_count=flight_count,
-    nav_path=request.path,
+    nav_path=nav_path,
     nav_offsets=nav_offsets,
     carrier=carrier,
     origin=origin,
