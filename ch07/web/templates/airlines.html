@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+  <p class="lead">Airline {{carrier_code}}</p>
+  <h4>Fleet: {{airline_airplanes.FleetCount}} Planes</h4>
+  <ul class="nav nav-pills">
+    {% for tail_number in airline_airplanes.TailNumbers -%}
+    <li class="button">
+      <a href="/airplane/{{tail_number}}">{{tail_number}}</a>
+    </li>
+    {% endfor -%}
+  </ul>
+{% endblock %}
