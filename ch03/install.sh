@@ -120,18 +120,18 @@ echo "spark.driver.extraClassPath $PROJECT_HOME/lib/mongo-java-driver-3.2.2.jar:
 #
 # Install ElasticSearch in the elasticsearch directory in the root of our project, and the Elasticsearch for Hadoop package
 #
-wget -P /tmp/ https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.1/elasticsearch-2.2.1.tar.gz
+wget -P /tmp/ https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.5/elasticsearch-2.3.5.tar.gz
 mkdir elasticsearch
-tar -xvzf /tmp/elasticsearch-2.2.1.tar.gz -C elasticsearch --strip-components=1
+tar -xvzf /tmp/elasticsearch-2.3.5.tar.gz -C elasticsearch --strip-components=1
 elasticsearch/bin/elasticsearch & # re-run if you shutdown your computer
 
 # Install Elasticsearch for Hadoop
-wget -P /tmp/ http://download.elastic.co/hadoop/elasticsearch-hadoop-2.2.0.zip
-unzip /tmp/elasticsearch-hadoop-2.2.0.zip
-mv elasticsearch-hadoop-2.2.0 elasticsearch-hadoop
-cp elasticsearch-hadoop/elasticsearch-spark-1.2_2.10-2.2.0.jar lib/
-echo "spark.driver.extraClassPath $PROJECT_HOME/lib/elasticsearch-spark-1.2_2.10-2.2.0.jar" \
-  >> ../spark/conf/spark-defaults.conf
+wget -P /tmp/ http://download.elastic.co/hadoop/elasticsearch-hadoop-2.3.4.zip
+unzip /tmp/elasticsearch-hadoop-2.3.4.zip
+mv elasticsearch-hadoop-2.3.4 elasticsearch-hadoop
+cp elasticsearch-hadoop/dist/elasticsearch-spark-1.2_2.11-2.3.4.jar lib/
+echo "spark.driver.extraClassPath $PROJECT_HOME/lib/elasticsearch-spark-1.2_2.11-2.3.4.jar" \
+  >> $PROJECT_HOME/spark/conf/spark-defaults.conf
 
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
