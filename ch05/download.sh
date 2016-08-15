@@ -27,9 +27,9 @@ wget -P ../data/ http://av-info.faa.gov/data/ACRef/tab/engine.txt
 wget -P ../data/ http://av-info.faa.gov/data/ACRef/tab/prop.txt
 
 # Get Aircraft database
-#wget -P /tmp/ http://registry.faa.gov/database/AR042016.zip
-#unzip -d ../data/ /tmp/AR042016.zip
+# wget -P /tmp/ http://registry.faa.gov/database/AR042016.zip
+# unzip -d ../data/ /tmp/AR042016.zip
 
-# Get wikidata
-wget -P /tmp/ https://dumps.wikimedia.org/wikidatawiki/entities/20160404/wikidata-20160404-all.json.bz2
-
+# Get FAA Registration data
+# wget -P /tmp/ http://registry.faa.gov/database/AR042016.zip
+# unzip -d ../data/ /tmp/AR042016.zip
