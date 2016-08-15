@@ -132,6 +132,7 @@ mv elasticsearch-hadoop-2.3.4 elasticsearch-hadoop
 cp elasticsearch-hadoop/dist/elasticsearch-spark-1.2_2.11-2.3.4.jar lib/
 echo "spark.driver.extraClassPath $PROJECT_HOME/lib/elasticsearch-spark-1.2_2.11-2.3.4.jar" \
   >> $PROJECT_HOME/spark/conf/spark-defaults.conf
+echo "spark.speculation false" >> $PROJECT_HOME/spark/conf/spark-defaults.conf
 
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
