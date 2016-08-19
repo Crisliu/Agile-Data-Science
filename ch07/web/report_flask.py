@@ -39,7 +39,12 @@ def list_flights(origin, dest, flight_date):
   )
   flight_count = flights.count()
   
-  return render_template('flights.html', flights=flights, flight_date=flight_date, flight_count=flight_count)
+  return render_template(
+    'flights.html',
+    flights=flights,
+    flight_date=flight_date,
+    flight_count=flight_count
+  )
 
 # Controller: Fetch a flight table
 @app.route("/total_flights")
@@ -75,14 +80,26 @@ def total_flights_chart():
 @app.route("/airplane/<tail_number>")
 @app.route("/airplane/flights/<tail_number>")
 def flights_per_airplane(tail_number):
-  flights = client.agile_data_science.flights_per_airplane.find_one({'TailNum': tail_number})
-  return render_template('flights_per_airplane.html', flights=flights, tail_number=tail_number)
+  flights = client.agile_data_science.flights_per_airplane.find_one(
+    {'TailNum': tail_number}
+  )
+  return render_template(
+    'flights_per_airplane.html',
+    flights=flights,
+    tail_number=tail_number
+  )
 
 # Controller: Fetch an airplane entity page
 @app.route("/airline/<carrier_code>")
 def airline(carrier_code):
-  airline_airplanes = client.agile_data_science.airplanes_per_carrier.find_one({'Carrier': carrier_code})
-  return render_template('airlines.html', airline_airplanes=airline_airplanes, carrier_code=carrier_code)
+  airline_airplanes = client.agile_data_science.airplanes_per_carrier.find_one(
+    {'Carrier': carrier_code}
+  )
+  return render_template(
+    'airlines.html',
+    airline_airplanes=airline_airplanes,
+    carrier_code=carrier_code
+  )
 
 # Controller: Fetch an airplane entity page
 @app.route("/")
