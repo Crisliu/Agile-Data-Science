@@ -1,5 +1,6 @@
 # Load the parquet file
 on_time_dataframe = sqlContext.read.parquet('../data/on_time_performance.parquet')
+on_time_dataframe.registerTempTable("on_time_performance")
 
 # Filter down to the fields we need to identify and link to a flight
 flights = on_time_dataframe.rdd.map(lambda x: 
