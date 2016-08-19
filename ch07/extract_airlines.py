@@ -27,5 +27,6 @@ airplanes_per_carrier.count() # 14
 # Save to Mongo in the airplanes_per_carrier relation
 import pymongo_spark
 pymongo_spark.activate()
-airplanes_per_carrier.saveToMongoDB('mongodb://localhost:27017/agile_data_science.airplanes_per_carrier')
-
+airplanes_per_carrier.saveToMongoDB(
+  'mongodb://localhost:27017/agile_data_science.airplanes_per_carrier'
+)
