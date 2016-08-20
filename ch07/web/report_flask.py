@@ -2,9 +2,19 @@ from flask import Flask, render_template, request
 from pymongo import MongoClient
 from bson import json_util
 
-# Set up Flask and Mongo
+# Configuration details
+import config
+
+# Helpers for search
+import search_helpers
+
+# Set up Flask, Mongo and Elasticsearch
 app = Flask(__name__)
+
 client = MongoClient()
+
+from pyelasticsearch import ElasticSearch
+elastic = ElasticSearch(config.ELASTIC_URL)
 
 # Chapter 5 controller: Fetch a flight and display it
 @app.route("/on_time_performance")
@@ -108,6 +118,79 @@ def airline(carrier_code):
 def airlines():
   airlines = client.agile_data_science.airplanes_per_carrier.find()
   return render_template('all_airlines.html', airlines=airlines)
+
+@app.route("/flights/search")
+@app.route("/flights/search/")
+def search_flights():
+
+  # Search parameters
+  carrier = request.args.get('Carrier')
+  flight_date = request.args.get('FlightDate')
+  origin = request.args.get('Origin')
+  dest = request.args.get('Dest')
+  tail_number = request.args.get('TailNum')
+  flight_number = request.args.get('FlightNum')
+
+  # Pagination parameters
+  start = request.args.get('start') or 0
+  start = int(start)
+  end = request.args.get('end') or config.RECORDS_PER_PAGE
+  end = int(end)
+
+  print request.args
+  # Navigation path and offset setup
+  nav_path = search_helpers.strip_place(request.url)
+  nav_offsets = search_helpers.get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
+
+  # Build the base of our elasticsearch query
+  query = {
+    'query': {
+      'bool': {
+        'must': []}
+    },
+    'sort': [
+      {'FlightDate': {'order': 'asc', 'ignore_unmapped' : True} },
+      {'DepTime': {'order': 'asc', 'ignore_unmapped' : True} },
+      {'Carrier': {'order': 'asc', 'ignore_unmapped' : True} },
+      {'FlightNum': {'order': 'asc', 'ignore_unmapped' : True} },
+      '_score'
+    ],
+    'from': start,
+    'size': config.RECORDS_PER_PAGE
+  }
+
+  # Add any search parameters present
+  if carrier:
+    query['query']['bool']['must'].append({'match': {'Carrier': carrier}})
+  if flight_date:
+    query['query']['bool']['must'].append({'match': {'FlightDate': flight_date}})
+  if origin:
+    query['query']['bool']['must'].append({'match': {'Origin': origin}})
+  if dest:
+    query['query']['bool']['must'].append({'match': {'Dest': dest}})
+  if tail_number:
+    query['query']['bool']['must'].append({'match': {'TailNum': tail_number}})
+  if flight_number:
+    query['query']['bool']['must'].append({'match': {'FlightNum': flight_number}})
+
+  # Query elasticsearch, process to get records and count
+  results = elastic.search(query)
+  flights, flight_count = search_helpers.process_search(results)
+
+  # Persist search parameters in the form template
+  return render_template(
+    'search.html',
+    flights=flights,
+    flight_date=flight_date,
+    flight_count=flight_count,
+    nav_path=nav_path,
+    nav_offsets=nav_offsets,
+    carrier=carrier,
+    origin=origin,
+    dest=dest,
+    tail_number=tail_number,
+    flight_number=flight_number
+    )
 
 if __name__ == "__main__":
   app.run(debug=True)
