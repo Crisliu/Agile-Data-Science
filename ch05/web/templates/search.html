@@ -4,17 +4,17 @@
     <p class="lead">{{flight_count}} Flights</p>
     <form action="/flights/search" method="get">
       <label for="Carrier">Carrier</label>
-      <input name="Carrier" maxlength="3" style="width: 36px; margin-right: 10px;" value="{{carrier}}"></input>
+      <input name="Carrier" maxlength="3" style="width: 36px; margin-right: 10px;" value="{{carrier if carrier else ''}}"></input>
       <label for="Origin">Origin</label>
-      <input name="Origin" maxlength="3" style="width: 36px; margin-right: 10px;" value="{{origin}}"></input>
+      <input name="Origin" maxlength="3" style="width: 36px; margin-right: 10px;" value="{{origin if origin else ''}}"></input>
       <label for="Dest">Dest</label>
-      <input name="Dest" maxlength="3" style="width: 36px; margin-right: 10px;" value="{{dest}}"></input>
+      <input name="Dest" maxlength="3" style="width: 36px; margin-right: 10px;" value="{{dest if dest else ''}}"></input>
       <label for="FlightDate">FlightDate</label>
-      <input name="FlightDate" style="width: 100px; margin-right: 10px;" value="{{flight_date}}"></input>
+      <input name="FlightDate" style="width: 100px; margin-right: 10px;" value="{{flight_date if flight_date else ''}}"></input>
       <label for="TailNum">TailNum</label>
-      <input name="TailNum" style="width: 100px; margin-right: 10px;" value="{{tail_number}}"></input>
+      <input name="TailNum" style="width: 100px; margin-right: 10px;" value="{{tail_number if tail_number else ''}}"></input>
       <label for="FlightNum">FlightNum</label>
-      <input name="FlightNum" style="width: 50px; margin-right: 10px;" value="{{flight_number}}"></input>
+      <input name="FlightNum" style="width: 50px; margin-right: 10px;" value="{{flight_number if flight_number else ''}}"></input>
       <button type="submit" class="btn btn-xs btn-default" style="height: 25px">Submit</button>
     </form>
     <table class="table table-condensed table-striped">
