@@ -3,6 +3,7 @@ from flask import Flask, render_template, request
 from pymongo import MongoClient
 from bson import json_util
 import config
+import json
 
 from pyelasticsearch import ElasticSearch
 elastic = ElasticSearch(config.ELASTIC_URL)
@@ -117,21 +118,23 @@ def search_flights():
   query = {
     'query': {
       'bool': {
-        'must': []}}, 
-      'sort': [
-        {'FlightDate': {'order': 'asc', 'ignore_unmapped' : True} }, 
-        {'DepTime': {'order': 'asc', 'ignore_unmapped' : True} }, 
-        {'Carrier': {'order': 'asc', 'ignore_unmapped' : True} }, 
-        {'FlightNum': {'order': 'asc', 'ignore_unmapped' : True} }, 
-        '_score'
-      ], 
-      'from': start, 
-      'size': config.RECORDS_PER_PAGE}
+        'must': []}
+    },
+    'sort': [
+      {'FlightDate': {'order': 'asc', 'ignore_unmapped' : True} },
+      {'DepTime': {'order': 'asc', 'ignore_unmapped' : True} },
+      {'Carrier': {'order': 'asc', 'ignore_unmapped' : True} },
+      {'FlightNum': {'order': 'asc', 'ignore_unmapped' : True} },
+      '_score'
+    ],
+    'from': start,
+    'size': config.RECORDS_PER_PAGE
+  }
   
   # Add any search parameters present
-  if carrier: 
+  if carrier:
     query['query']['bool']['must'].append({'match': {'Carrier': carrier}})
-  if flight_date: 
+  if flight_date:
     query['query']['bool']['must'].append({'match': {'FlightDate': flight_date}})
   if origin: 
     query['query']['bool']['must'].append({'match': {'Origin': origin}})
@@ -143,6 +146,9 @@ def search_flights():
     query['query']['bool']['must'].append({'match': {'FlightNum': flight_number}})
   
   # Query elasticsearch, process to get records and count
+  print ("QUERY")
+  print carrier, flight_date, origin, dest, tail_number, flight_number
+  print json.dumps(query)
   results = elastic.search(query)
   flights, flight_count = process_search(results)
   
