@@ -137,7 +137,6 @@ def search_flights():
   end = request.args.get('end') or config.RECORDS_PER_PAGE
   end = int(end)
 
-  print request.args
   # Navigation path and offset setup
   nav_path = search_helpers.strip_place(request.url)
   nav_offsets = search_helpers.get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
