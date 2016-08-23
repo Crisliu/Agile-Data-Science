@@ -13,3 +13,4 @@ lib
 ch03/static
 ch06/web/static
 *.pyc
+ch06/scrape_faa.py
