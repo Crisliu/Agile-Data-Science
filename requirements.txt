@@ -6,3 +6,4 @@ pymongo-spark
 pyelasticsearch
 requests
 selenium
+bs4
