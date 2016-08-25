@@ -1,6 +1,8 @@
 #
 # Utility functions to read and write json and jsonl files
 #
+import codecs, json
+
 def write_json_file(obj, path):
   '''Dump an object and write it out as json to a file.'''
   f = codecs.open(path, 'w', 'utf-8')
@@ -26,4 +28,5 @@ def read_json_lines_file(path):
   f = codecs.open(path, "r", "utf-8")
   for line in f:
     record = json.loads(line.rstrip("\n|\r"))
+    ary.append(record)
   return ary
