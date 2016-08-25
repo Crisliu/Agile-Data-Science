@@ -10,5 +10,7 @@ tail_numbers = tail_numbers.filter(lambda x: x != '')
 unique_tail_numbers = tail_numbers.distinct()
 
 # Store as JSON objects via a dataframe. Repartition to 1 to get 1 json file.
-unique_records = tail_numbers.map(lambda x: {'TailNum': x})
+unique_records = unique_tail_numbers.map(lambda x: {'TailNum': x})
 unique_records.toDF().repartition(1).write.json("../data/tail_numbers.json")
+
+# Now from bash: ls data/tail_numbers.json/part*
