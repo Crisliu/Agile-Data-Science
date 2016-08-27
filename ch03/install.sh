@@ -51,12 +51,12 @@ cd ch03
 #
 
 # May need to update this link... see http://spark.apache.org/downloads.html
-wget -P /tmp/ http://d3kbcqa49mib13.cloudfront.net/spark-1.6.1-bin-without-hadoop.tgz
+wget -P /tmp/ http://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-bin-without-hadoop.tgz
 
 cd ..
 
 mkdir spark
-tar -xvf /tmp/spark-1.6.1-bin-without-hadoop.tgz -C spark --strip-components=1
+tar -xvf /tmp/spark-2.0.0-bin-without-hadoop.tgz -C spark --strip-components=1
 echo "" >> ~/.bash_profile
 echo "# Spark environment setup" >> ~/.bash_profile
 export SPARK_HOME=$PROJECT_HOME/spark
