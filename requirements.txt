@@ -8,3 +8,4 @@ requests
 selenium
 bs4
 wikipedia
+tldextract
