@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
   <div>
+    <!-- Navigation guide -->
+    / Flights / <a href="/on_time_performance?Carrier={{flight.Carrier}}&FlightDate={{flight.FlightDate}}&FlightNum={{flight.FlightNum}}">{{flight.TailNum}}</a>
+
     <p class="lead">Flight {{flight.FlightNum}}</p>
     <table class="table">
       <thead>

@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
   <div>
+    <!-- Navigation guide -->
+    / <a href="/flights/search">Flights</a> / <a href="/flights/search">Search</a>
+
     <p class="lead">{{flight_count}} Flights</p>
     <form action="/flights/search" method="get">
       <label for="Carrier">Carrier</label>
