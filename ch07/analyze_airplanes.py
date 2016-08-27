@@ -65,11 +65,12 @@ relative_manufacturer_counts.show(30) # show top 30
 #
 # Now get these things on the web
 #
-grouped_manufacturer_counts = manufacturer_counts.groupBy()
+relative_manufacturer_counts = relative_manufacturer_counts.rdd.map(lambda row: row.asDict())
+grouped_manufacturer_counts = relative_manufacturer_counts.groupBy(lambda x: 1)
 
 # Save to Mongo in the airplanes_per_carrier relation
 import pymongo_spark
 pymongo_spark.activate()
-manufacturer_counts.saveToMongoDB(
-  'mongodb://localhost:27017/agile_data_science.manufacturer_counts'
+grouped_manufacturer_counts.saveToMongoDB(
+  'mongodb://localhost:27017/agile_data_science.manufacturer_totals'
 )
