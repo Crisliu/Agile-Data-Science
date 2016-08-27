@@ -1,12 +1,12 @@
 # Load the FAA N-Number Inquiry Records
-faa_tail_number_inquiry = sqlContext.read.json('../data/faa_tail_number_inquiry.jsonl')
+faa_tail_number_inquiry = sqlContext.read.json('data/faa_tail_number_inquiry.jsonl')
 faa_tail_number_inquiry.show()
 
 # Count the records
 faa_tail_number_inquiry.count()
 
 # Load our unique tail numbers
-unique_tail_numbers = sqlContext.read.json('../data/tail_numbers.jsonl')
+unique_tail_numbers = sqlContext.read.json('data/tail_numbers.jsonl')
 unique_tail_numbers.show()
 
 # left outer join tail numbers to our inquries to see how many came through

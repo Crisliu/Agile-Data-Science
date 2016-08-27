@@ -1,5 +1,5 @@
 # Load the parquet file
-on_time_dataframe = sqlContext.read.parquet('../data/on_time_performance.parquet')
+on_time_dataframe = sqlContext.read.parquet('data/on_time_performance.parquet')
 
 # Use SQL to look at the total flights by month across 2015
 on_time_dataframe.registerTempTable("on_time_dataframe")

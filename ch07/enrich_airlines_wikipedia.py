@@ -4,6 +4,7 @@ import utils
 
 import wikipedia
 from bs4 import BeautifulSoup
+import tldextract
 
 # Load our airlines...
 our_airlines = utils.read_json_lines_file('data/our_airlines.jsonl')
@@ -40,6 +41,10 @@ for airline in our_airlines:
   # 4) finally get the href of the a tag
   url = a.get('href')
   airline['url'] = url
+
+  # Get the domain to display with the url
+  url_parts = tldextract.extract(url)
+  airline['domain'] = url_parts.domain + '.' + url_parts.suffix
 
   with_url.append(airline)
 

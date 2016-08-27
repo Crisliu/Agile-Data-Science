@@ -28,4 +28,4 @@ our_airlines.show()
 # Store as JSON objects via a dataframe. Repartition to 1 to get 1 json file.
 our_airlines.repartition(1).write.json("data/our_airlines.json")
 
-#wikidata = sqlContext.read.json('../data/wikidata-20160404-all.json.bz2')
+#wikidata = sqlContext.read.json('data/wikidata-20160404-all.json.bz2')
