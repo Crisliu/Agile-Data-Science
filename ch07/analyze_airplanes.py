@@ -27,7 +27,7 @@ total_airplanes = sqlContext.sql(
 print "Total airplanes: {}".format(total_airplanes.collect()[0].OverallTotal)
 
 mfr_with_totals = manufacturer_counts.join(total_airplanes)
-mfr_with_totals = mfr_with_totals.map(
+mfr_with_totals = mfr_with_totals.rdd.map(
   lambda x: {
     'Manufacturer': x.Manufacturer,
     'Total': x.Total,
@@ -41,7 +41,31 @@ mfr_with_totals = mfr_with_totals.map(
 )
 mfr_with_totals.toDF().show()
 
-grouped_manufacturer_counts = manufacturer_counts.groupBy
+#
+# Same with sub-queries
+#
+relative_manufacturer_counts = sqlContext.sql("""SELECT
+  Manufacturer,
+  COUNT(*) AS Total,
+  ROUND(
+    100 * (
+      COUNT(*)/(SELECT COUNT(*) FROM airplanes)
+    ),
+    2
+  ) AS PercentageTotal
+FROM
+  airplanes
+GROUP BY
+  Manufacturer
+ORDER BY
+  Total DESC, Manufacturer"""
+)
+relative_manufacturer_counts.show(30) # show top 30
+
+#
+# Now get these things on the web
+#
+grouped_manufacturer_counts = manufacturer_counts.groupBy()
 
 # Save to Mongo in the airplanes_per_carrier relation
 import pymongo_spark
