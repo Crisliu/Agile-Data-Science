@@ -102,11 +102,15 @@ def flights_per_airplane(tail_number):
 # Controller: Fetch an airplane entity page
 @app.route("/airline/<carrier_code>")
 def airline(carrier_code):
+  airline_summary = client.agile_data_science.airlines.find_one(
+    {'CarrierCode': carrier_code}
+  )
   airline_airplanes = client.agile_data_science.airplanes_per_carrier.find_one(
     {'Carrier': carrier_code}
   )
   return render_template(
     'airlines.html',
+    airline_summary=airline_summary,
     airline_airplanes=airline_airplanes,
     carrier_code=carrier_code
   )
