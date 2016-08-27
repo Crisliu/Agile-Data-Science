@@ -1,6 +1,6 @@
 # Run me with:
 #
-# IPYTHON=1 pyspark --jars ../lib/mongo-hadoop-spark-1.5.1.jar,../lib/mongo-java-driver-3.2.2.jar,../lib/mongo-hadoop-1.5.1.jar \
+# PYSPARK_DRIVER_PYTHON=ipython pyspark --jars ../lib/mongo-hadoop-spark-1.5.1.jar,../lib/mongo-java-driver-3.2.2.jar,../lib/mongo-hadoop-1.5.1.jar \
 # --driver-class-path ../lib/mongo-hadoop-spark-1.5.1.jar:../lib/mongo-java-driver-3.2.2.jar:../lib/mongo-hadoop-1.5.1.jar
 
 import pymongo
