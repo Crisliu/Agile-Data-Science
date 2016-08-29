@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block body %}
+  <!-- Navigation guide -->
+  / <a href="/airplanes">Airplanes</a>
+
+  <p class="lead">
+    <!-- Airline Name and website-->
+    US Commercial Fleet
+  </p>
+
+  <form action="/airplanes" method="get">
+    {% for item in search_config %}
+      {% if 'label' in item %}
+        <label for="{{item['field']}}">{{item['label']}}</label>
+      {% else %}
+        <label for="{{item['field']}}">{{item['field']}}</label>
+      {% endif %}
+        <input name="{{item['field']}}" maxlength="3" style="width: 36px; margin-right: 10px;" value="{{args[item['field']] if args[item['field']] else ''}}"></input>
+    {% endfor %}
+    <button type="submit" class="btn btn-xs btn-default" style="height: 25px">Submit</button>
+  </form>
+
+  <table class="table table-condensed table-striped">
+    <thead>
+      {% for item in search_config %}
+        {% if 'label' in item %}
+          <th>{{item['label']}}</th>
+        {% else %}
+          <th>{{item['field']}}</th>
+        {% endif %}
+      {% endfor %}
+    </thead>
+    <tbody>
+      {% for airplane in airplanes %}
+      <tr>
+        {% for item in search_config %}
+          <td>{{airplane[item['field']]}}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% import "macros.jnj" as common %}
+{% if nav_offsets and nav_path -%}
+  {{ common.display_nav(nav_offsets, nav_path, airplane_count)|safe }}
+{% endif -%}
+{% endblock %}

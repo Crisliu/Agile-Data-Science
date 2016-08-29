@@ -86,6 +86,79 @@ def total_flights_chart():
     ])
   return render_template('total_flights_chart.html', total_flights=total_flights)
 
+@app.route("/airplanes")
+@app.route("/airplanes/")
+def search_airplanes():
+
+  search_config = [
+    {'field': 'TailNum', 'label': 'Tail Number'},
+    {'field': 'Owner'},
+    {'field': 'OwnerState', 'label': 'Owner State'},
+    {'field': 'Manufacturer'},
+    {'field': 'Model'},
+    {'field': 'ManufacturerYear', 'label': 'MFR Year'},
+    {'field': 'SerialNumber', 'label': 'Serial Number'},
+    {'field': 'EngineManufacturer', 'label': 'Engine MFR'},
+    {'field': 'EngineModel', 'label': 'Engine Model'}
+  ]
+
+  # Pagination parameters
+  start = request.args.get('start') or 0
+  start = int(start)
+  end = request.args.get('end') or config.RECORDS_PER_PAGE
+  end = int(end)
+
+  # Navigation path and offset setup
+  nav_path = search_helpers.strip_place(request.url)
+  nav_offsets = search_helpers.get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
+
+  # Build the base of our elasticsearch query
+  query = {
+    'query': {
+      'bool': {
+        'must': []}
+    },
+    'sort': [
+      {'Owner': {'order': 'asc', 'ignore_unmapped': True}},
+      {'Manufacturer': {'order': 'asc', 'ignore_unmapped' : True} },
+      {'ManufacturerYear': {'order': 'asc', 'ignore_unmapped' : True} },
+      {'SerialNumber': {'order': 'asc', 'ignore_unmapped' : True} },
+      '_score'
+    ],
+    'from': start,
+    'size': config.RECORDS_PER_PAGE
+  }
+
+  arg_dict = {}
+  for item in search_config:
+    field = item['field']
+    value = request.args.get(field)
+    print field, value
+    arg_dict[field] = value
+    if value:
+      query['query']['bool']['must'].append({'match': {field: value}})
+
+  # Query elasticsearch, process to get records and count
+  results = elastic.search(query)
+  airplanes, airplane_count = search_helpers.process_search(results)
+
+  # Manufacturer Chart
+  mfr_chart = client.agile_data_science.manufacturer_totals.find_one()
+
+  print arg_dict
+
+  # Persist search parameters in the form template
+  return render_template(
+    'all_airplanes.html',
+    search_config=search_config,
+    args=arg_dict,
+    airplanes=airplanes,
+    airplane_count=airplane_count,
+    nav_path=nav_path,
+    nav_offsets=nav_offsets,
+    mfr_chart=mfr_chart,
+  )
+
 # Controller: Fetch a flight and display it
 @app.route("/airplane/<tail_number>")
 @app.route("/airplane/flights/<tail_number>")
