@@ -114,8 +114,6 @@ cd ../../../../../ # to $PROJECT_HOME
 cp mongo-hadoop/spark/src/main/python/pymongo_spark.py lib/
 export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib
 echo 'export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib' >> ~/.bash_profile
-echo "spark.driver.extraClassPath $PROJECT_HOME/lib/mongo-java-driver-3.2.2.jar:$PROJECT_HOME/lib/mongo-hadoop-1.5.1.jar:$PROJECT_HOME/lib/mongo-hadoop-spark-1.5.1.jar" \
-  >> ../spark/conf/spark-defaults.conf
 
 #
 # Install ElasticSearch in the elasticsearch directory in the root of our project, and the Elasticsearch for Hadoop package
@@ -126,13 +124,19 @@ tar -xvzf /tmp/elasticsearch-2.3.5.tar.gz -C elasticsearch --strip-components=1
 elasticsearch/bin/elasticsearch & # re-run if you shutdown your computer
 
 # Install Elasticsearch for Hadoop
-wget -P /tmp/ http://download.elastic.co/hadoop/elasticsearch-hadoop-2.3.4.zip
-unzip /tmp/elasticsearch-hadoop-2.3.4.zip
-mv elasticsearch-hadoop-2.3.4 elasticsearch-hadoop
-cp elasticsearch-hadoop/dist/elasticsearch-spark-1.2_2.11-2.3.4.jar lib/
-echo "spark.driver.extraClassPath $PROJECT_HOME/lib/elasticsearch-spark-1.2_2.11-2.3.4.jar" \
-  >> $PROJECT_HOME/spark/conf/spark-defaults.conf
+wget -P /tmp/ http://download.elastic.co/hadoop/elasticsearch-hadoop-5.0.0-alpha5.zip
+unzip /tmp/elasticsearch-hadoop-5.0.0-alpha5.zip
+mv elasticsearch-hadoop-5.0.0-alpha5 elasticsearch-hadoop
+cp elasticsearch-hadoop/dist/elasticsearch-hadoop-5.0.0-alpha5.jar lib/
+cp elasticsearch-hadoop/dist/elasticsearch-spark-20_2.10-5.0.0-alpha5.jar lib/
 echo "spark.speculation false" >> $PROJECT_HOME/spark/conf/spark-defaults.conf
+
+# Setup mongo and elasticsearch jars for Spark
+echo "spark.jars $PROJECT_HOME/lib/mongo-hadoop-spark-2.0.0-rc0.jar,\
+$PROJECT_HOME/lib/mongo-java-driver-3.2.2.jar,\
+$PROJECT_HOME/lib/mongo-hadoop-2.0.0-rc0.jar,\
+$PROJECT_HOME/lib/elasticsearch-spark-20_2.10-5.0.0-alpha5.jar" \
+  >> ../spark/conf/spark-defaults.conf
 
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
