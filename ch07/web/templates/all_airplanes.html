@@ -8,6 +8,14 @@
     US Commercial Fleet
   </p>
 
+  <!-- Chart of fleet manufacturers -->
+  <div>
+    <p>Total Flights by Month</p>
+    <div id="chart"><svg class="chart"></svg></div>
+  </div>
+  <script src="/static/airplanes.js"></script>
+
+  <!-- Generate form from search_config and request args -->
   <form action="/airplanes" method="get">
     {% for item in search_config %}
       {% if 'label' in item %}
@@ -15,12 +23,13 @@
       {% else %}
         <label for="{{item['field']}}">{{item['field']}}</label>
       {% endif %}
-        <input name="{{item['field']}}" maxlength="3" style="width: 36px; margin-right: 10px;" value="{{args[item['field']] if args[item['field']] else ''}}"></input>
+        <input name="{{item['field']}}" style="width: 36px; margin-right: 10px;" value="{{args[item['field']] if args[item['field']] else ''}}"></input>
     {% endfor %}
     <button type="submit" class="btn btn-xs btn-default" style="height: 25px">Submit</button>
   </form>
 
   <table class="table table-condensed table-striped">
+    <!-- Create table header, based on search_config -->
     <thead>
       {% for item in search_config %}
         {% if 'label' in item %}
@@ -30,6 +39,8 @@
         {% endif %}
       {% endfor %}
     </thead>
+
+    <!-- Create table content, based on airplanes for each <tr> and search_config for each <td> -->
     <tbody>
       {% for airplane in airplanes %}
       <tr>
