@@ -58,7 +58,8 @@ FROM
 GROUP BY
   Manufacturer
 ORDER BY
-  Total DESC, Manufacturer"""
+  Total DESC, Manufacturer
+LIMIT 10"""
 )
 relative_manufacturer_counts.show(30) # show top 30
 
@@ -72,5 +73,5 @@ grouped_manufacturer_counts = relative_manufacturer_counts.groupBy(lambda x: 1)
 import pymongo_spark
 pymongo_spark.activate()
 grouped_manufacturer_counts.saveToMongoDB(
-  'mongodb://localhost:27017/agile_data_science.manufacturer_totals'
+  'mongodb://localhost:27017/agile_data_science.airplane_manufacturer_totals'
 )
