@@ -32,4 +32,4 @@ airplanes = sqlContext.sql("""SELECT
 FROM
   tail_num_plus_inquiry""")
 
-airplanes.repartition(1).write.json('data/airplanes.json')
+airplanes.repartition(1).write.mode("overwrite").json('data/airplanes.json')
