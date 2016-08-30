@@ -3,7 +3,7 @@ airplanes = sqlContext.read.json("data/airplanes.json")
 airplanes.show()
 
 airplanes.write.format("org.elasticsearch.spark.sql")\
-  .option("es.resource","agile_data_science/airplanes")\
+  .option("es.resource","agile_data_science/airplane")\
   .mode("overwrite")\
   .save()
 
