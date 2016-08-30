@@ -16,6 +16,8 @@ client = MongoClient()
 from pyelasticsearch import ElasticSearch
 elastic = ElasticSearch(config.ELASTIC_URL)
 
+import json
+
 # Chapter 5 controller: Fetch a flight and display it
 @app.route("/on_time_performance")
 def on_time_performance():
@@ -92,25 +94,28 @@ def search_airplanes():
 
   search_config = [
     {'field': 'TailNum', 'label': 'Tail Number'},
-    {'field': 'Owner'},
+    {'field': 'Owner', 'sort_order': 0},
     {'field': 'OwnerState', 'label': 'Owner State'},
-    {'field': 'Manufacturer'},
-    {'field': 'Model'},
+    {'field': 'Manufacturer', 'sort_order': 1},
+    {'field': 'Model', 'sort_order': 2},
     {'field': 'ManufacturerYear', 'label': 'MFR Year'},
     {'field': 'SerialNumber', 'label': 'Serial Number'},
-    {'field': 'EngineManufacturer', 'label': 'Engine MFR'},
-    {'field': 'EngineModel', 'label': 'Engine Model'}
+    {'field': 'EngineManufacturer', 'label': 'Engine MFR', 'sort_order': 3},
+    {'field': 'EngineModel', 'label': 'Engine Model', 'sort_order': 4}
   ]
 
   # Pagination parameters
   start = request.args.get('start') or 0
   start = int(start)
-  end = request.args.get('end') or config.RECORDS_PER_PAGE
+  end = request.args.get('end') or config.AIRPLANE_RECORDS_PER_PAGE
   end = int(end)
 
   # Navigation path and offset setup
   nav_path = search_helpers.strip_place(request.url)
-  nav_offsets = search_helpers.get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
+  nav_offsets = search_helpers.get_navigation_offsets(start, end, config.AIRPLANE_RECORDS_PER_PAGE)
+
+  print "nav_path: [{}]".format(nav_path)
+  print json.dumps(nav_offsets)
 
   # Build the base of our elasticsearch query
   query = {
@@ -119,14 +124,16 @@ def search_airplanes():
         'must': []}
     },
     'sort': [
-      {'Owner': {'order': 'asc', 'ignore_unmapped': True}},
-      {'Manufacturer': {'order': 'asc', 'ignore_unmapped' : True} },
-      {'ManufacturerYear': {'order': 'asc', 'ignore_unmapped' : True} },
-      {'SerialNumber': {'order': 'asc', 'ignore_unmapped' : True} },
+      {'Owner': {'order': 'asc'} },
+      # {'Manufacturer': {'order': 'asc', 'ignore_unmapped' : True} },
+      # {'Model': {'order': 'asc', 'ignore_unmapped': True} },
+      # {'EngineManufacturer': {'order': 'asc', 'ignore_unmapped' : True} },
+      # {'EngineModel': {'order': 'asc', 'ignore_unmapped': True} },
+      # {'TailNum': {'order': 'asc', 'ignore_unmapped' : True} },
       '_score'
     ],
     'from': start,
-    'size': config.RECORDS_PER_PAGE
+    'size': config.AIRPLANE_RECORDS_PER_PAGE
   }
 
   arg_dict = {}
@@ -142,11 +149,6 @@ def search_airplanes():
   results = elastic.search(query)
   airplanes, airplane_count = search_helpers.process_search(results)
 
-  # Manufacturer Chart
-  mfr_chart = client.agile_data_science.manufacturer_totals.find_one()
-
-  print arg_dict
-
   # Persist search parameters in the form template
   return render_template(
     'all_airplanes.html',
@@ -156,8 +158,13 @@ def search_airplanes():
     airplane_count=airplane_count,
     nav_path=nav_path,
     nav_offsets=nav_offsets,
-    mfr_chart=mfr_chart,
   )
+
+@app.route("/airplanes/chart/manufacturers.json")
+@app.route("/airplanes/chart/manufacturers.json")
+def airplane_manufacturers_chart():
+  mfr_chart = client.agile_data_science.airplane_manufacturer_totals.find_one()
+  return json.dumps(mfr_chart)
 
 # Controller: Fetch a flight and display it
 @app.route("/airplane/<tail_number>")
