@@ -33,6 +33,7 @@ def compare_manufacturers(mfrs):
   mfr1 = mfrs[0]
   mfr2 = mfrs[1]
   lcb = longest_common_beginning(mfr1, mfr2)
+  lcb = lcb.strip() # remove extra spaces
   len_lcb = len(lcb)
   record = {
     'mfr1': mfr1,
@@ -69,4 +70,35 @@ map_with_dupes = mfr1_map.union(mfr2_map)
 # 4) Remove duplicates
 mfr_dedupe_mapping = map_with_dupes.distinct()
 
+# 5) Convert mapping to dataframe to join to airplanes dataframe
+mapping_dataframe = mfr_dedupe_mapping.toDF()
 
+# 6) Give the mapping column names
+mapping_dataframe.registerTempTable("mapping_dataframe")
+mapping_dataframe = sqlContext.sql(
+  "SELECT _1 AS Raw, _2 AS NewManufacturer FROM mapping_dataframe"
+)
+
+# JOIN our mapping left outer...
+airplanes_w_mapping = airplanes.join(
+  mapping_dataframe,
+  on=airplanes.Manufacturer == mapping_dataframe.Raw,
+  how='left_outer'
+)
+# Now replace Manufacturer with NewManufacturer where needed
+airplanes_w_mapping.registerTempTable("airplanes_w_mapping")
+resolved_airplanes = sqlContext.sql("""SELECT
+  TailNum,
+  SerialNumber,
+  Owner,
+  OwnerState,
+  IF(NewManufacturer IS NOT null,NewManufacturer,Manufacturer) AS Manufacturer,
+  Model,
+  ManufacturerYear,
+  EngineManufacturer,
+  EngineModel
+FROM
+  airplanes_w_mapping""")
+
+# Store for later use, in place of airplanes.json
+resolved_airplanes.repartition(1).write.mode("overwrite").json("data/resolved_airplanes.json")
