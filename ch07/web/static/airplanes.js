@@ -1,7 +1,6 @@
 var margin = {top: 20, right: 30, bottom: 30, left: 40},
     width = 900 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom,
-    barTopMargin = 13;
+    height = 300 - margin.top - margin.bottom;
 
 var x = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1);
@@ -24,11 +23,10 @@ var chart = d3.select(".chart")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-console.log("HELLO");
 d3.json("/airplanes/chart/manufacturers.json", function(error, data) {
     var data = data.data;
 
-    x.domain(data.map(function(d) { var val = d.Manufacturer; return val; }));
+    x.domain(data.map(function(d) { return d.Manufacturer; }));
     y.domain([0, d3.max(data, function(d) { return d.Total; })]);
 
     chart.append("g")
@@ -44,7 +42,7 @@ d3.json("/airplanes/chart/manufacturers.json", function(error, data) {
         .data(data)
         .enter().append("rect")
         .attr("class", "bar")
-        .attr("x", function(d) { var val = d.Manufacturer; return x(val); })
+        .attr("x", function(d) { return x(d.Manufacturer); })
         .attr("y", function(d) { return y(d.Total); })
         .attr("height", function(d) { return height - y(d.Total); })
         .attr("width", x.rangeBand());
