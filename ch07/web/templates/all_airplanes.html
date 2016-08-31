@@ -10,7 +10,7 @@
 
   <!-- Chart of fleet manufacturers -->
   <div>
-    <p>Total Flights by Month</p>
+    <p>Airplanes by Manufacturer</p>
     <div id="chart"><svg class="chart"></svg></div>
   </div>
   <script src="/static/airplanes.js"></script>
@@ -51,6 +51,32 @@
       {% endfor %}
     </tbody>
   </table>
+
+  <!-- css for x axis in chart -->
+  <style>
+    .axis text {
+      font: 8px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .bar {
+      fill: #ff6600;
+    }
+
+    .x axis {
+      white-space: nowrap;
+      width: 100%;                   /* IE6 needs any width */
+      overflow: hidden;              /* "overflow" value must be different from  visible"*/
+      -o-text-overflow: ellipsis;    /* Opera < 11*/
+      text-overflow:    ellipsis;    /* IE, Safari (WebKit), Opera >= 11, FF > 6 */
+   }
+  </style>
 
 {% import "macros.jnj" as common %}
 {% if nav_offsets and nav_path -%}

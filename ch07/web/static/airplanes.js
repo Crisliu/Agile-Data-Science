@@ -1,44 +1,58 @@
-var width = 530,
-    height = 150;
+var margin = {top: 20, right: 30, bottom: 30, left: 40},
+    width = 900 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom,
+    barTopMargin = 13;
 
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
 var y = d3.scale.linear()
     .range([height, 0]);
-    // We define the domain once we get our data in d3.json, below
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(function(d) {
+        return truncate(d, 14);
+    });
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
 
 var chart = d3.select(".chart")
-    .attr("width", width)
-    .attr("height", height);
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("/airplanes/chart/manufacturers.json", function(data) {
-
+console.log("HELLO");
+d3.json("/airplanes/chart/manufacturers.json", function(error, data) {
     var data = data.data;
 
-    var defaultColor = 'steelblue';
-    var modeColor = '#4CA9F5';
+    x.domain(data.map(function(d) { var val = d.Manufacturer; return val; }));
+    y.domain([0, d3.max(data, function(d) { return d.Total; })]);
 
-    var maxY = d3.max(data, function(d) { return d.Total; });
-    y.domain([0, maxY]);
+    chart.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
 
-    var varColor = function(d, i) {
-        if(d['Total'] == maxY) { return modeColor; }
-        else { return defaultColor; }
-    }
-    var barWidth = width / data.length;
-    var bar = chart.selectAll("g")
+    chart.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+    chart.selectAll(".bar")
         .data(data)
-        .enter()
-        .append("g")
-        .attr("transform", function(d, i) { return "translate(" + i * barWidth + ",0)"; });
-
-    bar.append("rect")
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { var val = d.Manufacturer; return x(val); })
         .attr("y", function(d) { return y(d.Total); })
         .attr("height", function(d) { return height - y(d.Total); })
-        .attr("width", barWidth - 1)
-        .style("fill", varColor);
-
-    bar.append("text")
-        .attr("x", barWidth / 2)
-        .attr("y", function(d) { return y(d.Total) + 3; })
-        .attr("dy", ".75em")
-        .text(function(d) { return d.Total; });
+        .attr("width", x.rangeBand());
 });
+
+function truncate(d, l) {
+     if(d.length > l)
+         return d.substring(0,l)+'...';
+     else
+         return d;
+}
