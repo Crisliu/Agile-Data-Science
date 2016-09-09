@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+  <div>
+      <!-- Navigation guide -->
+      / <a href="/delays">Delays</a>
+
+      <p class="lead" style="margin: 10px; margin-left: 0px;">
+        <!-- Airline Name and website-->
+        Summary of Flight Delays
+      </p>
+
+    <div id="weather_delay_histogram"></div>
+    <script src="/static/delays.js"></script>
+  </div>
+{% endblock %}
