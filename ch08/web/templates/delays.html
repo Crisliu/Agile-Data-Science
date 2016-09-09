@@ -10,7 +10,12 @@
       </p>
 
     <div id="chart"><svg class="chart"></svg></div>
-    <script src="/static/delays.js"></script>
+    <script src="/static/barchart.js"></script>
     <link href="/static/bar.css" type="text/css" rel="stylesheet" />
+
+    <script>
+        var barChart = new BarChart('/weather_delay_histogram.json');
+        barChart.render();
+    </script>
   </div>
 {% endblock %}
