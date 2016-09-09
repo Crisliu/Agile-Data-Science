@@ -33,11 +33,13 @@ class BarChart {
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        var labelName = this.labelName;
+        var valueName = this.valueName;
         d3.json(this.url, function(error, data) {
             var data = data.data;
 
-            x.domain(data.map(function(d) { return d[this.labelName]; }));
-            y.domain([0, d3.max(data, function(d) { return d[this.valueName]; })]);
+            x.domain(data.map(function(d) { return d[labelName]; }));
+            y.domain([0, d3.max(data, function(d) { return d[valueName]; })]);
 
             chart.append("g")
                 .attr("class", "x axis")
@@ -52,9 +54,9 @@ class BarChart {
                 .data(data)
                 .enter().append("rect")
                 .attr("class", "bar")
-                .attr("x", function(d) { return x(d[this.labelName]); })
-                .attr("y", function(d) { return y(d[this.valueName]); })
-                .attr("height", function(d) { return height - y(d[this.valueName]); })
+                .attr("x", function(d) { return x(d[labelName]); })
+                .attr("y", function(d) { return y(d[valueName]); })
+                .attr("height", function(d) { return height - y(d[valueName]); })
                 .attr("width", x.rangeBand());
         });
 
@@ -66,7 +68,3 @@ class BarChart {
         }
     }
 }
-
-var barChart1 = new BarChart('/weather_delay_histogram.json', 'label', 'value', 'chart');
-console.log(barChart1);
-barChart1.render();
