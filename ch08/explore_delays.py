@@ -1,5 +1,7 @@
 # Load the on-time parquet file
 on_time_dataframe = sqlContext.read.parquet('data/on_time_performance.parquet')
+on_time_dataframe.registerTempTable("on_time_performance")
+
 total_flights = on_time_dataframe.count()
 
 # Flights that were late leaving...
@@ -30,23 +32,31 @@ print "Percentage Late: {}%".format(pct_late)
 # Get the average minutes late
 sqlContext.sql("SELECT ROUND(AVG(ArrDelayMinutes),1) FROM on_time_performance").show()
 
-# Why are flights late? Lets look at a weather delayed flight
-weather_delays = on_time_dataframe.filter(
-  (on_time_dataframe.WeatherDelay != None)
-  &
-  (on_time_dataframe.WeatherDelay > 0)
-)
-weather_delays.select(
-  weather_delays.Carrier,
-  weather_delays.DepDelayMinutes,
-  weather_delays.ArrDelayMinutes,
-  weather_delays.WeatherDelay,
-  weather_delays.CarrierDelay,
-  weather_delays.NASDelay,
-  weather_delays.SecurityDelay,
-).show(1000)
-
-on_time_dataframe.registerTempTable("on_time_performance")
+# Why are flights late? Lets look at some delayed flights and the delay causes
+late_flights = sqlContext.sql("""
+SELECT
+  ArrDelayMinutes,
+  WeatherDelay,
+  CarrierDelay,
+  NASDelay,
+  SecurityDelay,
+  LateAircraftDelay
+FROM
+  on_time_performance
+WHERE
+  WeatherDelay IS NOT NULL
+  OR
+  CarrierDelay IS NOT NULL
+  OR
+  NASDelay IS NOT NULL
+  OR
+  SecurityDelay IS NOT NULL
+  OR
+  LateAircraftDelay IS NOT NULL
+ORDER BY
+  FlightDate
+""")
+late_flights.sample(False, 0.01).show()
 
 # Calculate the percentage contribution to delay for each source
 total_delays = sqlContext.sql("""
@@ -54,9 +64,11 @@ SELECT
   ROUND(SUM(WeatherDelay)/SUM(ArrDelayMinutes) * 100, 1) AS pct_weather_delay,
   ROUND(SUM(CarrierDelay)/SUM(ArrDelayMinutes) * 100, 1) AS pct_carrier_delay,
   ROUND(SUM(NASDelay)/SUM(ArrDelayMinutes) * 100, 1) AS pct_nas_delay,
-  ROUND(SUM(SecurityDelay)/SUM(ArrDelayMinutes) * 100, 1) AS pct_security_delay
+  ROUND(SUM(SecurityDelay)/SUM(ArrDelayMinutes) * 100, 1) AS pct_security_delay,
+  ROUND(SUM(LateAircraftDelay)/SUM(ArrDelayMinutes) * 100, 1) AS pct_late_aircraft_delay
 FROM on_time_performance
 """)
+total_delays.show()
 
 # Generate a histogram of the weather and carrier delays
 weather_delay_histogram = on_time_dataframe\
