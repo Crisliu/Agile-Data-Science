@@ -84,7 +84,7 @@ weather_delay_histogram = on_time_dataframe\
   .select("WeatherDelay")\
   .rdd\
   .flatMap(lambda x: x)\
-  .histogram([0, 15, 30, 60, 120, 240, 480, 720, 24*60.0])
+  .histogram([1, 15, 30, 60, 120, 240, 480, 720, 24*60.0])
 print weather_delay_histogram
 
 # Transform the data into something easily consumed by d3
