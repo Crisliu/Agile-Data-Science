@@ -43,6 +43,21 @@ SELECT DISTINCT(Airport) FROM all_airports_flights
 distinct_airports.count() # 332
 
 # Load the weather records themselves
-daily_weather_records = sqlContext.read.format('com.databricks.spark.csv')\
+hourly_weather_records = sqlContext.read.format('com.databricks.spark.csv')\
   .options(header='true', inferschema='true', delimiter=',')\
-  .load('data/2015*daily.txt')
+  .load('data/2015*hourly.txt')
+hourly_weather_records.show()
+
+# Show a few fields for a period for (probably) one station
+trimmed_hourly_weather_records = hourly_weather_records.select(
+  hourly_weather_records.WBAN,
+  hourly_weather_records.Date,
+  hourly_weather_records.Time,
+  hourly_weather_records.SkyCondition,
+  hourly_weather_records.WeatherType,
+  hourly_weather_records.DryBulbCelsius,
+  hourly_weather_records.Visibility,
+  hourly_weather_records.WindSpeed,
+  hourly_weather_records.WindDirection,
+)
+trimmed_hourly_weather_records.show()
