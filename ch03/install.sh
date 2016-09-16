@@ -72,6 +72,9 @@ echo 'export PATH=$PATH:$SPARK_HOME/bin' >> ~/.bash_profile
 cp ../spark/conf/spark-defaults.conf.template ../spark/conf/spark-defaults.conf
 echo 'spark.io.compression.codec org.apache.spark.io.LZ4CompressionCodec' >> ../spark/conf/spark-defaults.conf
 
+# Give Spark 6GB of RAM
+echo "spark.driver.memory 6g" >> ../spark/conf/spark-defaults.conf
+
 cd ch03
 
 #
