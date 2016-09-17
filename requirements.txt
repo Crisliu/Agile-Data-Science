@@ -9,3 +9,7 @@ selenium
 bs4
 wikipedia
 tldextract
+numpy
+scipy
+sklearn
+
