@@ -1,26 +1,58 @@
 # Loads CSV with header parsing and type inference, in one line!
 # Must use 'pyspark --packages com.databricks:spark-csv_2.10:1.4.0' for this to work
 on_time_dataframe = sqlContext.read.format('com.databricks.spark.csv')\
-  .options(header='true', inferschema='true')\
+  .options(
+    header='true',
+    treatEmptyValuesAsNulls='true',
+  )\
   .load('data/On_Time_On_Time_Performance_2015.csv.gz')
-on_time_dataframe = on_time_dataframe.drop("") # drop empty column
+on_time_dataframe.registerTempTable("on_time_performance")
+
+trimmed_cast_performance = sqlContext.sql("""
+SELECT
+  Year, Quarter, Month, DayofMonth, DayOfWeek, FlightDate,
+  Carrier, TailNum, FlightNum,
+  Origin, OriginCityName, OriginState,
+  Dest, DestCityName, DestState,
+  DepTime, cast(DepDelayMinutes as int), cast(TaxiOut as float), cast(TaxiIn as float),
+  WheelsOff, WheelsOn,
+  ArrTime, cast(ArrDelayMinutes as float), cast(Cancelled as int), cast(Diverted as int),
+  cast(ActualElapsedTime as float), cast(AirTime as float),
+  cast(Flights as int), cast(Distance as float),
+  cast(CarrierDelay as float), cast(WeatherDelay as float), cast(NASDelay as float),
+  cast(SecurityDelay as float), cast(LateAircraftDelay as float)
+FROM
+  on_time_performance
+""")
+
+# Replace on_time_performance table with our new, trimmed table and show its contents
+trimmed_cast_performance.registerTempTable("on_time_performance")
+trimmed_cast_performance.show()
+
+# Verify we can sum numeric columns
+sqlContext.sql("""SELECT
+  SUM(WeatherDelay), SUM(CarrierDelay), SUM(NASDelay),
+  SUM(SecurityDelay), SUM(LateAircraftDelay)
+FROM on_time_performance
+""").show()
 
 # Save records as gzipped json lines
-on_time_dataframe.toJSON()\
+trimmed_cast_performance.toJSON()\
   .saveAsTextFile(
-    'data/On_Time_On_Time_Performance_2015.jsonl.gz',
+    'data/on_time_performance.jsonl.gz',
     'org.apache.hadoop.io.compress.GzipCodec'
   )
 
 # View records on filesystem
 # gunzip -c data/On_Time_On_Time_Performance_2015.jsonl.gz/part-00000.gz | head
 
-# Load JSON records back
-on_time_dataframe = sqlContext.read.json('data/On_Time_On_Time_Performance_2015.jsonl.gz')
-on_time_dataframe.show()
-
 # Save records using Parquet
 on_time_dataframe.write.parquet("data/on_time_performance.parquet")
 
-# Load the parquet file
+# Load JSON records back
+on_time_dataframe = sqlContext.read.json('data/on_time_performance.jsonl.gz')
+on_time_dataframe.show()
+
+# Load the parquet file back
 on_time_dataframe = sqlContext.read.parquet('data/on_time_performance.parquet')
+on_time_dataframe.show()
