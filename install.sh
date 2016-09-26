@@ -29,8 +29,6 @@ echo 'export PATH="$HOME/anaconda/bin:$PATH"' >> ~/.bash_profile
 #
 wget -P /tmp/ http://apache.osuosl.org/hadoop/common/hadoop-2.6.4/hadoop-2.6.4.tar.gz
 
-cd ..
-
 mkdir hadoop
 tar -xvf /tmp/hadoop-2.6.4.tar.gz -C hadoop --strip-components=1
 echo '# Hadoop environment setup' >> ~/.bash_profile
@@ -43,8 +41,6 @@ echo 'export HADOOP_CLASSPATH=$(hadoop classpath)' >> ~/.bash_profile
 export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 echo 'export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop' >> ~/.bash_profile
 
-cd ch03
-
 #
 # Install Spark in the spark directory in the root of our project. Also, setup
 # our Spark environment for PySpark to run
@@ -52,8 +48,6 @@ cd ch03
 
 # May need to update this link... see http://spark.apache.org/downloads.html
 wget -P /tmp/ http://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-bin-without-hadoop.tgz
-
-cd ..
 
 mkdir spark
 tar -xvf /tmp/spark-2.0.0-bin-without-hadoop.tgz -C spark --strip-components=1
@@ -69,19 +63,21 @@ export PATH=$PATH:$SPARK_HOME/bin
 echo 'export PATH=$PATH:$SPARK_HOME/bin' >> ~/.bash_profile
 
 # Have to set spark.io.compression.codec in Spark local mode
-cp ../spark/conf/spark-defaults.conf.template ../spark/conf/spark-defaults.conf
-echo 'spark.io.compression.codec org.apache.spark.io.LZ4CompressionCodec' >> ../spark/conf/spark-defaults.conf
+cp spark/conf/spark-defaults.conf.template spark/conf/spark-defaults.conf
+echo 'spark.io.compression.codec org.apache.spark.io.LZ4CompressionCodec' >> spark/conf/spark-defaults.conf
 
 # Give Spark 6GB of RAM
-echo "spark.driver.memory 6g" >> ../spark/conf/spark-defaults.conf
+echo "spark.driver.memory 6g" >> spark/conf/spark-defaults.conf
 
-cd ch03
+# Install and add snappy-java to our classpath
+wget -P lib/ http://central.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.2.6/snappy-java-1.1.2.6.jar
+export SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar:$SPARK_CLASSPATH
+echo 'export SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar:$SPARK_CLASSPATH' >> ~/.bash_profile
 
 #
 # Install MongoDB in the mongo directory in the root of our project. Also, get the jar for the MongoDB driver
 # and the mongo-hadoop project.
 #
-cd ..
 
 wget -P /tmp/ $MONGO_DOWNLOAD_URL
 MONGO_FILE_NAME=${MONGO_DOWNLOAD_URL##*/}
@@ -90,6 +86,8 @@ tar -xvf /tmp/$MONGO_FILE_NAME -C mongodb --strip-components=1
 export PATH=$PATH:$PROJECT_HOME/mongodb/bin
 echo 'export PATH=$PATH:$PROJECT_HOME/mongodb/bin' >> ~/.bash_profile
 mkdir -p mongodb/data/db
+
+# Start Mongo
 mongodb/bin/mongod --dbpath mongodb/data/db & # re-run if you shutdown your computer
 
 # Get the MongoDB Java Driver
@@ -113,7 +111,7 @@ cp mongo-hadoop/build/libs/mongo-hadoop-*.jar lib/
 # pip install pymongo-spark # add sudo if needed
 cd mongo-hadoop/spark/src/main/python
 python setup.py install
-cd ../../../../../ # to $PROJECT_HOME
+cd $PROJECT_HOME# to $PROJECT_HOME
 cp mongo-hadoop/spark/src/main/python/pymongo_spark.py lib/
 export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib
 echo 'export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib' >> ~/.bash_profile
@@ -124,7 +122,9 @@ echo 'export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib' >> ~/.bash_profile
 wget -P /tmp/ https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.5/elasticsearch-2.3.5.tar.gz
 mkdir elasticsearch
 tar -xvzf /tmp/elasticsearch-2.3.5.tar.gz -C elasticsearch --strip-components=1
-elasticsearch/bin/elasticsearch & # re-run if you shutdown your computer
+
+# Run elasticsearch
+elasticsearch/bin/elasticsearch 2>1 > /dev/null & # re-run if you shutdown your computer
 
 # Install Elasticsearch for Hadoop
 wget -P /tmp/ http://download.elastic.co/hadoop/elasticsearch-hadoop-5.0.0-alpha5.zip
@@ -139,16 +139,16 @@ echo "spark.jars $PROJECT_HOME/lib/mongo-hadoop-spark-2.0.0-rc0.jar,\
 $PROJECT_HOME/lib/mongo-java-driver-3.2.2.jar,\
 $PROJECT_HOME/lib/mongo-hadoop-2.0.0-rc0.jar,\
 $PROJECT_HOME/lib/elasticsearch-spark-20_2.10-5.0.0-alpha5.jar" \
-  >> ../spark/conf/spark-defaults.conf
+  >> spark/conf/spark-defaults.conf
 
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
 
 # Get bootstrap
-mkdir web/static
-cd web/static
+mkdir ch03/web/static
+cd ch03/web/static
 wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
 wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css'
 wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'
 wget 'http://d3js.org/d3.v3.min.js'
-cd ../..
+cd $PROJECT_HOME
