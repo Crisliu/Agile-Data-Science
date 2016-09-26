@@ -18,8 +18,8 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
 fi
 
 # Download and install Anaconda
-wget -P /tmp/ "http://repo.continuum.io/archive/Anaconda2-2.5.0-${ANADONCA_OS_NAME}-x86_64.sh"
-bash "/tmp/Anaconda2-2.5.0-${ANADONCA_OS_NAME}-x86_64.sh" -b -p $HOME/anaconda
+wget -P /tmp/ "http://repo.continuum.io/archive/Anaconda2-4.1.1-${ANADONCA_OS_NAME}-x86_64.sh"
+bash "/tmp/Anaconda2-4.1.1-${ANADONCA_OS_NAME}-x86_64.sh" -b -p $HOME/anaconda
 export PATH="$HOME/anaconda/bin:$PATH"
 echo 'export PATH="$HOME/anaconda/bin:$PATH"' >> ~/.bash_profile
 
