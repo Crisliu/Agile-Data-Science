@@ -64,13 +64,10 @@ echo 'export PATH=$PATH:$SPARK_HOME/bin' >> ~/.bash_profile
 
 # Have to set spark.io.compression.codec in Spark local mode
 cp spark/conf/spark-defaults.conf.template spark/conf/spark-defaults.conf
-echo 'spark.io.compression.codec org.apache.spark.io.LZ4CompressionCodec' >> spark/conf/spark-defaults.conf
+echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' >> spark/conf/spark-defaults.conf
 
 # Give Spark 6GB of RAM
-echo "spark.driver.memory 6g" >> spark/conf/spark-defaults.conf
-
-# Install and add snappy-java to our classpath below via spark.jars
-wget -P lib/ http://central.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.2.6/snappy-java-1.1.2.6.jar
+echo "spark.driver.memory 8g" >> spark/conf/spark-defaults.conf
 
 #
 # Install MongoDB in the mongo directory in the root of our project. Also, get the jar for the MongoDB driver
@@ -132,16 +129,21 @@ cp elasticsearch-hadoop/dist/elasticsearch-hadoop-5.0.0-alpha5.jar lib/
 cp elasticsearch-hadoop/dist/elasticsearch-spark-20_2.10-5.0.0-alpha5.jar lib/
 echo "spark.speculation false" >> $PROJECT_HOME/spark/conf/spark-defaults.conf
 
+# Install and add snappy-java and lzo-java to our classpath below via spark.jars
+wget -P lib/ http://central.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.2.6/snappy-java-1.1.2.6.jar
+wget -P lib/ http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.0/lzo-hadoop-1.0.0.jar
+
 # Setup mongo and elasticsearch jars for Spark
 echo "spark.jars $PROJECT_HOME/lib/mongo-hadoop-spark-2.0.0-rc0.jar,\
 $PROJECT_HOME/lib/mongo-java-driver-3.2.2.jar,\
 $PROJECT_HOME/lib/mongo-hadoop-2.0.0-rc0.jar,\
 $PROJECT_HOME/lib/elasticsearch-spark-20_2.10-5.0.0-alpha5.jar,\
-$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" \
+$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar,\
+$PROJECT_HOME/lib/lzo-hadoop-1.0.0.jar" \
   >> spark/conf/spark-defaults.conf
 
-# Setup parquet to use LZO instead of troublesome snappy
-echo "spark.sql.parquet.compression.codec lzo" >> spark/conf/spark-defaults.conf
+# Setup spark classpath for snappy for parquet
+echo "SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" >> spark/conf/spark-env.sh
 
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
