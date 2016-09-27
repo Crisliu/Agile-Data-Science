@@ -140,6 +140,9 @@ $PROJECT_HOME/lib/elasticsearch-spark-20_2.10-5.0.0-alpha5.jar,\
 $PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" \
   >> spark/conf/spark-defaults.conf
 
+# Setup parquet to use LZO instead of troublesome snappy
+echo "spark.sql.parquet.compression.codec lzo" >> spark/conf/spark-defaults.conf
+
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
 
