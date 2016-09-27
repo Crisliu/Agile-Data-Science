@@ -136,7 +136,7 @@ echo "spark.speculation false" >> $PROJECT_HOME/spark/conf/spark-defaults.conf
 echo "spark.jars $PROJECT_HOME/lib/mongo-hadoop-spark-2.0.0-rc0.jar,\
 $PROJECT_HOME/lib/mongo-java-driver-3.2.2.jar,\
 $PROJECT_HOME/lib/mongo-hadoop-2.0.0-rc0.jar,\
-$PROJECT_HOME/lib/elasticsearch-spark-20_2.10-5.0.0-alpha5.jar\
+$PROJECT_HOME/lib/elasticsearch-spark-20_2.10-5.0.0-alpha5.jar,\
 $PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" \
   >> spark/conf/spark-defaults.conf
 
