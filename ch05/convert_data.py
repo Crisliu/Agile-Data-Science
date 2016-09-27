@@ -47,7 +47,7 @@ trimmed_cast_performance.toJSON()\
 # gunzip -c data/on_time_performance.jsonl.gz/part-00000.gz | head
 
 # Save records using Parquet
-on_time_dataframe.write.mode("overwrite").parquet("data/on_time_performance.parquet")
+trimmed_cast_performance.write.mode("overwrite").parquet("data/on_time_performance.parquet")
 
 # Load JSON records back
 on_time_dataframe = sqlContext.read.json('data/on_time_performance.jsonl.gz')
