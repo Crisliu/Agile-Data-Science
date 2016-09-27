@@ -2,7 +2,6 @@ Flask
 kafka-python
 pymongo
 py4j
-pymongo-spark
 pyelasticsearch
 requests
 selenium
@@ -12,4 +11,4 @@ tldextract
 numpy
 scipy
 sklearn
-
+matplotlib
