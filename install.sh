@@ -18,8 +18,8 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
 fi
 
 # Download and install Anaconda
-wget -P /tmp/ "http://repo.continuum.io/archive/Anaconda2-4.1.1-${ANADONCA_OS_NAME}-x86_64.sh"
-bash "/tmp/Anaconda2-4.1.1-${ANADONCA_OS_NAME}-x86_64.sh" -b -p $HOME/anaconda
+wget -P /tmp/ "http://repo.continuum.io/archive/Anaconda3-4.2.0-${ANADONCA_OS_NAME}-x86_64.sh"
+bash "/tmp/Anaconda3-4.2.0-${ANADONCA_OS_NAME}-x86_64.sh" -b -p $HOME/anaconda
 export PATH="$HOME/anaconda/bin:$PATH"
 echo 'export PATH="$HOME/anaconda/bin:$PATH"' >> ~/.bash_profile
 
@@ -27,7 +27,7 @@ echo 'export PATH="$HOME/anaconda/bin:$PATH"' >> ~/.bash_profile
 # Install Hadoop in the hadoop directory in the root of our project. Also, setup
 # our Hadoop environment for Spark to run
 #
-wget -P /tmp/ http://apache.osuosl.org/hadoop/common/hadoop-2.6.4/hadoop-2.6.4.tar.gz
+wget -P /tmp/ http://apache.osuosl.org/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
 
 mkdir hadoop
 tar -xvf /tmp/hadoop-2.6.4.tar.gz -C hadoop --strip-components=1
@@ -47,10 +47,10 @@ echo 'export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop' >> ~/.bash_profile
 #
 
 # May need to update this link... see http://spark.apache.org/downloads.html
-wget -P /tmp/ http://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-bin-without-hadoop.tgz
+wget -P /tmp/ http://d3kbcqa49mib13.cloudfront.net/spark-2.0.1-bin-without-hadoop.tgz
 
 mkdir spark
-tar -xvf /tmp/spark-2.0.0-bin-without-hadoop.tgz -C spark --strip-components=1
+tar -xvf /tmp/spark-2.0.1-bin-without-hadoop.tgz -C spark --strip-components=1
 echo "" >> ~/.bash_profile
 echo "# Spark environment setup" >> ~/.bash_profile
 export SPARK_HOME=$PROJECT_HOME/spark
@@ -156,3 +156,8 @@ wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.cs
 wget 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'
 wget 'http://d3js.org/d3.v3.min.js'
 cd $PROJECT_HOME
+
+# Install Apache Zeppelin
+wget -P /tmp/ http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.1/zeppelin-0.6.1-bin-all.tgz
+mkdir zeppelin
+tar -xvzf /tmp/zeppelin-0.6.1-bin-all.tgz -C zeppelin --strip-components=1
