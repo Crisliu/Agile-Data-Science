@@ -3,7 +3,7 @@
 # This file is intended as a guide to installation, and not a complete script that will work on all platforms. Use accordingly. I think it works, though.
 #
 
-export PROJECT_HOME=`pwd`"/.."
+export PROJECT_HOME=`pwd`
 
 if [ "$(uname)" == "Darwin" ]; then
     ANADONCA_OS_NAME='MacOSX'
