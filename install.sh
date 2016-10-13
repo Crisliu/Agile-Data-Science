@@ -69,6 +69,9 @@ echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' >> 
 # Give Spark 6GB of RAM
 echo "spark.driver.memory 8g" >> spark/conf/spark-defaults.conf
 
+echo "PYSPARK_PYTHON=python3" >> spark/conf/spark-env.sh
+echo "PYSPARK_DRIVER_PYTHON=python3" >> spark/conf/spark-env.sh
+
 #
 # Install MongoDB in the mongo directory in the root of our project. Also, get the jar for the MongoDB driver
 # and the mongo-hadoop project.
