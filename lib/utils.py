@@ -2,6 +2,7 @@
 # Utility functions to read and write json and jsonl files
 #
 import codecs, json
+from frozendict import frozendict
 
 def write_json_file(obj, path):
   '''Dump an object and write it out as json to a file.'''
@@ -30,3 +31,12 @@ def read_json_lines_file(path):
     record = json.loads(line.rstrip("\n|\r"))
     ary.append(record)
   return ary
+
+class FrozenEncoder(json.JSONEncoder):
+  def default(self, obj):
+    if isinstance(obj, frozendict):
+      return dict(obj)
+    if isinstance(obj, frozenset):
+      return list(obj)
+    # Let the base class default method raise the TypeError
+    return json.JSONEncoder.default(self, obj)
