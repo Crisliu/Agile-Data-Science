@@ -22,7 +22,8 @@ SELECT
   cast(ActualElapsedTime as float), cast(AirTime as float),
   cast(Flights as int), cast(Distance as float),
   cast(CarrierDelay as float), cast(WeatherDelay as float), cast(NASDelay as float),
-  cast(SecurityDelay as float), cast(LateAircraftDelay as float)
+  cast(SecurityDelay as float), cast(LateAircraftDelay as float),
+  CRSDepTime, CRSArrTime
 FROM
   on_time_performance
 """)
