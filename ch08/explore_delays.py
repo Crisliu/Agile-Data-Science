@@ -29,8 +29,15 @@ print "Late arrivals:   {:,}".format(total_late_arrivals)
 print "Recoveries:      {:,}".format(total_on_time_heros)
 print "Percentage Late: {}%".format(pct_late)
 
-# Get the average minutes late
-sqlContext.sql("SELECT ROUND(AVG(ArrDelayMinutes),1) FROM on_time_performance").show()
+
+# Get the average minutes late departing and arriving
+sqlContext.sql("""
+SELECT
+  ROUND(AVG(DepDelay),1) AS AvgDepDelay,
+  ROUND(AVG(ArrDelay),1) AS AvgArrDelay
+FROM on_time_performance
+"""
+).show()
 
 # Why are flights late? Lets look at some delayed flights and the delay causes
 late_flights = sqlContext.sql("""
