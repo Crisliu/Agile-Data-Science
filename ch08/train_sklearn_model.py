@@ -118,3 +118,60 @@ plt.xticks(())
 plt.yticks(())
 
 plt.show()
+
+#
+# Try same without departure delay; a harder problem.
+#
+
+# Remove the two delay fields and the flight date from our training data
+for item in training_data:
+  item.pop('DepDelay', None)
+print("DepDelay removed from training data...")
+
+# Refit data to DictVectorizer
+print("Original dimensions: [{:,}]".format(len(training_data)))
+training_vectors = vectorizer.fit_transform(training_data)
+print("Size of DictVectorized vectors: {:,} Bytes".format(training_vectors.data.nbytes))
+print("Training data vectorized again...")
+
+# Redo test/train split
+X_train, X_test, y_train, y_test = train_test_split(
+  training_vectors,
+  results_vector,
+  test_size=0.1,
+  random_state=17
+)
+print(X_train.shape, X_test.shape)
+print(y_train.shape, y_test.shape)
+print("Test train split performed again...")
+
+# Refit regression on new training data
+regressor.fit(X_train, y_train)
+print("Regressor fitted again...")
+
+# Predict using the test data again
+predicted = regressor.predict(X_test)
+print("Predictions made for X_test again...")
+
+# Get the median absolute error again
+medae = median_absolute_error(y_test, predicted)
+print("Median absolute error:    {:.3g}".format(medae))
+
+# Get the r2 score gain
+r2 = r2_score(y_test, predicted)
+print("r2 score:                 {:.3g}".format(r2))
+
+# Plot outputs, compare actual vs predicted values
+import matplotlib.pyplot as plt
+
+plt.scatter(
+  y_test,
+  predicted,
+  color='blue',
+  linewidth=1
+)
+
+plt.xticks(())
+plt.yticks(())
+
+plt.show()
