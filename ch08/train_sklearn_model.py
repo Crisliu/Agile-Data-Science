@@ -120,6 +120,35 @@ plt.yticks(())
 plt.show()
 
 #
+# Swap out LinearRegression for a GradientBoostingRegressor and determing feature importances
+#
+regressor = GradientBoostingRegressor
+print("Swapped gradient boosting trees for linear regression, yet again!")
+
+regressor.fit(X_train, y_train)
+print("Gradient boosting regressor fitted...")
+
+predicted = regressor.predict(X_test)
+print("Random forest predictions made for X_test...")
+
+# Definitions from http://scikit-learn.org/stable/modules/model_evaluation.html
+from sklearn.metrics import median_absolute_error, r2_score
+# Median absolute error is the median of all absolute differences between the target and the prediction.
+# Less is better, more indicates a high error between target and prediction.
+medae = median_absolute_error(y_test, predicted)
+print("Gradient boosting regressor median absolute error:    {:.3g}".format(medae))
+
+# R2 score is the coefficient of determination. Ranges from 1-0, 1.0 is best, 0.0 is worst.
+# Measures how well future samples are likely to be predicted.
+r2 = r2_score(y_test, predicted)
+print("Gradient boosting regressor r2 score:                 {:.3g}".format(r2))
+
+#
+# Interrogate Model, Visualize Feature Importances
+#
+
+
+#
 # Try same without departure delay; a harder problem.
 #
 
