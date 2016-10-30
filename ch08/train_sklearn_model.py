@@ -147,60 +147,60 @@ print("Gradient boosting regressor r2 score:                 {:.3g}".format(r2))
 # Interrogate Model, Visualize Feature Importances
 #
 
+# Excellent example here: http://scikit-learn.org/stable/auto_examples/ensemble/plot_forest_importances.html
+print(regressor.feature_importances_)
 
-#
-# Try same without departure delay; a harder problem.
-#
+# Print the raw importances... not super useful
+importances = regressor.feature_importances_
+print(importances)
 
-# Remove the two delay fields and the flight date from our training data
-for item in training_data:
-  item.pop('DepDelay', None)
-print("DepDelay removed from training data...")
+# Get the feature importances with their labels from DictVectorizer
+feature_name_importances = list(zip(vectorizer.get_feature_names(), regressor.feature_importances_))
 
-# Refit data to DictVectorizer
-print("Original dimensions: [{:,}]".format(len(training_data)))
-training_vectors = vectorizer.fit_transform(training_data)
-print("Size of DictVectorized vectors: {:,} Bytes".format(training_vectors.data.nbytes))
-print("Training data vectorized again...")
+# Count the feature importances
+feature_importance_count = len(feature_name_importances)
+print("Total feature importances: {:,}\n".format(feature_importance_count))
 
-# Redo test/train split
-X_train, X_test, y_train, y_test = train_test_split(
-  training_vectors,
-  results_vector,
-  test_size=0.1,
-  random_state=17
+# Sort the feature importances in descending order
+sorted_feature_importances = sorted(feature_name_importances, key=lambda x: -1 * x[1])
+
+# Print the sorted feature importances
+for item in sorted_feature_importances:
+    print("{0: <15}: {1}".format(item[0], item[1]))
+
+# Too many! Most are 0. Print only the non-zero feature importances.
+non_zero_feature_importances = [feature for feature in sorted_feature_importances if feature[1] > 0.0]
+non_zero_count = len(non_zero_feature_importances)
+print("Total non-zero feature importances: {}\n".format(non_zero_count))
+
+for item in non_zero_feature_importances:
+    print("{0: <15}: {1}".format(item[0], item[1]))
+
+# Plot the top 20 feature importances
+top_20_feature_importanes = non_zero_feature_importances[0:20]
+top_20_feature_importanes
+
+# Cleans up the appearance
+plt.rcdefaults()
+
+labels = [i[0] for i in top_20_feature_importanes]
+reversed_labels = list(reversed(labels))
+
+y_pos = [1.6 * item for item in np.arange(len(labels))]
+
+chart_feature_importances = [i[1] for i in top_20_feature_importanes]
+reversed_cfis = list(reversed(chart_feature_importances))
+
+# See http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.barh
+plt.barh(
+  y_pos,
+  reversed_cfis,
+  align='center',
+  alpha=0.5,
+  linewidth=0,
 )
-print(X_train.shape, X_test.shape)
-print(y_train.shape, y_test.shape)
-print("Test train split performed again...")
-
-# Refit regression on new training data
-regressor.fit(X_train, y_train)
-print("Regressor fitted again...")
-
-# Predict using the test data again
-predicted = regressor.predict(X_test)
-print("Predictions made for X_test again...")
-
-# Get the median absolute error again
-medae = median_absolute_error(y_test, predicted)
-print("Median absolute error:    {:.3g}".format(medae))
-
-# Get the r2 score gain
-r2 = r2_score(y_test, predicted)
-print("r2 score:                 {:.3g}".format(r2))
-
-# Plot outputs, compare actual vs predicted values
-import matplotlib.pyplot as plt
-
-plt.scatter(
-  y_test,
-  predicted,
-  color='blue',
-  linewidth=1
-)
-
-plt.xticks(())
-plt.yticks(())
+plt.yticks(y_pos, reversed_labels)
+plt.xlabel('Usage')
+plt.title('Programming language usage')
 
 plt.show()
