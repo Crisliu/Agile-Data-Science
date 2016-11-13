@@ -6,23 +6,63 @@
 # }
 #
 
-from pyspark.sql.types import StringType, IntegerType, FloatType, DateType, TimestampType
+from pyspark.sql.types import StringType, IntegerType, FloatType, DoubleType, DateType, TimestampType
 from pyspark.sql.types import StructType, StructField
+from pyspark.sql.functions import udf
 
 schema = StructType([
-  StructField("ArrDelay", FloatType(), True),     # "ArrDelay":5.0
+  StructField("ArrDelay", DoubleType(), True),     # "ArrDelay":5.0
   StructField("CRSArrTime", TimestampType(), True),    # "CRSArrTime":"2015-12-31T03:20:00.000-08:00"
   StructField("CRSDepTime", TimestampType(), True),    # "CRSDepTime":"2015-12-31T03:05:00.000-08:00"
   StructField("Carrier", StringType(), True),     # "Carrier":"WN"
   StructField("DayOfMonth", IntegerType(), True), # "DayOfMonth":31
   StructField("DayOfWeek", IntegerType(), True),  # "DayOfWeek":4
   StructField("DayOfYear", IntegerType(), True),  # "DayOfYear":365
-  StructField("DepDelay", FloatType(), True),     # "DepDelay":14.0
+  StructField("DepDelay", DoubleType(), True),     # "DepDelay":14.0
   StructField("Dest", StringType(), True),        # "Dest":"SAN"
-  StructField("Distance", FloatType(), True),     # "Distance":368.0
+  StructField("Distance", DoubleType(), True),     # "Distance":368.0
   StructField("FlightDate", DateType(), True),    # "FlightDate":"2015-12-30T16:00:00.000-08:00"
   StructField("FlightNum", StringType(), True),   # "FlightNum":"6109"
   StructField("Origin", StringType(), True),      # "Origin":"TUS"
 ])
 
 features = sqlContext.read.json("data/simple_flight_delay_features.json", schema=schema)
+
+#
+# Check for nulls in features before using Spark ML
+#
+null_counts = [(column, features.where(features[column].isNull()).count()) for column in features.columns]
+cols_with_nulls = filter(lambda x: x[1] > 0, null_counts)
+print(list(cols_with_nulls))
+
+#
+# Categorize or 'bucketize' the arrival delay field into on time, or slightly/very late using a DataFrame UDF
+#
+def bucketize_arr_delay(arr_delay):
+  bucket = None
+  if arr_delay <= 15.0:
+    bucket = 'on_time'
+  elif arr_delay > 15.0 and arr_delay <= 60.0:
+    bucket = 'slightly_late'
+  elif arr_delay > 60.0:
+    bucket = 'very_late'
+  return bucket
+
+# Wrap the function in pyspark.sql.functions.udf with...
+# pyspark.sql.types.StructField information
+dummy_function_udf = udf(bucketize_arr_delay, StringType())
+
+# Add a category column via pyspark.sql.DataFrame.withColumn
+manual_bucketized_features = features.withColumn("ArrDelayBucket", dummy_function_udf(features['ArrDelay']))
+manual_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
+
+#
+# Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
+#
+from pyspark.ml.feature import Bucketizer
+
+splits = [-float("inf"), 15.0, 60.0, float("inf")]
+bucketizer = Bucketizer(splits=splits, inputCol="ArrDelay", outputCol="ArrDelayBucket")
+ml_bucketized_features = bucketizer.transform(features)
+
+ml_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
