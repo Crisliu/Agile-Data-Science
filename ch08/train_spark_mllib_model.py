@@ -5,7 +5,6 @@
 #   "FlightDate":"2015-12-30T16:00:00.000-08:00","FlightNum":"6109","Origin":"TUS"
 # }
 #
-
 from pyspark.sql.types import StringType, IntegerType, FloatType, DoubleType, DateType, TimestampType
 from pyspark.sql.types import StructType, StructField
 from pyspark.sql.functions import udf
@@ -27,6 +26,7 @@ schema = StructType([
 ])
 
 features = sqlContext.read.json("data/simple_flight_delay_features.json", schema=schema)
+features.first()
 
 #
 # Check for nulls in features before using Spark ML
@@ -53,7 +53,10 @@ def bucketize_arr_delay(arr_delay):
 dummy_function_udf = udf(bucketize_arr_delay, StringType())
 
 # Add a category column via pyspark.sql.DataFrame.withColumn
-manual_bucketized_features = features.withColumn("ArrDelayBucket", dummy_function_udf(features['ArrDelay']))
+manual_bucketized_features = features.withColumn(
+  "ArrDelayBucket",
+  dummy_function_udf(features['ArrDelay'])
+)
 manual_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
 
 #
@@ -62,7 +65,11 @@ manual_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
 from pyspark.ml.feature import Bucketizer
 
 splits = [-float("inf"), 15.0, 60.0, float("inf")]
-bucketizer = Bucketizer(splits=splits, inputCol="ArrDelay", outputCol="ArrDelayBucket")
+bucketizer = Bucketizer(
+  splits=splits,
+  inputCol="ArrDelay",
+  outputCol="ArrDelayBucket"
+)
 ml_bucketized_features = bucketizer.transform(features)
 
 ml_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
@@ -71,15 +78,65 @@ ml_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
 # Extract features tools in with pyspark.ml.feature
 #
 from pyspark.ml import Pipeline
-from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorIndexer, VectorAssembler
+from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorIndexer
+from pyspark.ml.feature import VectorAssembler
 
 # Turn category fields into categoric feature vectors, then drop intermediate fields
-for column in ['Carrier', 'DayOfMonth', 'DayOfWeek', 'DayOfYear', 'Origin', 'Dest', 'FlightNum']:
-  string_indexer = StringIndexer(inputCol=column, outputCol=column + "_index")
-  one_hot_encoder = OneHotEncoder(dropLast=False, inputCol=column + "_index", outputCol=column + "_vec")
+for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
+               "Origin", "Dest", "FlightNum"]:
+  string_indexer = StringIndexer(
+    inputCol=column,
+    outputCol=column + "_index"
+  )
+  one_hot_encoder = OneHotEncoder(
+    dropLast=False,
+    inputCol=column + "_index",
+    outputCol=column + "_vec"
+  )
   string_pipeline = Pipeline(stages=[string_indexer, one_hot_encoder])
-  ml_bucketized_features = string_pipeline.fit(ml_bucketized_features).transform(ml_bucketized_features)
+  ml_bucketized_features = string_pipeline.fit(ml_bucketized_features)\
+                                          .transform(ml_bucketized_features)
   ml_bucketized_features = ml_bucketized_features.drop(column).drop(column + "_index")
 
-# Setup a pipeline of all the tools
-# pipeline = Pipeline(stages=[tokenizer, stop_words_remover, hashing_tf, idf, lr])
+# Handle continuous, numeric fields by combining them into one feature vector
+numeric_columns = ["DepDelay", "Distance"]
+vector_assembler = VectorAssembler(
+  inputCols=numeric_columns,
+  outputCol="NumericFeatures_vec"
+)
+ml_bucketized_features = vector_assembler.transform(ml_bucketized_features)
+for column in numeric_columns:
+  ml_bucketized_features = ml_bucketized_features.drop(column)
+
+# Combine various features into one feature vector, 'features'
+feature_columns = ["Carrier_vec", "DayOfMonth_vec", "DayOfWeek_vec", "DayOfYear_vec",
+                   "Origin_vec", "Dest_vec", "FlightNum_vec", "NumericFeatures_vec"]
+assembler = VectorAssembler(
+    inputCols=feature_columns,
+    outputCol="features"
+)
+final_vectorized_features = assembler.transform(ml_bucketized_features)
+for column in feature_columns:
+  final_vectorized_features = final_vectorized_features.drop(column)
+
+final_vectorized_features.show()
+
+#
+# Cross validate, train and evaluate classifier
+#
+
+# Rename ArrDelayBucket to label
+final_vectorized_features = final_vectorized_features.selectExpr(
+  "features",
+  "ArrDelayBucket as label"
+)
+
+from pyspark.ml.classification import RandomForestClassifier
+
+# Cross validate, predict, evaluate
+training_data, test_data = final_vectorized_features.randomSplit([0.8, 0.2])
+rfc = RandomForestClassifier()
+model = rfc.fit(training_data)
+prediction = model.transform(test_data)
+
+
