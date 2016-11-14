@@ -66,3 +66,20 @@ bucketizer = Bucketizer(splits=splits, inputCol="ArrDelay", outputCol="ArrDelayB
 ml_bucketized_features = bucketizer.transform(features)
 
 ml_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
+
+#
+# Extract features tools in with pyspark.ml.feature
+#
+from pyspark.ml import Pipeline
+from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorIndexer, VectorAssembler
+
+# Turn category fields into categoric feature vectors, then drop intermediate fields
+for column in ['Carrier', 'DayOfMonth', 'DayOfWeek', 'DayOfYear', 'Origin', 'Dest', 'FlightNum']:
+  string_indexer = StringIndexer(inputCol=column, outputCol=column + "_index")
+  one_hot_encoder = OneHotEncoder(dropLast=False, inputCol=column + "_index", outputCol=column + "_vec")
+  string_pipeline = Pipeline(stages=[string_indexer, one_hot_encoder])
+  ml_bucketized_features = string_pipeline.fit(ml_bucketized_features).transform(ml_bucketized_features)
+  ml_bucketized_features = ml_bucketized_features.drop(column).drop(column + "_index")
+
+# Setup a pipeline of all the tools
+# pipeline = Pipeline(stages=[tokenizer, stop_words_remover, hashing_tf, idf, lr])
