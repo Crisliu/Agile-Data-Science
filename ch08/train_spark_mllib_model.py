@@ -59,6 +59,12 @@ manual_bucketized_features = features.withColumn(
 )
 manual_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
 
+manual_bucketized_features = manual_bucketized_features.withColumn(
+  "DepDelayBucket",
+  dummy_function_udf(features['DepDelay'])
+)
+manual_bucketized_features.select("DepDelay", "DepDelayBucket").show()
+
 #
 # Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
 #
@@ -72,7 +78,14 @@ bucketizer = Bucketizer(
 )
 ml_bucketized_features = bucketizer.transform(features)
 
-ml_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
+bucketizer = Bucketizer(
+  splits=splits,
+  inputCol="DepDelay",
+  outputCol="DepDelayBucket"
+)
+ml_bucketized_features = bucketizer.transform(ml_bucketized_features)
+
+ml_bucketized_features.select("ArrDelay", "ArrDelayBucket", "DepDelay", "DepDelayBucket").show()
 
 #
 # Extract features tools in with pyspark.ml.feature
@@ -83,7 +96,7 @@ from pyspark.ml.feature import VectorAssembler
 
 # Turn category fields into categoric feature vectors, then drop intermediate fields
 for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-               "Origin", "Dest", "FlightNum"]:
+               "Origin", "Dest", "FlightNum", "DepDelayBucket"]:
   string_indexer = StringIndexer(
     inputCol=column,
     outputCol=column + "_index"
@@ -110,10 +123,11 @@ for column in numeric_columns:
 
 # Combine various features into one feature vector, 'features'
 feature_columns = ["Carrier_vec", "DayOfMonth_vec", "DayOfWeek_vec", "DayOfYear_vec",
-                   "Origin_vec", "Dest_vec", "FlightNum_vec", "NumericFeatures_vec"]
+                   "Origin_vec", "Dest_vec", "FlightNum_vec", "DepDelayBucket_vec",
+                   "NumericFeatures_vec"]
 assembler = VectorAssembler(
     inputCols=feature_columns,
-    outputCol="features"
+    outputCol="Features_vec"
 )
 final_vectorized_features = assembler.transform(ml_bucketized_features)
 for column in feature_columns:
@@ -125,18 +139,23 @@ final_vectorized_features.show()
 # Cross validate, train and evaluate classifier
 #
 
-# Rename ArrDelayBucket to label
-final_vectorized_features = final_vectorized_features.selectExpr(
-  "features",
-  "ArrDelayBucket as label"
-)
-
-from pyspark.ml.classification import RandomForestClassifier
-
-# Cross validate, predict, evaluate
+# Test/train split
 training_data, test_data = final_vectorized_features.randomSplit([0.8, 0.2])
-rfc = RandomForestClassifier()
+
+# Instantiate and fit random forest classifier
+from pyspark.ml.classification import RandomForestClassifier
+rfc = RandomForestClassifier(featuresCol="Features_vec", labelCol="ArrDelayBucket")
 model = rfc.fit(training_data)
-prediction = model.transform(test_data)
 
+# Evaluate model using test data
+predictions = model.transform(test_data)
 
+from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+evaluator = MulticlassClassificationEvaluator(labelCol="ArrDelayBucket", metricName="accuracy")
+accuracy = evaluator.evaluate(predictions)
+print("Accuracy = {}".format(mae))
+
+# Show a sample sorted by scheduled departure... needed because prediction is sorted by ArrDelay,
+# so show() shows only 0 predictions.
+one_percent = predictions.sample(fraction=0.01, withReplacement=True)
+one_percent.orderBy("CRSDepTime").show(100)
