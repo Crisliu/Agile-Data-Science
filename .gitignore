@@ -16,3 +16,5 @@ ch06/web/static
 ch06/scrape_faa.py
 tmp
 .idea
+kafka
+zeppelin
