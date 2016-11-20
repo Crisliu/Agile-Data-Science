@@ -30,7 +30,7 @@ echo 'export PATH="$HOME/anaconda/bin:$PATH"' >> ~/.bash_profile
 wget -P /tmp/ http://apache.osuosl.org/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
 
 mkdir hadoop
-tar -xvf /tmp/hadoop-2.6.4.tar.gz -C hadoop --strip-components=1
+tar -xvf /tmp/hadoop-2.7.3.tar.gz -C hadoop --strip-components=1
 echo '# Hadoop environment setup' >> ~/.bash_profile
 export HADOOP_HOME=$PROJECT_HOME/hadoop
 echo 'export HADOOP_HOME=$PROJECT_HOME/hadoop' >> ~/.bash_profile
@@ -47,10 +47,10 @@ echo 'export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop' >> ~/.bash_profile
 #
 
 # May need to update this link... see http://spark.apache.org/downloads.html
-wget -P /tmp/ http://d3kbcqa49mib13.cloudfront.net/spark-2.0.1-bin-without-hadoop.tgz
+wget -P /tmp/ http://d3kbcqa49mib13.cloudfront.net/spark-2.0.2-bin-without-hadoop.tgz
 
 mkdir spark
-tar -xvf /tmp/spark-2.0.1-bin-without-hadoop.tgz -C spark --strip-components=1
+tar -xvf /tmp/spark-2.0.2-bin-without-hadoop.tgz -C spark --strip-components=1
 echo "" >> ~/.bash_profile
 echo "# Spark environment setup" >> ~/.bash_profile
 export SPARK_HOME=$PROJECT_HOME/spark
@@ -67,10 +67,10 @@ cp spark/conf/spark-defaults.conf.template spark/conf/spark-defaults.conf
 echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' >> spark/conf/spark-defaults.conf
 
 # Give Spark 6GB of RAM
-echo "spark.driver.memory 8g" >> spark/conf/spark-defaults.conf
+echo "spark.driver.memory 8g" >> $SPARK_HOME/conf/spark-defaults.conf
 
-echo "PYSPARK_PYTHON=python3" >> spark/conf/spark-env.sh
-echo "PYSPARK_DRIVER_PYTHON=python3" >> spark/conf/spark-env.sh
+echo "PYSPARK_PYTHON=python3" >> $SPARK_HOME/conf/spark-env.sh
+echo "PYSPARK_DRIVER_PYTHON=python3" >> $SPARK_HOME/conf/spark-env.sh
 
 #
 # Install MongoDB in the mongo directory in the root of our project. Also, get the jar for the MongoDB driver
@@ -150,6 +150,11 @@ echo "SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" >> spark/conf/s
 
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
+
+# Install Apache Kafka
+wget -P /tmp/ http://www-us.apache.org/dist/kafka/0.10.1.0/kafka_2.11-0.10.1.0.tgz
+mkdir kafka
+tar -xvzf /tmp/kafka_2.11-0.10.1.0.tgz -C kafka --strip-components=1
 
 # Get bootstrap
 mkdir ch03/web/static
