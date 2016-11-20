@@ -12,3 +12,4 @@ numpy
 scipy
 sklearn
 matplotlib
+kafka-python
