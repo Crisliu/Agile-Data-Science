@@ -281,8 +281,62 @@ def delays():
 
 @app.route("/weather_delay_histogram.json")
 def weather_delay_json():
-  record = client.relato.weather_delay_histogram.find_one()
+  record = client.agile_data_science.weather_delay_histogram.find_one()
   return json_util.dumps(record)
 
+@app.route("/weather/station/<wban>/observations/daily/<iso_date>")
+def daily_station_observations(wban, iso_date):
+  profile_observations = client.agile_data_science.daily_station_observations.find_one(
+    {'WBAN': wban, 'Date': iso_date}
+  )
+  return render_template('daily_weather_station.html', profile_observations=profile_observations)
+
+@app.route("/weather/station/<wban>")
+def weather_station(wban):
+  weather_station_summary = client.weather_station_summary.find({'WBAN': wban})
+  return render_template('weather_station.html', weather_station_summary=weather_station_summary)
+
+# Load our regression model
+from sklearn.externals import joblib
+regressor = joblib.load('data/sklearn_regressor.pkl')
+vectorizer = joblib.load('data/sklearn_vectorizer.pkl')
+
+# Make our API a post, so a search engine wouldn't hit it
+@app.route("/flights/delays/predict/regress", methods=['POST'])
+def regress_flight_delays():
+  
+  api_field_type_map = \
+    {
+      "DepDelay": int,
+      "Carrier": str,
+      "Date": str,
+      "Dest": str,
+      "FlightNum": str,
+      "Origin": str
+    }
+  
+  api_values = {}
+  for api_field_name, api_field_type in api_field_type_map.items():
+    api_values[api_field_name] = request.form.get(api_field_name, type=api_field_type)
+  
+  # Set the direct values
+  prediction_features = {}
+  prediction_features['Origin'] = api_values['Origin']
+  prediction_features['Dest'] = api_values['Dest']
+  prediction_features['FlightNum'] = api_values['FlightNum']
+  
+  # Set the derived values
+  prediction_features['Distance'] = get_flight_distance(api_values['Origin'], api_values['Dest'])
+  
+  date_features_dict = get_regression_date_args(api_values['Date'])
+  for api_field_name, api_field_value in date_features_dict:
+    prediction_features[api_field_name] = api_field_value
+  
+  # Vectorize the derived features
+  feature_vectors = vectorizer.fit_transform([prediction_features])
+  results = regressor.predict(feature_vectors)
+  result = results[0]
+  vectorizer.inverse_transform(result)
+  
 if __name__ == "__main__":
   app.run(debug=True)
