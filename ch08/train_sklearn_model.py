@@ -119,3 +119,28 @@ plt.yticks(())
 
 plt.show()
 
+#
+# Persist model using pickle
+#
+import pickle
+
+# Dump the model
+regressor_bytes = pickle.dumps(regressor)
+model_f = open('data/sklearn_regressor.pkl', 'wb')
+model_f.write(regressor_bytes)
+
+# Load the model
+model_f = open('data/sklearn_regressor.pkl', 'rb')
+model_bytes = model_f.read()
+regressor = pickle.loads(model_bytes)
+
+#
+# Persist model using sklearn.externals.joblib
+#
+from sklearn.externals import joblib
+
+# Dump the model
+joblib.dump(regressor, 'data/sklearn_regressor.pkl')
+
+# Load the model
+regressor = joblib.load('data/sklearn_regressor.pkl')
