@@ -9,8 +9,8 @@ import datetime
 print("Imports loaded...")
 
 # Load and check the size of our training data. May take a minute.
-print("Original JSON file size: {:,} Bytes".format(os.path.getsize("../data/simple_flight_delay_features.jsonl")))
-training_data = utils.read_json_lines_file('../data/simple_flight_delay_features.jsonl')
+print("Original JSON file size: {:,} Bytes".format(os.path.getsize("data/simple_flight_delay_features.jsonl")))
+training_data = utils.read_json_lines_file('data/simple_flight_delay_features.jsonl')
 print("Training items: {:,}".format(len(training_data))) # 5,714,008
 print("Data loaded...")
 
@@ -124,23 +124,35 @@ plt.show()
 #
 import pickle
 
-# Dump the model
+# Dump the model itself
 regressor_bytes = pickle.dumps(regressor)
 model_f = open('data/sklearn_regressor.pkl', 'wb')
 model_f.write(regressor_bytes)
 
-# Load the model
+# Dump the DictVectorizer that vectorizes the features
+vectorizer_bytes = pickle.dumps(vectorizer)
+vectorizer_f = open('data/sklearn_vectorizer.pkl', 'wb')
+vectorizer_f.write(vectorizer_bytes)
+
+# Load the model itself
 model_f = open('data/sklearn_regressor.pkl', 'rb')
 model_bytes = model_f.read()
 regressor = pickle.loads(model_bytes)
+
+# Load the DictVectorizer
+vectorizer_f = open('data/sklearn_vectorizer.pkl', 'rb')
+vectorizer_bytes = vectorizer_f.read()
+vectorizer = pickle.loads(vectorizer_bytes)
 
 #
 # Persist model using sklearn.externals.joblib
 #
 from sklearn.externals import joblib
 
-# Dump the model
+# Dump the model and vectorizer
 joblib.dump(regressor, 'data/sklearn_regressor.pkl')
+joblib.dump(vectorizer, 'data/sklearn_vectorizer.pkl')
 
-# Load the model
+# Load the model and vectorizer
 regressor = joblib.load('data/sklearn_regressor.pkl')
+vectorizer = joblib.load('data/sklearn_vectorizer.pkl')
