@@ -1,9 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
   <div>
-    <!-- Navigation guide -->
-    / <a href="/flights">Flights</a>
-
     <p class="lead">{{flight_count}} Flights on {{flight_date}}</p>
     <table class="table table-condensed table-striped">
       <thead>
@@ -32,4 +29,8 @@
       </tbody>
     </table>
   </div>
+  {% import "macros.jnj" as common %}
+  {% if nav_offsets and nav_path -%}
+    {{ common.display_nav(nav_offsets, nav_path, flight_count, query)|safe }}
+  {% endif -%}
 {% endblock %}
