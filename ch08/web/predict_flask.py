@@ -5,8 +5,8 @@ from bson import json_util
 # Configuration details
 import config
 
-# Helpers for search
-import search_helpers
+# Helpers for search and prediction APIs
+import predict_utils
 
 # Set up Flask, Mongo and Elasticsearch
 app = Flask(__name__)
@@ -326,9 +326,9 @@ def regress_flight_delays():
   prediction_features['FlightNum'] = api_values['FlightNum']
   
   # Set the derived values
-  prediction_features['Distance'] = get_flight_distance(api_values['Origin'], api_values['Dest'])
+  prediction_features['Distance'] = predict_utils.get_flight_distance(client, api_values['Origin'], api_values['Dest'])
   
-  date_features_dict = get_regression_date_args(api_values['Date'])
+  date_features_dict = predict_utils.get_regression_date_args(api_values['Date'])
   for api_field_name, api_field_value in date_features_dict:
     prediction_features[api_field_name] = api_field_value
   
