@@ -105,42 +105,50 @@ r2 = r2_score(y_test, predicted)
 print("r2 score:                 {:.3g}".format(r2))
 
 # Plot outputs, compare actual vs predicted values
-import matplotlib.pyplot as plt
-
-plt.scatter(
-  y_test,
-  predicted,
-  color='blue',
-  linewidth=1
-)
-
-plt.xticks(())
-plt.yticks(())
-
-plt.show()
+# import matplotlib.pyplot as plt
+#
+# plt.scatter(
+#   y_test,
+#   predicted,
+#   color='blue',
+#   linewidth=1
+# )
+#
+# plt.xticks(())
+# plt.yticks(())
+#
+# plt.show()
 
 #
 # Persist model using pickle
 #
+print("Testing model persistance...")
+
 import pickle
 
+project_home = os.environ["PROJECT_HOME"]
+
 # Dump the model itself
+regressor_path = "{}/data/sklearn_regressor.pkl".format(project_home)
+
 regressor_bytes = pickle.dumps(regressor)
-model_f = open('data/sklearn_regressor.pkl', 'wb')
+model_f = open(regressor_path, 'wb')
 model_f.write(regressor_bytes)
 
 # Dump the DictVectorizer that vectorizes the features
+vectorizer_path = "{}/data/sklearn_vectorizer.pkl".format(project_home)
+
 vectorizer_bytes = pickle.dumps(vectorizer)
-vectorizer_f = open('data/sklearn_vectorizer.pkl', 'wb')
+vectorizer_f = open(vectorizer_path, 'wb')
 vectorizer_f.write(vectorizer_bytes)
 
 # Load the model itself
-model_f = open('data/sklearn_regressor.pkl', 'rb')
+model_f = open(regressor_path, 'rb')
 model_bytes = model_f.read()
 regressor = pickle.loads(model_bytes)
 
 # Load the DictVectorizer
-vectorizer_f = open('data/sklearn_vectorizer.pkl', 'rb')
+vectorizer_f = open(vectorizer_path, 'rb')
 vectorizer_bytes = vectorizer_f.read()
 vectorizer = pickle.loads(vectorizer_bytes)
 
@@ -150,9 +158,9 @@ vectorizer = pickle.loads(vectorizer_bytes)
 from sklearn.externals import joblib
 
 # Dump the model and vectorizer
-joblib.dump(regressor, 'data/sklearn_regressor.pkl')
-joblib.dump(vectorizer, 'data/sklearn_vectorizer.pkl')
+joblib.dump(regressor, regressor_path)
+joblib.dump(vectorizer, vectorizer_path)
 
 # Load the model and vectorizer
-regressor = joblib.load('data/sklearn_regressor.pkl')
-vectorizer = joblib.load('data/sklearn_vectorizer.pkl')
+regressor = joblib.load(regressor_path)
+vectorizer = joblib.load(vectorizer_path)
