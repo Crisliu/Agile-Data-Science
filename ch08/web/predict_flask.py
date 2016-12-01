@@ -148,7 +148,7 @@ def search_airplanes():
 
   # Query elasticsearch, process to get records and count
   results = elastic.search(query)
-  airplanes, airplane_count = search_helpers.process_search(results)
+  airplanes, airplane_count = predict_utils.process_search(results)
 
   # Persist search parameters in the form template
   return render_template(
@@ -259,7 +259,7 @@ def search_flights():
 
   # Query elasticsearch, process to get records and count
   results = elastic.search(query)
-  flights, flight_count = search_helpers.process_search(results)
+  flights, flight_count = predict_utils.process_search(results)
 
   # Persist search parameters in the form template
   return render_template(
@@ -344,6 +344,21 @@ def regress_flight_delays():
   # Return a JSON object
   result_obj = {"Delay": result}
   return json.dumps(result_obj)
+
+@app.route("/flights/delays/predict")
+def flight_delays_page():
+  """Serves flight delay predictions"""
   
+  form_config = [
+    {'field': 'DepDelay', 'label': 'Departure Delay'},
+    {'field': 'Carrier'},
+    {'field': 'Date'},
+    {'field': 'Origin'},
+    {'field': 'Dest', 'label': 'Destination'},
+    {'field': 'FlightNum', 'label': 'Flight Number'},
+  ]
+  
+  return render_template('flight_delays_predict.html', form_config=form_config)
+ 
 if __name__ == "__main__":
   app.run(debug=True)
