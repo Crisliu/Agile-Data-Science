@@ -328,10 +328,10 @@ def regress_flight_delays():
   prediction_features['FlightNum'] = api_form_values['FlightNum']
   
   # Set the derived values
-  prediction_features['Distance'] = predict_utils.get_flight_distance(client, api_values['Origin'], api_values['Dest'])
+  prediction_features['Distance'] = predict_utils.get_flight_distance(client, api_form_values['Origin'], api_form_values['Dest'])
   
   # Turn the date into DayOfYear, DayOfMonth, DayOfWeek
-  date_features_dict = predict_utils.get_regression_date_args(api_values['Date'])
+  date_features_dict = predict_utils.get_regression_date_args(api_form_values['Date'])
   for api_field_name, api_field_value in date_features_dict.items():
     prediction_features[api_field_name] = api_field_value
   
