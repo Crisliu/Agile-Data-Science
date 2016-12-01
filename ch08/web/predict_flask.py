@@ -1,3 +1,4 @@
+import sys, os, re
 from flask import Flask, render_template, request
 from pymongo import MongoClient
 from bson import json_util
@@ -111,11 +112,11 @@ def search_airplanes():
   end = int(end)
 
   # Navigation path and offset setup
-  nav_path = search_helpers.strip_place(request.url)
-  nav_offsets = search_helpers.get_navigation_offsets(start, end, config.AIRPLANE_RECORDS_PER_PAGE)
+  nav_path = predict_utils.strip_place(request.url)
+  nav_offsets = predict_utils.get_navigation_offsets(start, end, config.AIRPLANE_RECORDS_PER_PAGE)
 
-  print "nav_path: [{}]".format(nav_path)
-  print json.dumps(nav_offsets)
+  print("nav_path: [{}]".format(nav_path))
+  print(json.dumps(nav_offsets))
 
   # Build the base of our elasticsearch query
   query = {
@@ -140,7 +141,7 @@ def search_airplanes():
   for item in search_config:
     field = item['field']
     value = request.args.get(field)
-    print field, value
+    print(field, value)
     arg_dict[field] = value
     if value:
       query['query']['bool']['must'].append({'match': {field: value}})
@@ -222,8 +223,8 @@ def search_flights():
   end = int(end)
 
   # Navigation path and offset setup
-  nav_path = search_helpers.strip_place(request.url)
-  nav_offsets = search_helpers.get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
+  nav_path = predict_utils.strip_place(request.url)
+  nav_offsets = predict_utils.get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
 
   # Build the base of our elasticsearch query
   query = {
@@ -298,8 +299,9 @@ def weather_station(wban):
 
 # Load our regression model
 from sklearn.externals import joblib
-regressor = joblib.load('data/sklearn_regressor.pkl')
-vectorizer = joblib.load('data/sklearn_vectorizer.pkl')
+project_home = os.environ["PROJECT_HOME"]
+vectorizer = joblib.load("{}/data/sklearn_vectorizer.pkl".format(project_home))
+regressor = joblib.load("{}/data/sklearn_regressor.pkl".format(project_home))
 
 # Make our API a post, so a search engine wouldn't hit it
 @app.route("/flights/delays/predict/regress", methods=['POST'])
@@ -315,28 +317,33 @@ def regress_flight_delays():
       "Origin": str
     }
   
-  api_values = {}
+  api_form_values = {}
   for api_field_name, api_field_type in api_field_type_map.items():
-    api_values[api_field_name] = request.form.get(api_field_name, type=api_field_type)
+    api_form_values[api_field_name] = request.form.get(api_field_name, type=api_field_type)
   
   # Set the direct values
   prediction_features = {}
-  prediction_features['Origin'] = api_values['Origin']
-  prediction_features['Dest'] = api_values['Dest']
-  prediction_features['FlightNum'] = api_values['FlightNum']
+  prediction_features['Origin'] = api_form_values['Origin']
+  prediction_features['Dest'] = api_form_values['Dest']
+  prediction_features['FlightNum'] = api_form_values['FlightNum']
   
   # Set the derived values
   prediction_features['Distance'] = predict_utils.get_flight_distance(client, api_values['Origin'], api_values['Dest'])
   
+  # Turn the date into DayOfYear, DayOfMonth, DayOfWeek
   date_features_dict = predict_utils.get_regression_date_args(api_values['Date'])
-  for api_field_name, api_field_value in date_features_dict:
+  for api_field_name, api_field_value in date_features_dict.items():
     prediction_features[api_field_name] = api_field_value
   
-  # Vectorize the derived features
-  feature_vectors = vectorizer.fit_transform([prediction_features])
-  results = regressor.predict(feature_vectors)
-  result = results[0]
-  vectorizer.inverse_transform(result)
+  # Vectorize the features
+  feature_vectors = vectorizer.transform([prediction_features])
+  
+  # Make the prediction!
+  result = regressor.predict(feature_vectors)[0]
+  
+  # Return a JSON object
+  result_obj = {"Delay": result}
+  return json.dumps(result_obj)
   
 if __name__ == "__main__":
   app.run(debug=True)
