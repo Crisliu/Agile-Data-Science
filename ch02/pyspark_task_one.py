@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 import sys, os, re
 import json
 import datetime, iso8601
