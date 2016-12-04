@@ -51,11 +51,14 @@ def main(iso_date, base_path):
   people_with_contactenated_titles = titles_by_name.map(concatenate_titles)
   people_output_json = people_with_contactenated_titles.map(json.dumps)
   
-  # Store today's output
+  # Get today's output path
   today_output_path = "{}/ch02/data/example_master_titles_daily.json/{}".format(
     base_path,
     rounded_today.isoformat()
   )
+  
+  # Write/replace today's output path
+  os.system("rm -rf {}".format(today_output_path))
   people_output_json.saveAsTextFile(today_output_path)
 
 if __name__ == "__main__":
