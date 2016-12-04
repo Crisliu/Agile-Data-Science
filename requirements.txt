@@ -13,4 +13,5 @@ scipy
 sklearn
 matplotlib
 kafka-python
+celery
 airflow
