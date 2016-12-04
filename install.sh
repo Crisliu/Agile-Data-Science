@@ -4,6 +4,7 @@
 #
 
 export PROJECT_HOME=`pwd`
+echo "export PROJECT_HOME=$PROJECT_HOME" >> ~/.bash_profile
 
 if [ "$(uname)" == "Darwin" ]; then
     ANADONCA_OS_NAME='MacOSX'
