@@ -1,5 +1,5 @@
 # Load the parquet file
-on_time_dataframe = sqlContext.read.parquet('data/on_time_performance.parquet')
+on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
 on_time_dataframe.registerTempTable("on_time_performance")
 
 # Dump the unneeded fields

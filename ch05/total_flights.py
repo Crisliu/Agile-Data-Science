@@ -1,9 +1,9 @@
 # Load the parquet file
-on_time_dataframe = sqlContext.read.parquet('data/on_time_performance.parquet')
+on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
 
 # Use SQL to look at the total flights by month across 2015
 on_time_dataframe.registerTempTable("on_time_dataframe")
-total_flights_by_month = sqlContext.sql(
+total_flights_by_month = spark.sql(
   """SELECT Month, Year, COUNT(*) AS total_flights
   FROM on_time_dataframe
   GROUP BY Year, Month
