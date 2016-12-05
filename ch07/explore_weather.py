@@ -161,7 +161,7 @@ one_record = cleaned_station_observations.take(1)[0]
 
 # Print it in a way we can actually see it
 import json
-print json.dumps(one_record, indent=2)
+print(json.dumps(one_record, indent=2))
 
 # Store the station/daily observation records to Mongo
 import pymongo_spark
