@@ -1,6 +1,6 @@
 # Loads CSV with header parsing and type inference, in one line!
 # Must use 'pyspark --packages com.databricks:spark-csv_2.10:1.4.0' for this to work
-on_time_dataframe = sqlContext.read.format('com.databricks.spark.csv')\
+on_time_dataframe = spark.read.format('com.databricks.spark.csv')\
   .options(
     header='true',
     treatEmptyValuesAsNulls='true',
@@ -8,7 +8,7 @@ on_time_dataframe = sqlContext.read.format('com.databricks.spark.csv')\
   .load('data/On_Time_On_Time_Performance_2015.csv.gz')
 on_time_dataframe.registerTempTable("on_time_performance")
 
-trimmed_cast_performance = sqlContext.sql("""
+trimmed_cast_performance = spark.sql("""
 SELECT
   Year, Quarter, Month, DayofMonth, DayOfWeek, FlightDate,
   Carrier, TailNum, FlightNum,
@@ -33,7 +33,7 @@ trimmed_cast_performance.registerTempTable("on_time_performance")
 trimmed_cast_performance.show()
 
 # Verify we can sum numeric columns
-sqlContext.sql("""SELECT
+spark.sql("""SELECT
   SUM(WeatherDelay), SUM(CarrierDelay), SUM(NASDelay),
   SUM(SecurityDelay), SUM(LateAircraftDelay)
 FROM on_time_performance
@@ -53,9 +53,9 @@ trimmed_cast_performance.toJSON()\
 trimmed_cast_performance.write.mode("overwrite").parquet("data/on_time_performance.parquet")
 
 # Load JSON records back
-on_time_dataframe = sqlContext.read.json('data/on_time_performance.jsonl.gz')
+on_time_dataframe = spark.read.json('data/on_time_performance.jsonl.gz')
 on_time_dataframe.show()
 
 # Load the parquet file back
-on_time_dataframe = sqlContext.read.parquet('data/on_time_performance.parquet')
+on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
 on_time_dataframe.show()
