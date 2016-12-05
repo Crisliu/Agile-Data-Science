@@ -24,7 +24,7 @@ for row_object in ary_of_objects:
   f.write(json_record + "\n")
 f.close()
 
-print "Wrote JSON Lines file /tmp/test.jsonl"
+print("Wrote JSON Lines file /tmp/test.jsonl")
 
 #
 # Read this jsonl file back into objects
@@ -34,8 +34,8 @@ f = codecs.open(path, "r", "utf-8")
 for line in f:
   record = json.loads(line.rstrip("\n|\r"))
   ary_of_objects.append(record)
-print ary_of_objects
-print "Read JSON Lines file /tmp/test.jsonl"
+print(ary_of_objects)
+print("Read JSON Lines file /tmp/test.jsonl")
 
 #
 # Utility functions to read and write json and jsonl files
