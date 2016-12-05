@@ -7,4 +7,5 @@ curl -XPOST 'http://localhost:5000/flights/delays/predict/regress' \
   -F 'Date=2016-12-23' \
   -F 'Dest=ATL' \
   -F 'FlightNum=1519' \
-  -F 'Origin=SFO'
+  -F 'Origin=SFO' \
+| json_pp
