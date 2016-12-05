@@ -53,5 +53,5 @@ def get_regression_date_args(iso_date):
   }
 
 def get_current_timestamp():
-  iso_now = datetime.datetime.now().isoformat()
+  iso_now = datetime.datetime.now()#.isoformat()
   return iso_now
