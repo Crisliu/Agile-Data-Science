@@ -24,7 +24,7 @@ total_airplanes = spark.sql(
   COUNT(*) AS OverallTotal
   FROM airplanes"""
 )
-print "Total airplanes: {}".format(total_airplanes.collect()[0].OverallTotal)
+print("Total airplanes: {}".format(total_airplanes.collect()[0].OverallTotal))
 
 mfr_with_totals = manufacturer_counts.join(total_airplanes)
 mfr_with_totals = mfr_with_totals.rdd.map(

@@ -114,8 +114,8 @@ def search_airplanes():
   nav_path = search_helpers.strip_place(request.url)
   nav_offsets = search_helpers.get_navigation_offsets(start, end, config.AIRPLANE_RECORDS_PER_PAGE)
 
-  print "nav_path: [{}]".format(nav_path)
-  print json.dumps(nav_offsets)
+  print("nav_path: [{}]".format(nav_path))
+  print(json.dumps(nav_offsets))
 
   # Build the base of our elasticsearch query
   query = {
@@ -140,7 +140,7 @@ def search_airplanes():
   for item in search_config:
     field = item['field']
     value = request.args.get(field)
-    print field, value
+    print(field, value)
     arg_dict[field] = value
     if value:
       query['query']['bool']['must'].append({'match': {field: value}})
