@@ -51,3 +51,7 @@ def get_regression_date_args(iso_date):
     "DayOfMonth": day_of_month,
     "DayOfWeek": day_of_week,
   }
+
+def get_current_timestamp():
+  iso_now = datetime.datetime.now().isoformat()
+  return iso_now
