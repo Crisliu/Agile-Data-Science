@@ -3,7 +3,7 @@ import iso8601
 import datetime
 
 # Load the on-time parquet file
-on_time_dataframe = sqlContext.read.parquet('data/on_time_performance.parquet')
+on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
 on_time_dataframe.registerTempTable("on_time_performance")
 
 # Select a few features of interest
