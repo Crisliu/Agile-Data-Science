@@ -3,11 +3,11 @@ import iso8601
 import datetime
 
 # Load the on-time parquet file
-on_time_dataframe = sqlContext.read.parquet('data/on_time_performance.parquet')
+on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
 on_time_dataframe.registerTempTable("on_time_performance")
 
 # Select a few features of interest
-simple_on_time_features = sqlContext.sql("""
+simple_on_time_features = spark.sql("""
 SELECT
   FlightNum,
   FlightDate,

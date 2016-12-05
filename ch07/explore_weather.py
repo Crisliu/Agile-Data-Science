@@ -1,11 +1,11 @@
 # Load the WBAN station master list
-wban_master_list = sqlContext.read.format('com.databricks.spark.csv')\
+wban_master_list = spark.read.format('com.databricks.spark.csv')\
   .options(header='true', inferschema='true', delimiter='|')\
   .load('data/wbanmasterlist.psv')
 wban_master_list.show(5)
 
 # Load the weather records themselves
-hourly_weather_records = sqlContext.read.format('com.databricks.spark.csv')\
+hourly_weather_records = spark.read.format('com.databricks.spark.csv')\
   .options(header='true', inferschema='true', delimiter=',')\
   .load('data/2015*hourly.txt')
 hourly_weather_records.show()
