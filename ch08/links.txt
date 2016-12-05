@@ -5,3 +5,5 @@ http://stackoverflow.com/questions/7172784/how-to-post-json-data-with-curl-from-
 https://airflow.incubator.apache.org/cli.html
 https://en.wikipedia.org/wiki/Scientific_method
 http://www.slideshare.net/xamat/agile-science
+https://www.tutorialspoint.com/python/dictionary_update.htm
+https://docs.python.org/3/library/string.html#formatstrings
