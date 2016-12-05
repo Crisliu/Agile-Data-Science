@@ -7,3 +7,4 @@ https://en.wikipedia.org/wiki/Scientific_method
 http://www.slideshare.net/xamat/agile-science
 https://www.tutorialspoint.com/python/dictionary_update.htm
 https://docs.python.org/3/library/string.html#formatstrings
+http://stackoverflow.com/questions/2943222/find-objects-between-two-dates-mongodb
