@@ -5,10 +5,9 @@ import json
 import datetime, iso8601
 
 # Save to Mongo
+from bson import json_util
 import pymongo_spark
 pymongo_spark.activate()
-
-iso_date = "2016-12-01"
 
 # Pass date and base path to main() from airflow
 def main(iso_date, base_path):
@@ -57,10 +56,13 @@ def main(iso_date, base_path):
     base_path,
     iso_today
   )
-
+  
+  # Generate json records
+  prediction_requests_json = prediction_requests.map(json_util.dumps)
+  
   # Write/replace today's output path
   os.system("rm -rf {}".format(today_output_path))
-  prediction_requests.saveAsTextFile(today_output_path)
+  prediction_requests_json.saveAsTextFile(today_output_path)
 
 if __name__ == "__main__":
   main(sys.argv[1], sys.argv[2])
