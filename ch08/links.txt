@@ -2,3 +2,6 @@ https://davidwalsh.name/curl-post-file
 http://localhost:5000/on_time_performance?Carrier=AA&FlightDate=2015-01-01&FlightNum=1519
 http://blog.luisrei.com/articles/flaskrest.html
 http://stackoverflow.com/questions/7172784/how-to-post-json-data-with-curl-from-terminal-commandline-to-test-spring-rest
+https://airflow.incubator.apache.org/cli.html
+https://en.wikipedia.org/wiki/Scientific_method
+http://www.slideshare.net/xamat/agile-science
