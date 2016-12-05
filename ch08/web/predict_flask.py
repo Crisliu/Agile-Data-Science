@@ -359,6 +359,46 @@ def flight_delays_page():
   ]
   
   return render_template('flight_delays_predict.html', form_config=form_config)
- 
+
+# Make our API a post, so a search engine wouldn't hit it
+@app.route("/flights/delays/predict/classify", methods=['POST'])
+def classify_flight_delays():
+  api_field_type_map = \
+    {
+      "DepDelay": int,
+      "Carrier": str,
+      "Date": str,
+      "Dest": str,
+      "FlightNum": str,
+      "Origin": str
+    }
+  
+  api_form_values = {}
+  for api_field_name, api_field_type in api_field_type_map.items():
+    api_form_values[api_field_name] = request.form.get(api_field_name, type=api_field_type)
+  
+  # Set the direct values
+  prediction_features = {}
+  prediction_features['Origin'] = api_form_values['Origin']
+  prediction_features['Dest'] = api_form_values['Dest']
+  prediction_features['FlightNum'] = api_form_values['FlightNum']
+  
+  # Set the derived values
+  prediction_features['Distance'] = predict_utils.get_flight_distance(client, api_form_values['Origin'],
+                                                                      api_form_values['Dest'])
+  
+  # Turn the date into DayOfYear, DayOfMonth, DayOfWeek
+  date_features_dict = predict_utils.get_regression_date_args(api_form_values['Date'])
+  for api_field_name, api_field_value in date_features_dict.items():
+    prediction_features[api_field_name] = api_field_value
+  
+  # Add a timestamp
+  prediction_features['Timestamp'] = predict_utils.get_current_timestamp()
+  
+  client.agile_data_science.prediction_tasks.insert_one(
+    prediction_features
+  )
+  return json_util.dumps(prediction_features)
+
 if __name__ == "__main__":
   app.run(debug=True)
