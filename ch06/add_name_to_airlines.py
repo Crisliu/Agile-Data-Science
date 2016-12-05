@@ -1,14 +1,14 @@
 # Load the on-time parquet file
-on_time_dataframe = sqlContext.read.parquet('data/on_time_performance.parquet')
+on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
 
 # The first step is easily expressed as SQL: get all unique tail numbers for each airline
 on_time_dataframe.registerTempTable("on_time_performance")
-carrier_codes = sqlContext.sql(
+carrier_codes = spark.sql(
   "SELECT DISTINCT Carrier FROM on_time_performance"
   )
 carrier_codes.collect()
 
-airlines = sqlContext.read.format('com.databricks.spark.csv')\
+airlines = spark.read.format('com.databricks.spark.csv')\
   .options(header='false', nullValue='\N')\
   .load('data/airlines.csv')
 airlines.show()
@@ -18,7 +18,7 @@ airlines.filter(airlines.C3 == 'DL').show()
 
 # Drop fields except for C1 as name, C3 as carrier code
 airlines.registerTempTable("airlines")
-airlines = sqlContext.sql("SELECT C1 AS Name, C3 AS CarrierCode from airlines")
+airlines = spark.sql("SELECT C1 AS Name, C3 AS CarrierCode from airlines")
 
 # Join our 14 carrier codes to the airliens table to get our set of airlines
 our_airlines = carrier_codes.join(airlines, carrier_codes.Carrier == airlines.CarrierCode)

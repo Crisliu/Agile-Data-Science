@@ -1,7 +1,7 @@
-airplanes = sqlContext.read.json('data/airplanes.json')
+airplanes = spark.read.json('data/airplanes.json')
 
 airplanes.registerTempTable("airplanes")
-manufacturer_variety = sqlContext.sql(
+manufacturer_variety = spark.sql(
 """SELECT
   DISTINCT(Manufacturer) AS Manufacturer
 FROM
@@ -13,7 +13,7 @@ manufacturer_variety_local = manufacturer_variety.collect()
 
 # We need to print these left justified
 for mfr in manufacturer_variety_local:
-  print mfr.Manufacturer
+  print(mfr.Manufacturer)
 
 # Detect the longest common beginning string in a pair of strings
 def longest_common_beginning(s1, s2):
@@ -75,7 +75,7 @@ mapping_dataframe = mfr_dedupe_mapping.toDF()
 
 # 6) Give the mapping column names
 mapping_dataframe.registerTempTable("mapping_dataframe")
-mapping_dataframe = sqlContext.sql(
+mapping_dataframe = spark.sql(
   "SELECT _1 AS Raw, _2 AS NewManufacturer FROM mapping_dataframe"
 )
 
@@ -87,7 +87,7 @@ airplanes_w_mapping = airplanes.join(
 )
 # Now replace Manufacturer with NewManufacturer where needed
 airplanes_w_mapping.registerTempTable("airplanes_w_mapping")
-resolved_airplanes = sqlContext.sql("""SELECT
+resolved_airplanes = spark.sql("""SELECT
   TailNum,
   SerialNumber,
   Owner,

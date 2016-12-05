@@ -1,4 +1,4 @@
-airplanes = sqlContext.read.json('data/resolved_airplanes.json')
+airplanes = spark.read.json('data/resolved_airplanes.json')
 
 #
 # Who makes the airplanes in the US commercial fleet, as a %
@@ -6,7 +6,7 @@ airplanes = sqlContext.read.json('data/resolved_airplanes.json')
 
 # How many airplanes are made by each manufacturer?
 airplanes.registerTempTable("airplanes")
-manufacturer_counts = sqlContext.sql("""SELECT
+manufacturer_counts = spark.sql("""SELECT
   Manufacturer,
   COUNT(*) AS Total
 FROM
@@ -19,7 +19,7 @@ ORDER BY
 manufacturer_counts.show(30) # show top 30
 
 # How many airplanes total?
-total_airplanes = sqlContext.sql(
+total_airplanes = spark.sql(
   """SELECT
   COUNT(*) AS OverallTotal
   FROM airplanes"""
@@ -44,7 +44,7 @@ mfr_with_totals.toDF().show()
 #
 # Same with sub-queries
 #
-relative_manufacturer_counts = sqlContext.sql("""SELECT
+relative_manufacturer_counts = spark.sql("""SELECT
   Manufacturer,
   COUNT(*) AS Total,
   ROUND(

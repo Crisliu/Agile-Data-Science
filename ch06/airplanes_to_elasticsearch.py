@@ -1,5 +1,5 @@
 # Load our airplanes
-airplanes = sqlContext.read.json("data/airplanes.json")
+airplanes = spark.read.json("data/airplanes.json")
 airplanes.show()
 
 airplanes.write.format("org.elasticsearch.spark.sql")\
