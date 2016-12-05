@@ -32,7 +32,7 @@ def get_navigation_offsets(offset1, offset2, increment):
 def strip_place(url):
   try:
     p = re.match('(.+)&start=.+&end=.+', url).group(1)
-  except AttributeError, e:
+  except AttributeError as e:
     return url
   return p
 
@@ -109,7 +109,7 @@ def search_flights():
   end = request.args.get('end') or config.RECORDS_PER_PAGE
   end = int(end)
   
-  print request.args
+  print(request.args)
   # Navigation path and offset setup
   nav_path = strip_place(request.url)
   nav_offsets = get_navigation_offsets(start, end, config.RECORDS_PER_PAGE)
@@ -146,9 +146,9 @@ def search_flights():
     query['query']['bool']['must'].append({'match': {'FlightNum': flight_number}})
   
   # Query elasticsearch, process to get records and count
-  print ("QUERY")
-  print carrier, flight_date, origin, dest, tail_number, flight_number
-  print json.dumps(query)
+  print("QUERY")
+  print(carrier, flight_date, origin, dest, tail_number, flight_number)
+  print(json.dumps(query))
   results = elastic.search(query)
   flights, flight_count = process_search(results)
   
