@@ -49,7 +49,10 @@ def main(iso_date, base_path):
   mongo_query_config["mongo.input.query"] = mongo_query_string
   
   # Load the day's requests using pymongo_spark
-  prediction_requests = sc.mongoRDD('mongodb://localhost:27017/agile_data_science.prediction_tasks', config=mongo_query_config)
+  prediction_requests = sc.mongoRDD(
+    'mongodb://localhost:27017/agile_data_science.prediction_tasks',
+    config=mongo_query_config
+  )
   
   # Build the day's output path: a date based primary key directory structure
   today_output_path = "{}/data/prediction_tasks.json/{}".format(
