@@ -400,5 +400,20 @@ def classify_flight_delays():
   )
   return json_util.dumps(prediction_features)
 
+@app.route("/flights/delays/predict_batch")
+def flight_delays_batch_page():
+  """Serves flight delay predictions"""
+  
+  form_config = [
+    {'field': 'DepDelay', 'label': 'Departure Delay'},
+    {'field': 'Carrier'},
+    {'field': 'Date'},
+    {'field': 'Origin'},
+    {'field': 'Dest', 'label': 'Destination'},
+    {'field': 'FlightNum', 'label': 'Flight Number'},
+  ]
+  
+  return render_template('flight_delays_predict_batch.html', form_config=form_config)
+
 if __name__ == "__main__":
   app.run(debug=True)
