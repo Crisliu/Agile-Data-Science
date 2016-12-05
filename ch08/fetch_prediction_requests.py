@@ -11,6 +11,7 @@ pymongo_spark.activate()
 
 # Pass date and base path to main() from airflow
 def main(iso_date, base_path):
+  
   APP_NAME = "fetch_prediction_requests.py"
   
   # If there is no SparkSession, create the environment
