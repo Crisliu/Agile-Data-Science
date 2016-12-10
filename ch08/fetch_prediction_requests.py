@@ -56,7 +56,7 @@ def main(iso_date, base_path):
   )
   
   # Build the day's output path: a date based primary key directory structure
-  today_output_path = "{}/data/prediction_tasks.json/{}".format(
+  today_output_path = "{}/data/prediction_tasks_daily.json/{}".format(
     base_path,
     iso_today
   )
