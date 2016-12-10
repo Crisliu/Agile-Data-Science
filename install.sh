@@ -175,6 +175,6 @@ wget 'http://d3js.org/d3.v3.min.js'
 cd $PROJECT_HOME
 
 # Install Apache Zeppelin
-wget -P /tmp/ http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.1/zeppelin-0.6.1-bin-all.tgz
+wget -P /tmp/ http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-all.tgz
 mkdir zeppelin
-tar -xvzf /tmp/zeppelin-0.6.1-bin-all.tgz -C zeppelin --strip-components=1
+tar -xvzf /tmp/zeppelin-0.6.2-bin-all.tgz -C zeppelin --strip-components=1
