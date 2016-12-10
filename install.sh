@@ -90,7 +90,7 @@ mkdir -p mongodb/data/db
 mongodb/bin/mongod --dbpath mongodb/data/db & # re-run if you shutdown your computer
 
 # Get the MongoDB Java Driver
-wget -P lib/ http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.2.2/mongo-java-driver-3.2.2.jar
+wget -P lib/ http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.0/mongo-java-driver-3.4.0.jar
 
 # Install the mongo-hadoop project in the mongo-hadoop directory in the root of our project.
 wget -P /tmp/ https://github.com/mongodb/mongo-hadoop/archive/r1.5.2.tar.gz
@@ -178,3 +178,9 @@ cd $PROJECT_HOME
 wget -P /tmp/ http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-all.tgz
 mkdir zeppelin
 tar -xvzf /tmp/zeppelin-0.6.2-bin-all.tgz -C zeppelin --strip-components=1
+
+# Configure Zeppelin
+cp zeppelin/conf/zeppelin-env.sh.template zeppelin/conf/zeppelin-env.sh
+echo "export SPARK_HOME=$PROJECT_HOME/spark" >> zeppelin/conf/zeppelin-env.sh
+echo "export SPARK_MASTER=local" >> zeppelin/conf/zeppelin-env.sh
+echo "export SPARK_CLASSPATH=" >> zeppelin/conf/zeppelin-env.sh
