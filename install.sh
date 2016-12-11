@@ -18,11 +18,14 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
     MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-3.2.4-signed.msi'
 fi
 
-# Download and install Anaconda
+# Download and install Anaconda Python
 wget -P /tmp/ "http://repo.continuum.io/archive/Anaconda3-4.2.0-${ANADONCA_OS_NAME}-x86_64.sh"
 bash "/tmp/Anaconda3-4.2.0-${ANADONCA_OS_NAME}-x86_64.sh" -b -p $HOME/anaconda
 export PATH="$HOME/anaconda/bin:$PATH"
 echo 'export PATH="$HOME/anaconda/bin:$PATH"' >> ~/.bash_profile
+
+# Setup Python package requirements
+pip install -r requirements.txt
 
 #
 # Install Hadoop in the hadoop directory in the root of our project. Also, setup
@@ -147,7 +150,7 @@ $PROJECT_HOME/lib/lzo-hadoop-1.0.0.jar" \
   >> spark/conf/spark-defaults.conf
 
 # Setup spark classpath for snappy for parquet
-# echo "SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" >> spark/conf/spark-env.sh
+echo "SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" >> spark/conf/spark-env.sh
 
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
