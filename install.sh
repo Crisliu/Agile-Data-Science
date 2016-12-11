@@ -149,7 +149,7 @@ $PROJECT_HOME/lib/snappy-java-1.1.2.6.jar,\
 $PROJECT_HOME/lib/lzo-hadoop-1.0.0.jar" \
   >> spark/conf/spark-defaults.conf
 
-# Setup spark classpath for snappy for parquet
+# Setup spark classpath for snappy for parquet... required for OS X 10.11, others can skip
 echo "SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" >> spark/conf/spark-env.sh
 
 # Install pyelasticsearch and p
