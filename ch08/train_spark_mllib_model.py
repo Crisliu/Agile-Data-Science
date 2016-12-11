@@ -49,7 +49,7 @@ arrival_bucketizer = Bucketizer(
   outputCol="ArrDelayBucket"
 )
 ml_bucketized_features = arrival_bucketizer.transform(features)
-arrival_bucketizer.save("models/arrival_bucketizer.bin")
+arrival_bucketizer.write().overwrite().save("models/arrival_bucketizer.bin")
 
 departure_bucketizer = Bucketizer(
   splits=splits,
@@ -57,7 +57,7 @@ departure_bucketizer = Bucketizer(
   outputCol="DepDelayBucket"
 )
 ml_bucketized_features = departure_bucketizer.transform(ml_bucketized_features)
-departure_bucketizer.save("models/departure_bucketizer.bin")
+departure_bucketizer.write().overwrite().save("models/departure_bucketizer.bin")
 
 ml_bucketized_features.select("ArrDelay", "ArrDelayBucket", "DepDelay", "DepDelayBucket").show()
 
@@ -88,7 +88,7 @@ for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
   
   # Save the pipeline
   string_pipeline_output_path = "models/string_indexer_pipeline_{}.bin".format(column)
-  string_pipeline.save(string_pipeline_output_path)
+  string_pipeline.write().overwrite().save(string_pipeline_output_path)
 
 # Handle continuous, numeric fields by combining them into one feature vector
 numeric_columns = ["DepDelay", "Distance"]
@@ -99,7 +99,7 @@ vector_assembler = VectorAssembler(
 ml_bucketized_features = vector_assembler.transform(ml_bucketized_features)
 
 # Save the numeric vector assembler
-vector_assembler.save("models/numeric_vector_assembler.bin")
+vector_assembler.write().overwrite().save("models/numeric_vector_assembler.bin")
 
 # Drop the original columns
 for column in numeric_columns:
@@ -109,16 +109,16 @@ for column in numeric_columns:
 feature_columns = ["Carrier_vec", "DayOfMonth_vec", "DayOfWeek_vec", "DayOfYear_vec",
                    "Origin_vec", "Dest_vec", "FlightNum_vec", "DepDelayBucket_vec",
                    "NumericFeatures_vec"]
-assembler = VectorAssembler(
+final_assembler = VectorAssembler(
     inputCols=feature_columns,
     outputCol="Features_vec"
 )
-final_vectorized_features = assembler.transform(ml_bucketized_features)
+final_vectorized_features = final_assembler.transform(ml_bucketized_features)
 for column in feature_columns:
   final_vectorized_features = final_vectorized_features.drop(column)
 
 # Save the final assembler
-assembler.save("models/final_vector_assembler.bin")
+final_assembler.write().overwrite().save("models/final_vector_assembler.bin")
 
 # Inspect the finalized features
 final_vectorized_features.show()
@@ -127,4 +127,7 @@ final_vectorized_features.show()
 from pyspark.ml.classification import RandomForestClassifier
 rfc = RandomForestClassifier(featuresCol="Features_vec", labelCol="ArrDelayBucket")
 model = rfc.fit(final_vectorized_features)
-model.save("models/spark_random_forest_classifier.flight_delays.bin")
+
+# Save the new model over the old one
+model_output_path = "models/spark_random_forest_classifier.flight_delays.bin"
+model.write().overwrite().save(model_output_path)
