@@ -38,54 +38,26 @@ cols_with_nulls = filter(lambda x: x[1] > 0, null_counts)
 print(list(cols_with_nulls))
 
 #
-# Categorize or 'bucketize' the arrival delay field into on time, or slightly/very late using a DataFrame UDF
-#
-def bucketize_arr_delay(arr_delay):
-  bucket = None
-  if arr_delay <= 15.0:
-    bucket = 'on_time'
-  elif arr_delay > 15.0 and arr_delay <= 60.0:
-    bucket = 'slightly_late'
-  elif arr_delay > 60.0:
-    bucket = 'very_late'
-  return bucket
-
-# Wrap the function in pyspark.sql.functions.udf with...
-# pyspark.sql.types.StructField information
-dummy_function_udf = udf(bucketize_arr_delay, StringType())
-
-# Add a category column via pyspark.sql.DataFrame.withColumn
-manual_bucketized_features = features.withColumn(
-  "ArrDelayBucket",
-  dummy_function_udf(features['ArrDelay'])
-)
-manual_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
-
-manual_bucketized_features = manual_bucketized_features.withColumn(
-  "DepDelayBucket",
-  dummy_function_udf(features['DepDelay'])
-)
-manual_bucketized_features.select("DepDelay", "DepDelayBucket").show()
-
-#
 # Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
 #
 from pyspark.ml.feature import Bucketizer
 
 splits = [-float("inf"), 15.0, 60.0, float("inf")]
-bucketizer = Bucketizer(
+arrival_bucketizer = Bucketizer(
   splits=splits,
   inputCol="ArrDelay",
   outputCol="ArrDelayBucket"
 )
-ml_bucketized_features = bucketizer.transform(features)
+ml_bucketized_features = arrival_bucketizer.transform(features)
+arrival_bucketizer.save("models/arrival_bucketizer.bin")
 
-bucketizer = Bucketizer(
+departure_bucketizer = Bucketizer(
   splits=splits,
   inputCol="DepDelay",
   outputCol="DepDelayBucket"
 )
-ml_bucketized_features = bucketizer.transform(ml_bucketized_features)
+ml_bucketized_features = departure_bucketizer.transform(ml_bucketized_features)
+departure_bucketizer.save("models/departure_bucketizer.bin")
 
 ml_bucketized_features.select("ArrDelay", "ArrDelayBucket", "DepDelay", "DepDelayBucket").show()
 
@@ -103,6 +75,7 @@ for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
     inputCol=column,
     outputCol=column + "_index"
   )
+  
   one_hot_encoder = OneHotEncoder(
     dropLast=False,
     inputCol=column + "_index",
@@ -112,6 +85,10 @@ for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
   ml_bucketized_features = string_pipeline.fit(ml_bucketized_features)\
                                           .transform(ml_bucketized_features)
   ml_bucketized_features = ml_bucketized_features.drop(column).drop(column + "_index")
+  
+  # Save the pipeline
+  string_pipeline_output_path = "models/string_indexer_pipeline_{}.bin".format(column)
+  string_pipeline.save(string_pipeline_output_path)
 
 # Handle continuous, numeric fields by combining them into one feature vector
 numeric_columns = ["DepDelay", "Distance"]
@@ -120,6 +97,11 @@ vector_assembler = VectorAssembler(
   outputCol="NumericFeatures_vec"
 )
 ml_bucketized_features = vector_assembler.transform(ml_bucketized_features)
+
+# Save the numeric vector assembler
+vector_assembler.save("models/numeric_vector_assembler.bin")
+
+# Drop the original columns
 for column in numeric_columns:
   ml_bucketized_features = ml_bucketized_features.drop(column)
 
@@ -135,6 +117,10 @@ final_vectorized_features = assembler.transform(ml_bucketized_features)
 for column in feature_columns:
   final_vectorized_features = final_vectorized_features.drop(column)
 
+# Save the final assembler
+assembler.save("models/final_vector_assembler.bin")
+
+# Inspect the finalized features
 final_vectorized_features.show()
 
 # Instantiate and fit random forest classifier on all the data
