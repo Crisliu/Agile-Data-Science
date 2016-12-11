@@ -135,6 +135,8 @@ def main(iso_date, base_path):
     base_path
   )
   sorted_features.repartition(1).write.mode("overwrite").json(output_path)
+  
+  # Copy the partial file to a JSON Lines file
   combine_cmd = "cp {}/part* {}/data/simple_flight_delay_features.jsonl".format(
     output_path,
     base_path
