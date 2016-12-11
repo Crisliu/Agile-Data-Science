@@ -377,11 +377,11 @@ def classify_flight_delays():
   for api_field_name, api_field_type in api_field_type_map.items():
     api_form_values[api_field_name] = request.form.get(api_field_name, type=api_field_type)
   
-  # Set the direct values
+  # Set the direct values, which excludes Date
   prediction_features = {}
-  prediction_features['Origin'] = api_form_values['Origin']
-  prediction_features['Dest'] = api_form_values['Dest']
-  prediction_features['FlightNum'] = api_form_values['FlightNum']
+  for key, value in api_form_values.items():
+    if key != "Date":
+      prediction_features[key] = value
   
   # Set the derived values
   prediction_features['Distance'] = predict_utils.get_flight_distance(client, api_form_values['Origin'],
