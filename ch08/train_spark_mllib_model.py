@@ -4,7 +4,6 @@ import sys, os, re
 import json
 import datetime, iso8601
 
-
 # Pass date and base path to main() from airflow
 def main(iso_date, base_path):
   APP_NAME = "extract_features.py"
