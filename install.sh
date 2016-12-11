@@ -147,7 +147,7 @@ $PROJECT_HOME/lib/lzo-hadoop-1.0.0.jar" \
   >> spark/conf/spark-defaults.conf
 
 # Setup spark classpath for snappy for parquet
-echo "SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" >> spark/conf/spark-env.sh
+# echo "SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" >> spark/conf/spark-env.sh
 
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
