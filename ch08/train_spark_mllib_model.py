@@ -108,16 +108,18 @@ def main(iso_date, base_path):
       outputCol=column + "_vec"
     )
     string_pipeline = Pipeline(stages=[string_indexer, one_hot_encoder])
-    ml_bucketized_features = string_pipeline.fit(ml_bucketized_features)\
-                                            .transform(ml_bucketized_features)
+    
+    string_pipeline_model = string_pipeline.fit(ml_bucketized_features)
+    ml_bucketized_features = string_pipeline_model.transform(ml_bucketized_features)
+    
     ml_bucketized_features = ml_bucketized_features.drop(column).drop(column + "_index")
     
-    # Save the pipeline
-    string_pipeline_output_path = "{}/models/string_indexer_pipeline_{}.bin".format(
+    # Save the pipeline model
+    string_pipeline_output_path = "{}/models/string_indexer_pipeline_model_{}.bin".format(
       base_path,
       column
     )
-    string_pipeline.write().overwrite().save(string_pipeline_output_path)
+    string_pipeline_model.write().overwrite().save(string_pipeline_output_path)
   
   # Handle continuous, numeric fields by combining them into one feature vector
   numeric_columns = ["DepDelay", "Distance"]
@@ -157,7 +159,7 @@ def main(iso_date, base_path):
   
   # Instantiate and fit random forest classifier on all the data
   from pyspark.ml.classification import RandomForestClassifier
-  rfc = RandomForestClassifier(featuresCol="Features_vec", labelCol="ArrDelayBucket")
+  rfc = RandomForestClassifier(featuresCol="Features_vec", labelCol="ArrDelayBucket", predictionCol="Prediction")
   model = rfc.fit(final_vectorized_features)
   
   # Save the new model over the old one
