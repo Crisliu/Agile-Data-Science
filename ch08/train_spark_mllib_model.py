@@ -6,7 +6,8 @@ import datetime, iso8601
 
 # Pass date and base path to main() from airflow
 def main(iso_date, base_path):
-  APP_NAME = "extract_features.py"
+  
+  APP_NAME = "train_spark_mllib_model.py"
   
   # If there is no SparkSession, create the environment
   try:
@@ -128,7 +129,7 @@ def main(iso_date, base_path):
   
   # Save the numeric vector assembler
   vector_assembler_path = "{}/models/numeric_vector_assembler.bin".format(base_path)
-  vector_assembler.write().overwrite().save()
+  vector_assembler.write().overwrite().save(vector_assembler_path)
   
   # Drop the original columns
   for column in numeric_columns:
@@ -148,9 +149,10 @@ def main(iso_date, base_path):
   
   # Save the final assembler
   final_assembler_path = "{}/models/final_vector_assembler.bin".format(base_path)
-  final_assembler.write().overwrite().save()
+  final_assembler.write().overwrite().save(final_assembler_path)
   
   # Inspect the finalized features
+  final_vectorized_features = final_vectorized_features.limit(100000) # remove me
   final_vectorized_features.show()
   
   # Instantiate and fit random forest classifier on all the data
