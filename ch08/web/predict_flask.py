@@ -367,7 +367,7 @@ def classify_flight_delays():
     {
       "DepDelay": int,
       "Carrier": str,
-      "Date": str,
+      "FlightDate": str,
       "Dest": str,
       "FlightNum": str,
       "Origin": str
@@ -380,15 +380,18 @@ def classify_flight_delays():
   # Set the direct values, which excludes Date
   prediction_features = {}
   for key, value in api_form_values.items():
-    if key != "Date":
-      prediction_features[key] = value
+    prediction_features[key] = value
   
   # Set the derived values
-  prediction_features['Distance'] = predict_utils.get_flight_distance(client, api_form_values['Origin'],
-                                                                      api_form_values['Dest'])
+  prediction_features['Distance'] = predict_utils.get_flight_distance(
+    client, api_form_values['Origin'],
+    api_form_values['Dest']
+  )
   
   # Turn the date into DayOfYear, DayOfMonth, DayOfWeek
-  date_features_dict = predict_utils.get_regression_date_args(api_form_values['Date'])
+  date_features_dict = predict_utils.get_regression_date_args(
+    api_form_values['FlightDate']
+  )
   for api_field_name, api_field_value in date_features_dict.items():
     prediction_features[api_field_name] = api_field_value
   
@@ -407,7 +410,7 @@ def flight_delays_batch_page():
   form_config = [
     {'field': 'DepDelay', 'label': 'Departure Delay'},
     {'field': 'Carrier'},
-    {'field': 'Date'},
+    {'field': 'FlightDate', 'label': 'Date'},
     {'field': 'Origin'},
     {'field': 'Dest', 'label': 'Destination'},
     {'field': 'FlightNum', 'label': 'Flight Number'},
