@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Compute today's date:
-export ISO_DATE = `date "+%Y-%m-%d"`
+export ISO_DATE=`date "+%Y-%m-%d"`
 
 # List DAGs
 airflow list_dags
