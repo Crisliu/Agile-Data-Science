@@ -58,10 +58,11 @@ def main(iso_date, base_path):
   
   # Load the classifier model
   from pyspark.ml.classification import RandomForestClassifier, RandomForestClassificationModel
-  rfc = RandomForestClassificationModel.load(
-    "{}/models/spark_random_forest_classifier.flight_delays.bin".format(
+  random_forest_model_path = "{}/models/spark_random_forest_classifier.flight_delays.bin".format(
       base_path
-    )
+  )
+  rfc = RandomForestClassificationModel.load(
+    random_forest_model_path
   )
   
   #
