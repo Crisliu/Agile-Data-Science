@@ -19,6 +19,10 @@ elastic = ElasticSearch(config.ELASTIC_URL)
 
 import json
 
+# Date/time stuff
+import iso8601
+import datetime
+
 # Chapter 5 controller: Fetch a flight and display it
 @app.route("/on_time_performance")
 def on_time_performance():
@@ -363,6 +367,7 @@ def flight_delays_page():
 # Make our API a post, so a search engine wouldn't hit it
 @app.route("/flights/delays/predict/classify", methods=['POST'])
 def classify_flight_delays():
+  """POST API for classifying flight delays"""
   api_field_type_map = \
     {
       "DepDelay": int,
@@ -416,7 +421,34 @@ def flight_delays_batch_page():
     {'field': 'FlightNum', 'label': 'Flight Number'},
   ]
   
-  return render_template('flight_delays_predict_batch.html', form_config=form_config)
+  return render_template("flight_delays_predict_batch.html", form_config=form_config)
+
+@app.route("/flights/delays/predict_batch/results/<iso_date>")
+def flight_delays_batch_results_page(iso_date):
+  """Serves page for batch prediction results"""
+  
+  # Get today and tomorrow's dates as iso strings to scope query
+  today_dt = iso8601.parse_date(iso_date)
+  rounded_today = today_dt.date()
+  iso_today = rounded_today.isoformat()
+  rounded_tomorrow_dt = rounded_today + datetime.timedelta(days=1)
+  iso_tomorrow = rounded_tomorrow_dt.isoformat()
+  
+  # Fetch today's prediction results from Mongo
+  predictions = client.agile_data_science.prediction_results.find(
+    {
+      'Timestamp': {
+        "$gte": iso_today,
+        "$lte": iso_tomorrow,
+      }
+    }
+  )
+  
+  return render_template(
+    "flight_delays_predict_batch_results.html",
+    predictions=predictions,
+    iso_date=iso_date
+  )
 
 if __name__ == "__main__":
   app.run(debug=True)
