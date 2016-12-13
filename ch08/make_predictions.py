@@ -75,20 +75,21 @@ def main(iso_date, base_path):
     iso_today
   )
 
-  from pyspark.sql.types import StringType, IntegerType, FloatType, DoubleType, DateType, TimestampType
+  from pyspark.sql.types import StringType, IntegerType, DoubleType, DateType, TimestampType
   from pyspark.sql.types import StructType, StructField
 
   schema = StructType([
-    StructField("Carrier", StringType(), True),  # "Carrier":"WN"
-    StructField("DayOfMonth", IntegerType(), True),  # "DayOfMonth":31
-    StructField("DayOfWeek", IntegerType(), True),  # "DayOfWeek":4
-    StructField("DayOfYear", IntegerType(), True),  # "DayOfYear":365
-    StructField("DepDelay", DoubleType(), True),  # "DepDelay":14.0
-    StructField("Dest", StringType(), True),  # "Dest":"SAN"
-    StructField("Distance", DoubleType(), True),  # "Distance":368.0
-    StructField("FlightDate", DateType(), True),  # "FlightDate":"2015-12-30T16:00:00.000-08:00"
-    StructField("FlightNum", StringType(), True),  # "FlightNum":"6109"
-    StructField("Origin", StringType(), True),  # "Origin":"TUS"
+    StructField("Carrier", StringType(), True),
+    StructField("DayOfMonth", IntegerType(), True),
+    StructField("DayOfWeek", IntegerType(), True),
+    StructField("DayOfYear", IntegerType(), True),
+    StructField("DepDelay", DoubleType(), True),
+    StructField("Dest", StringType(), True),
+    StructField("Distance", DoubleType(), True),
+    StructField("FlightDate", DateType(), True),
+    StructField("FlightNum", StringType(), True),
+    StructField("Origin", StringType(), True),
+    StructField("Timestamp", TimestampType(), True),
   ])
   
   prediction_requests = spark.read.json(today_input_path, schema=schema)
