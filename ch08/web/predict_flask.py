@@ -28,6 +28,8 @@ from kafka import KafkaProducer, TopicPartition
 producer = KafkaProducer()
 PREDICTION_TOPIC = 'flight_delay_classification_request'
 
+import uuid
+
 # Chapter 5 controller: Fetch a flight and display it
 @app.route("/on_time_performance")
 def on_time_performance():
@@ -473,8 +475,6 @@ def classify_flight_delays_realtime():
   for api_field_name, api_field_type in api_field_type_map.items():
     api_form_values[api_field_name] = request.form.get(api_field_name, type=api_field_type)
   
-  print(api_form_values)
-  
   # Set the direct values, which excludes Date
   prediction_features = {}
   for key, value in api_form_values.items():
@@ -496,10 +496,40 @@ def classify_flight_delays_realtime():
   # Add a timestamp
   prediction_features['Timestamp'] = predict_utils.get_current_timestamp()
   
+  # Create a unique ID for this message
+  unique_id = str(uuid.uuid4())
+  prediction_features['UUID'] = unique_id
+  
   message_bytes = json.dumps(prediction_features).encode()
   producer.send(PREDICTION_TOPIC, message_bytes)
+
+  response = {"status": "OK", "id": unique_id}
+  return json.dumps(response)
+
+@app.route("/flights/delays/predict_kafka")
+def flight_delays_page_kafka():
+  """Serves flight delay predictions from Kafka and Spark Streaming"""
   
-  return json_util.dumps(prediction_features)
+  form_config = [
+    {'field': 'DepDelay', 'label': 'Departure Delay'},
+    {'field': 'Carrier'},
+    {'field': 'FlightDate', 'label': 'Date'},
+    {'field': 'Origin'},
+    {'field': 'Dest', 'label': 'Destination'},
+    {'field': 'FlightNum', 'label': 'Flight Number'},
+  ]
+  
+  return render_template('flight_delays_predict_kafka.html', form_config=form_config)
+
+# Make our API a post, so a search engine wouldn't hit it
+# @app.route("/flights/delays/predict/classify_realtime/response", methods=['POST'])
+# def classify_flight_delays_realtime_response():
+#
+#   fields = {
+#     "Carrier": str,
+#     "Origin": str,
+#     "Dest":
+#   }
 
 if __name__ == "__main__":
   app.run(debug=True)
