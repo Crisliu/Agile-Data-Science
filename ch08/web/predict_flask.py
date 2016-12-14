@@ -504,11 +504,11 @@ def classify_flight_delays_realtime():
   producer.send(PREDICTION_TOPIC, message_bytes)
 
   response = {"status": "OK", "id": unique_id}
-  return json.dumps(response)
+  return json_util.dumps(response)
 
 @app.route("/flights/delays/predict_kafka")
 def flight_delays_page_kafka():
-  """Serves flight delay predictions from Kafka and Spark Streaming"""
+  """Serves flight delay prediction page with polling form"""
   
   form_config = [
     {'field': 'DepDelay', 'label': 'Departure Delay'},
@@ -521,15 +521,22 @@ def flight_delays_page_kafka():
   
   return render_template('flight_delays_predict_kafka.html', form_config=form_config)
 
-# Make our API a post, so a search engine wouldn't hit it
-# @app.route("/flights/delays/predict/classify_realtime/response", methods=['POST'])
-# def classify_flight_delays_realtime_response():
-#
-#   fields = {
-#     "Carrier": str,
-#     "Origin": str,
-#     "Dest":
-#   }
+@app.route("/flights/delays/predict/classify_realtime/response/<unique_id>")
+def classify_flight_delays_realtime_response(unique_id):
+  """Serves predictions to polling requestors"""
+  
+  prediction = client.agile_data_science.flight_delay_classification_response.find_one(
+    {
+      "id": unique_id
+    }
+  )
+  
+  response = {"status": "WAIT", "id": unique_id}
+  if prediction:
+    response["status"] = "OK"
+    response["prediction"] = prediction
+  
+  return json_util.dumps(response)
 
 if __name__ == "__main__":
   app.run(debug=True)

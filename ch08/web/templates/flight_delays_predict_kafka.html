@@ -25,40 +25,6 @@
       <p>Delay: <span id="result" style="display: inline-block;"></span></p>
   </div>
 
-  <script>
-    // Attach a submit handler to the form
-    $( "#flight_delay_classification" ).submit(function( event ) {
-
-      // Stop form from submitting normally
-      event.preventDefault();
-
-      // Get some values from elements on the page:
-      var $form = $( this ),
-        term = $form.find( "input[name='s']" ).val(),
-        url = $form.attr( "action" );
-
-      // Send the data using post
-      var posting = $.post(
-        url,
-        $( "#flight_delay_classification" ).serialize(),
-      );
-
-      // Put the results in a div
-      posting.done(function( data ) {
-        result = JSON.parse(data);
-        $( "#result" ).empty().append( result.Delay );
-      });
-    });
-
-    $( "#flight_delay_classification" ).ajax({
-        url: "/flights/delays/predict/classify_realtime",
-        type: "POST",
-        success: function(data) {
-            console.log("polling");
-        },
-        dataType: "json",
-        complete: setTimeout(function() {poll()}, 5000),
-        timeout: 2000
-    })
-  </script>
+  <!-- Load our form processing javascript -->
+  <script src="/static/flight_delay_predict_polling.js"></script>
 {% endblock %}
