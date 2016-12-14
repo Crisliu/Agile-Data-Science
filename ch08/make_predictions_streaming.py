@@ -8,7 +8,6 @@ from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils, OffsetRange, TopicAndPartition
 
-# Pass date and base path to main() from airflow
 def main(iso_date, base_path):
 
   APP_NAME = "make_predictions_streaming.py"
@@ -21,6 +20,12 @@ def main(iso_date, base_path):
   try:
     sc and ssc
   except NameError as e:
+    import findspark
+    findspark.add_packages(["org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2"])
+    findspark.init()
+    import pyspark
+    import pyspark.sql
+    import pyspark.streaming
   
     conf = SparkConf().set("spark.default.parallelism", 1)
     sc = SparkContext(appName="Agile Data Science: PySpark Streaming 'Hello, World!'", conf=conf)
@@ -87,3 +92,7 @@ def main(iso_date, base_path):
   object_stream.pprint()
 
   ssc.start()
+  ssc.awaitTermination()
+
+if __name__ == "__main__":
+  main(sys.argv[1], sys.argv[2])
