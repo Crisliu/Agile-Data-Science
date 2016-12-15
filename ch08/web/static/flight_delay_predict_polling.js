@@ -32,7 +32,7 @@ $( "#flight_delay_classification" ).submit(function( event ) {
 // Poll the prediction URL
 function poll(id) {
   var responseUrlBase = "/flights/delays/predict/classify_realtime/response/";
-  console.log(id);
+  console.log("Polling for request id " + id + "...");
 
   // Append the uuid to the URL as a slug argument
   var predictionUrl = responseUrlBase + id;
@@ -50,7 +50,7 @@ function conditionalPoll(data) {
   var response = JSON.parse(data.responseText);
 
   if(response.status == "OK") {
-    renderPage(data);
+    renderPage(response.prediction);
   }
   else if(response.status == "WAIT") {
     setTimeout(function() {poll(response.id)}, 1000);
@@ -58,6 +58,19 @@ function conditionalPoll(data) {
 }
 
 // Render the response on the page
-function renderPage(data) {
-  $( "#result" ).empty().append( data.prediction );
+function renderPage(response) {
+
+  var displayMessage;
+
+  if(response.Prediction == 0) {
+    displayMessage = "On Time (0-15 Minutes Late)";
+  }
+  else if(response.Prediction == 1) {
+    displayMessage = "Slightly Late (15-60 Minute Delay)";
+  }
+  else if(response.Prediction == 2) {
+    displayMessage = "Very Late (60+ Minute Delay)";
+  }
+
+  $( "#result" ).empty().append( displayMessage );
 }
