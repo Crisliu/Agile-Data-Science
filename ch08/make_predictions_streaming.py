@@ -48,6 +48,7 @@ def main(base_path):
     conf = SparkConf().set("spark.default.parallelism", 1)
     sc = SparkContext(appName="Agile Data Science: PySpark Streaming 'Hello, World!'", conf=conf)
     ssc = StreamingContext(sc, PERIOD)
+    spark = pyspark.sql.SparkSession(sc).builder.appName(APP_NAME).getOrCreate()
   
   #
   # Load all models to be used in making predictions
@@ -154,8 +155,7 @@ def main(base_path):
       StructField("Timestamp", TimestampType(), True),
       StructField("UUID", StringType(), True),
     ])
-  
-    spark = get_spark_session_instance(rdd.context.getConf())
+    
     prediction_requests_df = spark.createDataFrame(rdd, schema=prediction_request_schema)
     prediction_requests_df.show()
   
