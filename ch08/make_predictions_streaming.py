@@ -14,15 +14,6 @@ from bson import json_util
 import pymongo_spark
 pymongo_spark.activate()
 
-# Lazily instantiated global instance of SparkSession
-def get_spark_session_instance(sparkConf):
-  if ('sparkSessionSingletonInstance' not in globals()):
-    globals()['sparkSessionSingletonInstance'] = SparkSession\
-      .builder\
-      .config(conf=sparkConf)\
-      .getOrCreate()
-  return globals()['sparkSessionSingletonInstance']
-
 def main(base_path):
 
   APP_NAME = "make_predictions_streaming.py"
