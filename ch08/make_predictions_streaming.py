@@ -125,10 +125,6 @@ def main(base_path):
 
   def classify_prediction_requests(rdd):
   
-    #
-    # Load each and every model in the pipeline
-    #
-  
     from pyspark.sql.types import StringType, IntegerType, DoubleType, DateType, TimestampType
     from pyspark.sql.types import StructType, StructField
   
