@@ -5,32 +5,26 @@ import json
 import datetime, iso8601
 
 from pyspark import SparkContext, SparkConf
+from pyspark.sql import SparkSession, Row
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils, OffsetRange, TopicAndPartition
 
-def main(iso_date, base_path):
+# Lazily instantiated global instance of SparkSession
+def get_spark_session_instance(sparkConf):
+  if ('sparkSessionSingletonInstance' not in globals()):
+    globals()['sparkSessionSingletonInstance'] = SparkSession\
+      .builder\
+      .config(conf=sparkConf)\
+      .getOrCreate()
+  return globals()['sparkSessionSingletonInstance']
 
-  APP_NAME = "make_predictions_streaming.py"
 
-  # Process data every 10 seconds
-  PERIOD = 10
-  BROKERS = 'localhost:9092'
-  PREDICTION_TOPIC = 'flight_delay_classification_request'
+#
+# Create a dataframe from the RDD-based object stream
+#
+
+def classify_prediction_requests(base_path, rdd):
   
-  try:
-    sc and ssc
-  except NameError as e:
-    import findspark
-    findspark.add_packages(["org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2"])
-    findspark.init()
-    import pyspark
-    import pyspark.sql
-    import pyspark.streaming
-  
-    conf = SparkConf().set("spark.default.parallelism", 1)
-    sc = SparkContext(appName="Agile Data Science: PySpark Streaming 'Hello, World!'", conf=conf)
-    ssc = StreamingContext(sc, PERIOD)
-
   #
   # Load each and every model in the pipeline
   #
@@ -75,6 +69,105 @@ def main(iso_date, base_path):
     random_forest_model_path
   )
   
+  from pyspark.sql.types import StringType, IntegerType, DoubleType, DateType, TimestampType
+  from pyspark.sql.types import StructType, StructField
+  
+  prediction_request_schema = StructType([
+    StructField("Carrier", StringType(), True),
+    StructField("DayOfMonth", IntegerType(), True),
+    StructField("DayOfWeek", IntegerType(), True),
+    StructField("DayOfYear", IntegerType(), True),
+    StructField("DepDelay", DoubleType(), True),
+    StructField("Dest", StringType(), True),
+    StructField("Distance", DoubleType(), True),
+    StructField("FlightDate", DateType(), True),
+    StructField("FlightNum", StringType(), True),
+    StructField("Origin", StringType(), True),
+    StructField("Timestamp", TimestampType(), True),
+    StructField("UUID", StringType(), True),
+  ])
+  
+  spark = get_spark_session_instance(rdd.context.getConf())
+  prediction_requests_df = spark.createDataFrame(rdd, schema=prediction_request_schema)
+  prediction_requests_df.show()
+
+  # Bucketize the departure and arrival delays for classification
+  ml_bucketized_features = departure_bucketizer.transform(prediction_requests_df)
+
+  # Check the buckets
+  ml_bucketized_features.select("DepDelay", "DepDelayBucket").show()
+
+  # Vectorize string fields with the corresponding pipeline for that column
+  # Turn category fields into categoric feature vectors, then drop intermediate fields
+  for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
+                 "Origin", "Dest", "FlightNum", "DepDelayBucket"]:
+    string_pipeline_path = "{}/models/string_indexer_pipeline_{}.bin".format(
+      base_path,
+      column
+    )
+    string_pipeline_model = string_vectorizer_pipeline_models[column]
+    ml_bucketized_features = string_pipeline_model.transform(ml_bucketized_features)
+    ml_bucketized_features = ml_bucketized_features.drop(column + "_index")
+
+  # Vectorize numeric columns
+  ml_bucketized_features = vector_assembler.transform(ml_bucketized_features)
+
+  # Drop the original numeric columns
+  numeric_columns = ["DepDelay", "Distance"]
+
+  # Combine various features into one feature vector, 'features'
+  final_vectorized_features = final_assembler.transform(ml_bucketized_features)
+  final_vectorized_features.show()
+
+  # Drop the individual vector columns
+  feature_columns = ["Carrier_vec", "DayOfMonth_vec", "DayOfWeek_vec", "DayOfYear_vec",
+                     "Origin_vec", "Dest_vec", "FlightNum_vec", "DepDelayBucket_vec",
+                     "NumericFeatures_vec"]
+  for column in feature_columns:
+    final_vectorized_features = final_vectorized_features.drop(column)
+
+  # Inspect the finalized features
+  final_vectorized_features.show()
+
+  # Make the prediction
+  predictions = rfc.transform(final_vectorized_features)
+
+  # Drop the features vector and prediction metadata to give the original fields
+  predictions = predictions.drop("Features_vec")
+  final_predictions = predictions.drop("indices").drop("values").drop("rawPrediction").drop("probability")
+
+  # Inspect the output
+  final_predictions.show()
+  
+  # Store to Mongo
+  
+
+def main(base_path):
+
+  APP_NAME = "make_predictions_streaming.py"
+
+  # Process data every 10 seconds
+  PERIOD = 10
+  BROKERS = 'localhost:9092'
+  PREDICTION_TOPIC = 'flight_delay_classification_request'
+  
+  try:
+    sc and ssc
+  except NameError as e:
+    import findspark
+
+    # Add the streaming package and initialize
+    findspark.add_packages(["org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2"])
+    findspark.init()
+    
+    import pyspark
+    import pyspark.sql
+    import pyspark.streaming
+  
+    conf = SparkConf().set("spark.default.parallelism", 1)
+    sc = SparkContext(appName="Agile Data Science: PySpark Streaming 'Hello, World!'", conf=conf)
+    ssc = StreamingContext(sc, PERIOD)
+  
   #
   # Process Prediction Requests in Streaming
   #
@@ -90,9 +183,32 @@ def main(iso_date, base_path):
 
   object_stream = stream.map(lambda x: json.loads(x[1]))
   object_stream.pprint()
-
+  
+  row_stream = object_stream.map(
+    lambda x: Row(
+      FlightDate=iso8601.parse_date(x['FlightDate']),
+      Origin=x['Origin'],
+      Distance=x['Distance'],
+      DayOfMonth=x['DayOfMonth'],
+      DayOfYear=x['DayOfYear'],
+      UUID=x['UUID'],
+      DepDelay=x['DepDelay'],
+      DayOfWeek=x['DayOfWeek'],
+      FlightNum=x['FlightNum'],
+      Dest=x['Dest'],
+      Timestamp=iso8601.parse_date(x['Timestamp']),
+      Carrier=x['Carrier']
+    )
+  )
+  row_stream.pprint()
+  
+  # Do the classification and store to Mongo
+  row_stream.foreachRDD(
+    lambda rdd: classify_prediction_requests(base_path, rdd)
+  )
+  
   ssc.start()
   ssc.awaitTermination()
 
 if __name__ == "__main__":
-  main(sys.argv[1], sys.argv[2])
+  main(sys.argv[1])
