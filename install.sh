@@ -76,6 +76,10 @@ echo "spark.driver.memory 8g" >> $SPARK_HOME/conf/spark-defaults.conf
 echo "PYSPARK_PYTHON=python3" >> $SPARK_HOME/conf/spark-env.sh
 echo "PYSPARK_DRIVER_PYTHON=python3" >> $SPARK_HOME/conf/spark-env.sh
 
+# Setup log4j config to reduce logging output
+cp $SPARK_HOME/conf/log4j.properties.template $SPARK_HOME/conf/log4j.properties
+sed -i .bak 's/INFO/ERROR/g' $SPARK_HOME/conf/log4j.properties
+
 #
 # Install MongoDB in the mongo directory in the root of our project. Also, get the jar for the MongoDB driver
 # and the mongo-hadoop project.
