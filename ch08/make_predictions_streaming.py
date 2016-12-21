@@ -158,7 +158,7 @@ def main(base_path):
       prediction_requests_df = string_pipeline_model.transform(prediction_requests_df)
       prediction_requests_df = prediction_requests_df.drop(column + "_index")
   
-    # Vectorize numeric columns
+    # Vectorize numeric columns: DepDelay and Distance
     numeric_vectorized_features = vector_assembler.transform(prediction_requests_df)
   
     # Drop the original numeric columns
