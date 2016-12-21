@@ -112,11 +112,8 @@ def main(iso_date, base_path):
     prediction_requests = string_pipeline_model.transform(prediction_requests)
     prediction_requests = prediction_requests.drop(column + "_index")
     
-  # Vectorize numeric columns
+  # Vectorize numeric columns: DepDelay and Distance
   numeric_vectorized_features = vector_assembler.transform(prediction_requests)
-  
-  # Drop the original numeric columns
-  numeric_columns = ["DepDelay", "Distance"]
   
   # Combine various features into one feature vector, 'features'
   final_vectorized_features = final_assembler.transform(numeric_vectorized_features)
