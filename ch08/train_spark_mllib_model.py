@@ -76,16 +76,7 @@ def main(iso_date, base_path):
   arrival_bucketizer_path = "{}/models/arrival_bucketizer.bin".format(base_path)
   arrival_bucketizer.write().overwrite().save(arrival_bucketizer_path)
   
-  departure_bucketizer = Bucketizer(
-    splits=splits,
-    inputCol="DepDelay",
-    outputCol="DepDelayBucket"
-  )
-  ml_bucketized_features = departure_bucketizer.transform(ml_bucketized_features)
-  departure_bucketizer_path = "{}/models/departure_bucketizer.bin".format(base_path)
-  departure_bucketizer.write().overwrite().save(departure_bucketizer_path)
-  
-  ml_bucketized_features.select("ArrDelay", "ArrDelayBucket", "DepDelay", "DepDelayBucket").show()
+  ml_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
   
   #
   # Extract features tools in with pyspark.ml.feature
@@ -96,7 +87,7 @@ def main(iso_date, base_path):
   
   # Turn category fields into categoric feature vectors, then drop intermediate fields
   for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-                 "Origin", "Dest", "FlightNum", "DepDelayBucket"]:
+                 "Origin", "Dest", "FlightNum"]:
     string_indexer = StringIndexer(
       inputCol=column,
       outputCol=column + "_index"
@@ -139,7 +130,7 @@ def main(iso_date, base_path):
   
   # Combine various features into one feature vector, 'features'
   feature_columns = ["Carrier_vec", "DayOfMonth_vec", "DayOfWeek_vec", "DayOfYear_vec",
-                     "Origin_vec", "Dest_vec", "FlightNum_vec", "DepDelayBucket_vec",
+                     "Origin_vec", "Dest_vec", "FlightNum_vec",
                      "NumericFeatures_vec"]
   final_assembler = VectorAssembler(
       inputCols=feature_columns,
@@ -154,7 +145,7 @@ def main(iso_date, base_path):
   final_assembler.write().overwrite().save(final_assembler_path)
   
   # Inspect the finalized features
-  final_vectorized_features = final_vectorized_features.limit(100000) # remove me, I am for the author's development
+  #final_vectorized_features = final_vectorized_features.limit(100000) # remove me, I am for the author's development
   final_vectorized_features.show()
   
   # Instantiate and fit random forest classifier on all the data
