@@ -5,7 +5,7 @@ import json
 import datetime, iso8601
 
 # Pass date and base path to main() from airflow
-def main(iso_date, base_path):
+def main(base_path):
   
   APP_NAME = "train_spark_mllib_model.py"
   
@@ -62,6 +62,20 @@ def main(iso_date, base_path):
   print(list(cols_with_nulls))
   
   #
+  # Add a Route variable to replace FlightNum
+  #
+  from pyspark.sql.functions import lit, concat
+  features_with_route = features.withColumn(
+    'Route',
+    concat(
+      features.Origin,
+      lit('-'),
+      features.Dest
+    )
+  )
+  features_with_route.show(6)
+  
+  #
   # Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
   #
   from pyspark.ml.feature import Bucketizer
@@ -72,7 +86,8 @@ def main(iso_date, base_path):
     inputCol="ArrDelay",
     outputCol="ArrDelayBucket"
   )
-  ml_bucketized_features = arrival_bucketizer.transform(features)
+  ml_bucketized_features = arrival_bucketizer.transform(features_with_route)
+  
   arrival_bucketizer_path = "{}/models/arrival_bucketizer.bin".format(base_path)
   arrival_bucketizer.write().overwrite().save(arrival_bucketizer_path)
   
@@ -82,43 +97,39 @@ def main(iso_date, base_path):
   # Extract features tools in with pyspark.ml.feature
   #
   from pyspark.ml import Pipeline
-  from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorIndexer
+  from pyspark.ml.feature import StringIndexer
   from pyspark.ml.feature import VectorAssembler
   
-  # Turn category fields into categoric feature vectors, then drop intermediate fields
+  # Turn category fields into indexes
   for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-                 "Origin", "Dest", "FlightNum"]:
+                 "Origin", "Dest", "FlightNum", "Route"]:
     string_indexer = StringIndexer(
       inputCol=column,
       outputCol=column + "_index"
     )
     
-    one_hot_encoder = OneHotEncoder(
-      dropLast=False,
-      inputCol=column + "_index",
-      outputCol=column + "_vec"
-    )
-    string_pipeline = Pipeline(stages=[string_indexer, one_hot_encoder])
+    string_indexer_model = string_indexer.fit(ml_bucketized_features)
+    ml_bucketized_features = string_indexer_model.transform(ml_bucketized_features)
     
-    string_pipeline_model = string_pipeline.fit(ml_bucketized_features)
-    ml_bucketized_features = string_pipeline_model.transform(ml_bucketized_features)
-    
-    ml_bucketized_features = ml_bucketized_features.drop(column).drop(column + "_index")
+    # Drop the original column
+    ml_bucketized_features = ml_bucketized_features.drop(column)
     
     # Save the pipeline model
-    string_pipeline_output_path = "{}/models/string_indexer_pipeline_model_{}.bin".format(
+    string_indexer_output_path = "{}/models/string_indexer_model_{}.bin".format(
       base_path,
       column
     )
-    string_pipeline_model.write().overwrite().save(string_pipeline_output_path)
+    string_indexer_model.write().overwrite().save(string_indexer_output_path)
   
   # Handle continuous, numeric fields by combining them into one feature vector
-  numeric_columns = ["DepDelay", "Distance"]
+  numeric_columns = ["DepDelay", "Distance", "Carrier_index", "DayOfMonth_index",
+                     "DayOfWeek_index", "DayOfYear_index", "Origin_index",
+                     "Origin_index", "Dest_index", "Route_index"]
   vector_assembler = VectorAssembler(
     inputCols=numeric_columns,
-    outputCol="NumericFeatures_vec"
+    outputCol="Features_vec"
   )
-  ml_bucketized_features = vector_assembler.transform(ml_bucketized_features)
+  final_vectorized_features = vector_assembler.transform(ml_bucketized_features)
   
   # Save the numeric vector assembler
   vector_assembler_path = "{}/models/numeric_vector_assembler.bin".format(base_path)
@@ -126,23 +137,7 @@ def main(iso_date, base_path):
   
   # Drop the original columns
   for column in numeric_columns:
-    ml_bucketized_features = ml_bucketized_features.drop(column)
-  
-  # Combine various features into one feature vector, 'features'
-  feature_columns = ["Carrier_vec", "DayOfMonth_vec", "DayOfWeek_vec", "DayOfYear_vec",
-                     "Origin_vec", "Dest_vec", "FlightNum_vec",
-                     "NumericFeatures_vec"]
-  final_assembler = VectorAssembler(
-      inputCols=feature_columns,
-      outputCol="Features_vec"
-  )
-  final_vectorized_features = final_assembler.transform(ml_bucketized_features)
-  for column in feature_columns:
     final_vectorized_features = final_vectorized_features.drop(column)
-  
-  # Save the final assembler
-  final_assembler_path = "{}/models/final_vector_assembler.bin".format(base_path)
-  final_assembler.write().overwrite().save(final_assembler_path)
   
   # Inspect the finalized features
   final_vectorized_features = final_vectorized_features.limit(100000) # remove me, I am for the author's development
@@ -150,14 +145,19 @@ def main(iso_date, base_path):
   
   # Instantiate and fit random forest classifier on all the data
   from pyspark.ml.classification import RandomForestClassifier
-  rfc = RandomForestClassifier(featuresCol="Features_vec", labelCol="ArrDelayBucket", predictionCol="Prediction")
+  rfc = RandomForestClassifier(
+    featuresCol="Features_vec",
+    labelCol="ArrDelayBucket",
+    predictionCol="Prediction",
+    maxBins=4657,
+  )
   model = rfc.fit(final_vectorized_features)
   
   # Save the new model over the old one
-  model_output_path = "{}/models/spark_random_forest_classifier.flight_delays.bin".format(
+  model_output_path = "{}/models/spark_random_forest_classifier.flight_delays.5.0.bin".format(
     base_path
   )
   model.write().overwrite().save(model_output_path)
 
 if __name__ == "__main__":
-  main(sys.argv[1], sys.argv[2])
+  main(sys.argv[1])
