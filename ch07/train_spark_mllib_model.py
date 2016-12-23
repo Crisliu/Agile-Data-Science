@@ -36,16 +36,33 @@ cols_with_nulls = filter(lambda x: x[1] > 0, null_counts)
 print(list(cols_with_nulls))
 
 #
-# Categorize or 'bucketize' the arrival delay field into on time, or slightly/very late using a DataFrame UDF
+# Add a Route variable to replace FlightNum
+#
+from pyspark.sql.functions import lit, concat
+
+features_with_route = features.withColumn(
+  'Route',
+  concat(
+    features.Origin,
+    lit('-'),
+    features.Dest
+  )
+)
+features_with_route.show(6)
+
+#
+# Categorize or 'bucketize' the arrival delay field using a DataFrame UDF
 #
 def bucketize_arr_delay(arr_delay):
   bucket = None
-  if arr_delay <= 15.0:
-    bucket = 'on_time'
-  elif arr_delay > 15.0 and arr_delay <= 60.0:
-    bucket = 'slightly_late'
-  elif arr_delay > 60.0:
-    bucket = 'very_late'
+  if arr_delay <= -15.0:
+    bucket = 0.0
+  elif arr_delay > -15.0 and arr_delay <= 0.0:
+    bucket = 1.0
+  elif arr_delay > 0.0 and arr_delay <= 30.0:
+    bucket = 2.0
+  elif arr_delay > 30.0:
+    bucket = 3.0
   return bucket
 
 # Wrap the function in pyspark.sql.functions.udf with...
@@ -53,86 +70,62 @@ def bucketize_arr_delay(arr_delay):
 dummy_function_udf = udf(bucketize_arr_delay, StringType())
 
 # Add a category column via pyspark.sql.DataFrame.withColumn
-manual_bucketized_features = features.withColumn(
+manual_bucketized_features = features_with_route.withColumn(
   "ArrDelayBucket",
   dummy_function_udf(features['ArrDelay'])
 )
 manual_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
 
-manual_bucketized_features = manual_bucketized_features.withColumn(
-  "DepDelayBucket",
-  dummy_function_udf(features['DepDelay'])
-)
-manual_bucketized_features.select("DepDelay", "DepDelayBucket").show()
-
 #
-# Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
+# Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay
 #
 from pyspark.ml.feature import Bucketizer
 
-splits = [-float("inf"), 15.0, 60.0, float("inf")]
+splits = [-float("inf"), -15.0, 0, 30.0, float("inf")]
 bucketizer = Bucketizer(
   splits=splits,
   inputCol="ArrDelay",
   outputCol="ArrDelayBucket"
 )
-ml_bucketized_features = bucketizer.transform(features)
+ml_bucketized_features = bucketizer.transform(features_with_route)
 
-bucketizer = Bucketizer(
-  splits=splits,
-  inputCol="DepDelay",
-  outputCol="DepDelayBucket"
-)
-ml_bucketized_features = bucketizer.transform(ml_bucketized_features)
-
-ml_bucketized_features.select("ArrDelay", "ArrDelayBucket", "DepDelay", "DepDelayBucket").show()
+# Check the buckets out
+ml_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
 
 #
 # Extract features tools in with pyspark.ml.feature
 #
-from pyspark.ml import Pipeline
-from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorIndexer
-from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.feature import StringIndexer, VectorAssembler
 
 # Turn category fields into categoric feature vectors, then drop intermediate fields
 for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-               "Origin", "Dest", "FlightNum", "DepDelayBucket"]:
+               "Origin", "Dest", "Route"]:
   string_indexer = StringIndexer(
     inputCol=column,
     outputCol=column + "_index"
   )
-  one_hot_encoder = OneHotEncoder(
-    dropLast=False,
-    inputCol=column + "_index",
-    outputCol=column + "_vec"
-  )
-  string_pipeline = Pipeline(stages=[string_indexer, one_hot_encoder])
-  ml_bucketized_features = string_pipeline.fit(ml_bucketized_features)\
+  ml_bucketized_features = string_indexer.fit(ml_bucketized_features)\
                                           .transform(ml_bucketized_features)
-  ml_bucketized_features = ml_bucketized_features.drop(column).drop(column + "_index")
+
+# Check out the indexes
+ml_bucketized_features.show(6)
 
 # Handle continuous, numeric fields by combining them into one feature vector
 numeric_columns = ["DepDelay", "Distance"]
+index_columns = ["Carrier_index", "DayOfMonth_index",
+                   "DayOfWeek_index", "DayOfYear_index", "Origin_index",
+                   "Origin_index", "Dest_index", "Route_index"]
 vector_assembler = VectorAssembler(
-  inputCols=numeric_columns,
-  outputCol="NumericFeatures_vec"
+  inputCols=numeric_columns + index_columns,
+  outputCol="Features_vec"
 )
-ml_bucketized_features = vector_assembler.transform(ml_bucketized_features)
-for column in numeric_columns:
-  ml_bucketized_features = ml_bucketized_features.drop(column)
+final_vectorized_features = vector_assembler.transform(ml_bucketized_features)
 
-# Combine various features into one feature vector, 'features'
-feature_columns = ["Carrier_vec", "DayOfMonth_vec", "DayOfWeek_vec", "DayOfYear_vec",
-                   "Origin_vec", "Dest_vec", "FlightNum_vec", "DepDelayBucket_vec",
-                   "NumericFeatures_vec"]
-assembler = VectorAssembler(
-    inputCols=feature_columns,
-    outputCol="Features_vec"
-)
-final_vectorized_features = assembler.transform(ml_bucketized_features)
-for column in feature_columns:
+# Drop the index columns
+for column in index_columns:
   final_vectorized_features = final_vectorized_features.drop(column)
 
+# Check out the features
 final_vectorized_features.show()
 
 #
@@ -144,7 +137,7 @@ training_data, test_data = final_vectorized_features.randomSplit([0.8, 0.2])
 
 # Instantiate and fit random forest classifier
 from pyspark.ml.classification import RandomForestClassifier
-rfc = RandomForestClassifier(featuresCol="Features_vec", labelCol="ArrDelayBucket")
+rfc = RandomForestClassifier(featuresCol="Features_vec", labelCol="ArrDelayBucket", maxBins=4657)
 model = rfc.fit(training_data)
 
 # Evaluate model using test data
@@ -153,9 +146,7 @@ predictions = model.transform(test_data)
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 evaluator = MulticlassClassificationEvaluator(labelCol="ArrDelayBucket", metricName="accuracy")
 accuracy = evaluator.evaluate(predictions)
-print("Accuracy = {}".format(mae))
+print("Accuracy = {}".format(accuracy))
 
-# Show a sample sorted by scheduled departure... needed because prediction is sorted by ArrDelay,
-# so show() shows only 0 predictions.
-one_percent = predictions.sample(fraction=0.01, withReplacement=True)
-one_percent.orderBy("CRSDepTime").show(100)
+# Check a sample
+predictions.sample(False, 0.001, 18).orderBy("CRSDepTime").show(6)
