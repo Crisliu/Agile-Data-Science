@@ -57,19 +57,23 @@ function conditionalPoll(data) {
   }
 }
 
-// Render the response on the page
+// Render the response on the page for splits:
+// [-float("inf"), -15.0, 0, 30.0, float("inf")]
 function renderPage(response) {
 
   var displayMessage;
 
   if(response.Prediction == 0) {
-    displayMessage = "On Time (0-15 Minutes Late)";
+    displayMessage = "Early (15+ Minutes Early)";
   }
   else if(response.Prediction == 1) {
-    displayMessage = "Slightly Late (15-60 Minute Delay)";
+    displayMessage = "Slightly Early (0-15 Minute Early)";
   }
   else if(response.Prediction == 2) {
-    displayMessage = "Very Late (60+ Minute Delay)";
+    displayMessage = "Slightly Late (0-30 Minute Delay)";
+  }
+  else if(response.Prediction == 3) {
+    displayMessage = "Very Late (30+ Minutes Late)";
   }
 
   $( "#result" ).empty().append( displayMessage );
