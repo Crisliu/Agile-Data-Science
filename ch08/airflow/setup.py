@@ -24,12 +24,18 @@ training_dag = DAG(
   default_args=default_args
 )
 
-# We use the same command for all our PySpark tasks
+# We use the same two commands for all our PySpark tasks
 pyspark_bash_command = """
+spark-submit --master {{ params.master }} \
+  {{ params.base_path }}/{{ params.filename }} \
+  {{ params.base_path }}
+"""
+pyspark_date_bash_command = """
 spark-submit --master {{ params.master }} \
   {{ params.base_path }}/{{ params.filename }} \
   {{ ds }} {{ params.base_path }}
 """
+
 
 # Gather the training data for our classifier
 extract_features_operator = BashOperator(
@@ -67,7 +73,7 @@ daily_prediction_dag = DAG(
 # Fetch prediction requests from MongoDB
 fetch_prediction_requests_operator = BashOperator(
   task_id = "pyspark_fetch_prediction_requests",
-  bash_command = pyspark_bash_command,
+  bash_command = pyspark_date_bash_command,
   params = {
     "master": "local[8]",
     "filename": "ch08/fetch_prediction_requests.py",
@@ -79,7 +85,7 @@ fetch_prediction_requests_operator = BashOperator(
 # Make the actual predictions for today
 make_predictions_operator = BashOperator(
   task_id = "pyspark_make_predictions",
-  bash_command = pyspark_bash_command,
+  bash_command = pyspark_date_bash_command,
   params = {
     "master": "local[8]",
     "filename": "ch08/make_predictions.py",
@@ -91,7 +97,7 @@ make_predictions_operator = BashOperator(
 # Load today's predictions to Mongo
 load_prediction_results_operator = BashOperator(
   task_id = "pyspark_load_prediction_results",
-  bash_command = pyspark_bash_command,
+  bash_command = pyspark_date_bash_command,
   params = {
     "master": "local[8]",
     "filename": "ch08/load_prediction_results.py",
