@@ -110,10 +110,6 @@ def main(iso_date, base_path):
   # Index string fields with the corresponding indexer for that column
   for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
                  "Origin", "Dest", "Route"]:
-    string_pipeline_path = "{}/models/string_indexer_model_{}.bin".format(
-      base_path,
-      column
-    )
     string_indexer_model = string_indexer_models[column]
     prediction_requests_with_route = string_indexer_model.transform(prediction_requests_with_route)
       
