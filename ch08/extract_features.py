@@ -5,7 +5,7 @@ import json
 import datetime, iso8601
 
 # Pass date and base path to main() from airflow
-def main(iso_date, base_path):
+def main(base_path):
   
   APP_NAME = "extract_features.py"
   
@@ -43,7 +43,8 @@ def main(iso_date, base_path):
     DepDelay,
     ArrDelay,
     CRSDepTime,
-    CRSArrTime
+    CRSArrTime,
+    CONCAT(Origin, '-', Dest) AS Route
   FROM on_time_performance
   """)
   simple_on_time_features.show()
@@ -114,6 +115,7 @@ def main(iso_date, base_path):
       'ArrDelay': row['ArrDelay'],
       'CRSDepTime': scheduled_dep_time,
       'CRSArrTime': scheduled_arr_time,
+      'Route': row['Route'],
     }
   
   timestamp_features = filled_on_time_features.rdd.map(alter_feature_datetimes)
@@ -144,5 +146,5 @@ def main(iso_date, base_path):
   os.system(combine_cmd)
 
 if __name__ == "__main__":
-  main(sys.argv[1], sys.argv[2])
+  main(sys.argv[1])
 
