@@ -79,18 +79,21 @@ def main(base_path):
   # Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
   #
   from pyspark.ml.feature import Bucketizer
-  
-  splits = [-float("inf"), 15.0, 60.0, float("inf")]
+
+  # Setup the Bucketizer
+  splits = [-float("inf"), -15.0, 0, 30.0, float("inf")]
   arrival_bucketizer = Bucketizer(
     splits=splits,
     inputCol="ArrDelay",
     outputCol="ArrDelayBucket"
   )
-  ml_bucketized_features = arrival_bucketizer.transform(features_with_route)
-  
-  arrival_bucketizer_path = "{}/models/arrival_bucketizer.bin".format(base_path)
+
+  # Save the model
+  arrival_bucketizer_path = "{}/models/arrival_bucketizer_2.0.bin".format(base_path)
   arrival_bucketizer.write().overwrite().save(arrival_bucketizer_path)
   
+  # Apply the model
+  ml_bucketized_features = arrival_bucketizer.transform(features_with_route)
   ml_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
   
   #
