@@ -27,38 +27,30 @@ def main(iso_date, base_path):
   
   # Load the arrival delay bucketizer
   from pyspark.ml.feature import Bucketizer
-  arrival_bucketizer_path = "{}/models/arrival_bucketizer.bin".format(base_path)
+  arrival_bucketizer_path = "{}/models/arrival_bucketizer_2.0.bin".format(base_path)
   arrival_bucketizer = Bucketizer.load(arrival_bucketizer_path)
   
-  # Load the departure delay bucketizer
-  departure_bucketizer_path = "{}/models/departure_bucketizer.bin".format(base_path)
-  departure_bucketizer = Bucketizer.load(departure_bucketizer_path)
+  # Load all the string indexers into a dict
+  from pyspark.ml.feature import StringIndexerModel
   
-  # Load all the string field vectorizer pipelines into a dict
-  from pyspark.ml import PipelineModel
-  
-  string_vectorizer_pipeline_models = {}
+  string_indexer_models = {}
   for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-                 "Origin", "Dest", "FlightNum"]:
-    string_pipeline_model_path = "{}/models/string_indexer_pipeline_model_{}.bin".format(
+                 "Origin", "Dest", "Route"]:
+    string_indexer_model_path = "{}/models/string_indexer_model_{}.bin".format(
       base_path,
       column
     )
-    string_pipeline_model = PipelineModel.load(string_pipeline_model_path)
-    string_vectorizer_pipeline_models[column] = string_pipeline_model
+    string_indexer_model = StringIndexerModel.load(string_indexer_model_path)
+    string_indexer_models[column] = string_indexer_model
   
   # Load the numeric vector assembler
   from pyspark.ml.feature import VectorAssembler
   vector_assembler_path = "{}/models/numeric_vector_assembler.bin".format(base_path)
   vector_assembler = VectorAssembler.load(vector_assembler_path)
-  
-  # Load the final assembler
-  final_assembler_path = "{}/models/final_vector_assembler.bin".format(base_path)
-  final_assembler = VectorAssembler.load(final_assembler_path)
-  
+    
   # Load the classifier model
   from pyspark.ml.classification import RandomForestClassifier, RandomForestClassificationModel
-  random_forest_model_path = "{}/models/spark_random_forest_classifier.flight_delays.bin".format(
+  random_forest_model_path = "{}/models/spark_random_forest_classifier.flight_delays.5.0.bin".format(
       base_path
   )
   rfc = RandomForestClassificationModel.load(
@@ -99,30 +91,40 @@ def main(iso_date, base_path):
   
   prediction_requests = spark.read.json(today_input_path, schema=schema)
   prediction_requests.show()
+
+  #
+  # Add a Route variable to replace FlightNum
+  #
   
-  # Vectorize string fields with the corresponding pipeline for that column
-  # Turn category fields into categoric feature vectors, then drop intermediate fields
+  from pyspark.sql.functions import lit, concat
+  prediction_requests_with_route = prediction_requests.withColumn(
+    'Route',
+    concat(
+      prediction_requests.Origin,
+      lit('-'),
+      prediction_requests.Dest
+    )
+  )
+  prediction_requests_with_route.show(6)
+  
+  # Index string fields with the corresponding indexer for that column
   for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-                 "Origin", "Dest", "FlightNum"]:
-    string_pipeline_path = "{}/models/string_indexer_pipeline_{}.bin".format(
+                 "Origin", "Dest", "Route"]:
+    string_pipeline_path = "{}/models/string_indexer_model_{}.bin".format(
       base_path,
       column
     )
-    string_pipeline_model = string_vectorizer_pipeline_models[column]
-    prediction_requests = string_pipeline_model.transform(prediction_requests)
-    prediction_requests = prediction_requests.drop(column + "_index")
-    
+    string_indexer_model = string_indexer_models[column]
+    prediction_requests_with_route = string_indexer_model.transform(prediction_requests_with_route)
+      
   # Vectorize numeric columns: DepDelay and Distance
-  numeric_vectorized_features = vector_assembler.transform(prediction_requests)
+  final_vectorized_features = vector_assembler.transform(prediction_requests_with_route)
   
-  # Combine various features into one feature vector, 'features'
-  final_vectorized_features = final_assembler.transform(numeric_vectorized_features)
-  final_vectorized_features.show()
-  
-  # Drop the individual vector columns
-  feature_columns = ["Carrier_vec", "DayOfMonth_vec", "DayOfWeek_vec", "DayOfYear_vec",
-                     "Origin_vec", "Dest_vec", "FlightNum_vec", "NumericFeatures_vec"]
-  for column in feature_columns:
+  # Drop the indexes for the nominal fields
+  index_columns = ["Carrier_index", "DayOfMonth_index","DayOfWeek_index",
+                   "DayOfYear_index", "Origin_index", "Origin_index",
+                   "Dest_index", "Route_index"]
+  for column in index_columns:
     final_vectorized_features = final_vectorized_features.drop(column)
 
   # Inspect the finalized features
