@@ -516,7 +516,6 @@ def flight_delays_page_kafka():
     {'field': 'FlightDate', 'label': 'Date'},
     {'field': 'Origin'},
     {'field': 'Dest', 'label': 'Destination'},
-    {'field': 'FlightNum', 'label': 'Flight Number'},
   ]
   
   return render_template('flight_delays_predict_kafka.html', form_config=form_config)
