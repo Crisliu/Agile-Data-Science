@@ -99,13 +99,11 @@ def main(base_path):
   #
   # Extract features tools in with pyspark.ml.feature
   #
-  from pyspark.ml import Pipeline
-  from pyspark.ml.feature import StringIndexer
-  from pyspark.ml.feature import VectorAssembler
+  from pyspark.ml.feature import StringIndexer, VectorAssembler
   
   # Turn category fields into indexes
   for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-                 "Origin", "Dest", "FlightNum", "Route"]:
+                 "Origin", "Dest", "Route"]:
     string_indexer = StringIndexer(
       inputCol=column,
       outputCol=column + "_index"
@@ -125,25 +123,25 @@ def main(base_path):
     string_indexer_model.write().overwrite().save(string_indexer_output_path)
   
   # Handle continuous, numeric fields by combining them into one feature vector
-  numeric_columns = ["DepDelay", "Distance", "Carrier_index", "DayOfMonth_index",
-                     "DayOfWeek_index", "DayOfYear_index", "Origin_index",
-                     "Origin_index", "Dest_index", "Route_index"]
+  numeric_columns = ["DepDelay", "Distance"]
+  index_columns = ["Carrier_index", "DayOfMonth_index",
+                   "DayOfWeek_index", "DayOfYear_index", "Origin_index",
+                   "Origin_index", "Dest_index", "Route_index"]
   vector_assembler = VectorAssembler(
-    inputCols=numeric_columns,
+    inputCols=numeric_columns + index_columns,
     outputCol="Features_vec"
   )
   final_vectorized_features = vector_assembler.transform(ml_bucketized_features)
-  
+
   # Save the numeric vector assembler
   vector_assembler_path = "{}/models/numeric_vector_assembler.bin".format(base_path)
   vector_assembler.write().overwrite().save(vector_assembler_path)
   
   # Drop the original columns
-  for column in numeric_columns:
+  for column in index_columns:
     final_vectorized_features = final_vectorized_features.drop(column)
   
   # Inspect the finalized features
-  final_vectorized_features = final_vectorized_features.limit(100000) # remove me, I am for the author's development
   final_vectorized_features.show()
   
   # Instantiate and fit random forest classifier on all the data
