@@ -34,15 +34,25 @@ features.registerTempTable("features")
 features.show()
 
 #
-# Check whether lateness varies a lot by hour
+# Check whether lateness varies a lot by hour scheduled departure/arrival
 #
 
 spark.sql("""
 SELECT
-  HOUR(CRSDepTime) AS Hour,
+  HOUR(CRSDepTime) + 1 AS Hour,
   AVG(ArrDelay),
   STD(ArrDelay)
 FROM features
 GROUP BY HOUR(CRSDepTime)
 ORDER BY HOUR(CRSDepTime)
+""").show(24)
+
+spark.sql("""
+SELECT
+  HOUR(CRSArrTime) + 1 AS Hour,
+  AVG(ArrDelay),
+  STD(ArrDelay)
+FROM features
+GROUP BY HOUR(CRSArrTime)
+ORDER BY HOUR(CRSArrTime)
 """).show(24)
