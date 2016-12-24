@@ -142,7 +142,6 @@ def main(base_path):
     final_vectorized_features = final_vectorized_features.drop(column)
   
   # Inspect the finalized features
-  final_vectorized_features = final_vectorized_features.limit(100000) # remove me, I am for the author's development
   final_vectorized_features.show()
   
   # Instantiate and fit random forest classifier on all the data
