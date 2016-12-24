@@ -69,14 +69,18 @@ def main(base_path):
   features_with_route.show(6)
   
   #
-  # Add the hour of day of scheduled departure
+  # Add the hour of day of scheduled arrival/departure
   #
   from pyspark.sql.functions import hour
   features_with_hour = features_with_route.withColumn(
     "CRSDepHourOfDay",
     hour(features.CRSDepTime)
   )
-  features_with_hour.show()
+  features_with_hour = features_with_hour.withColumn(
+    "CRSArrHourOfDay",
+    hour(features.CRSArrTime)
+  )
+  features_with_hour.select("CRSDepTime", "CRSDepHourOfDay", "CRSArrTime", "CRSArrHourOfDay").show()
 
   #
   # Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
@@ -105,8 +109,7 @@ def main(base_path):
   from pyspark.ml.feature import StringIndexer, VectorAssembler
 
   # Turn category fields into indexes
-  for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-                 "Origin", "Dest", "Route", "CRSDepHourOfDay"]:
+  for column in ["Carrier", "Origin", "Dest", "Route"]:
     string_indexer = StringIndexer(
       inputCol=column,
       outputCol=column + "_index"
@@ -115,9 +118,6 @@ def main(base_path):
     string_indexer_model = string_indexer.fit(ml_bucketized_features)
     ml_bucketized_features = string_indexer_model.transform(ml_bucketized_features)
   
-    # Drop the original column
-    ml_bucketized_features = ml_bucketized_features.drop(column)
-  
     # Save the pipeline model
     string_indexer_output_path = "{}/models/string_indexer_model_3.0.{}.bin".format(
       base_path,
@@ -125,12 +125,15 @@ def main(base_path):
     )
     string_indexer_model.write().overwrite().save(string_indexer_output_path)
 
-  # Handle continuous, numeric fields by combining them into one feature vector
-  numeric_columns = ["DepDelay", "Distance"]
-  index_columns = ["Carrier_index", "DayOfMonth_index",
-                   "DayOfWeek_index", "DayOfYear_index", "Origin_index",
-                   "Origin_index", "Dest_index", "Route_index",
-                   "CRSDepHourOfDay_index"]
+  # Combine continuous, numeric fields with indexes of nominal ones
+  # ...into one feature vector
+  numeric_columns = [
+    "DepDelay", "Distance",
+    "DayOfMonth", "DayOfWeek",
+    "DayOfYear", "CRSDepHourOfDay",
+    "CRSArrHourOfDay"]
+  index_columns = ["Carrier_index", "Origin_index",
+                   "Dest_index", "Route_index"]
   vector_assembler = VectorAssembler(
     inputCols=numeric_columns + index_columns,
     outputCol="Features_vec"
@@ -149,13 +152,23 @@ def main(base_path):
   final_vectorized_features.show()
 
   #
-  # Cross validate, train and evaluate classifier: loop 5 times
+  # Cross validate, train and evaluate classifier: loop 5 times for 4 metrics
   #
+
+  from collections import defaultdict
+  scores = defaultdict(list)
+  metric_names = ["accuracy", "weightedPrecision", "weightedRecall", "f1"]
+  split_count = 3
+
+  for i in range(1, split_count + 1):
+    print("Run {} out of {} of test/train splits in cross validation...".format(
+      i,
+      split_count,
+    )
+    )
   
-  accuracies = []
-  for i in range(0,5):
     # Test/train split
-    training_data, test_data = final_vectorized_features.randomSplit([0.8, 0.2])
+    training_data, test_data = final_vectorized_features.limit(1000000).randomSplit([0.8, 0.2])
   
     # Instantiate and fit random forest classifier on all the data
     from pyspark.ml.classification import RandomForestClassifier
@@ -168,7 +181,7 @@ def main(base_path):
     model = rfc.fit(training_data)
   
     # Save the new model over the old one
-    model_output_path = "{}/models/spark_random_forest_classifier.flight_delays.6.0.bin".format(
+    model_output_path = "{}/models/spark_random_forest_classifier.flight_delays.baseline.bin".format(
       base_path
     )
     model.write().overwrite().save(model_output_path)
@@ -176,22 +189,70 @@ def main(base_path):
     # Evaluate model using test data
     predictions = model.transform(test_data)
   
+    # Evaluate this split's results for each metric
     from pyspark.ml.evaluation import MulticlassClassificationEvaluator
-    evaluator = MulticlassClassificationEvaluator(labelCol="ArrDelayBucket", predictionCol="Prediction", metricName="accuracy")
-    accuracy = evaluator.evaluate(predictions)
+    for metric_name in metric_names:
+      evaluator = MulticlassClassificationEvaluator(
+        labelCol="ArrDelayBucket",
+        predictionCol="Prediction",
+        metricName=metric_name
+      )
+      score = evaluator.evaluate(predictions)
+    
+      scores[metric_name].append(score)
+      print("{} = {}".format(metric_name, score))
 
-    accuracies.append(accuracy)
-    print("Accuracy = {}".format(accuracy))
-  
   #
-  # Evaluate average and STD of scores
+  # Evaluate average and STD of each metric
   #
-  average_accuracy = sum(accuracies)/len(accuracies)
-  print("Average Accuracy = {:.3f}".format(average_accuracy))
-  
   import numpy as np
-  std_accuracy = np.std(accuracies)
-  print("STD Accuracy   =   {:.3f}".format(std_accuracy))
+  score_averages = defaultdict(float)
+  
+  for metric_name in metric_names:
+    metric_scores = scores[metric_name]
+  
+    average_accuracy = sum(metric_scores) / len(metric_scores)
+    print("AVG {} = {:.4f}".format(metric_name, average_accuracy))
+    score_averages[metric_name] = average_accuracy
+  
+    std_accuracy = np.std(metric_scores)
+    print("STD {} = {:.4f}".format(metric_name, std_accuracy))
+    
+  #
+  # Persist the score to a sccore log that exists between runs
+  #
+  import pickle
+  
+  # Load the score log or initialize an empty one
+  try:
+    score_log_filename = "{}/models/score_log.pickle".format(base_path)
+    score_log = pickle.load(open(score_log_filename, "rb"))
+    if not isinstance(score_log, list):
+      score_log = []
+  except IOError:
+    score_log = []
+  
+  # Compute the existing score log entry
+  score_log_entry = {metric_name: score_averages[metric_name] for metric_name in metric_names}
+  
+  # Compute and display the change in score for each metric
+  try:
+    last_log = score_log[-1]
+  except (IndexError, TypeError, AttributeError):
+    last_log = score_log_entry
+  
+  print("Experiment Report")
+  print("----------------------------------")
+  for metric_name in metric_names:
+    run_delta = score_log_entry[metric_name] - last_log[metric_name]
+    print("{} delta: {:.4f}".format(metric_name, run_delta))
+  print("----------------------------------")
+  
+  # Append the existing average scores to the log
+  score_log.append(score_log_entry)
+  
+  # Persist the log for next run
+  pickle.dump(score_log, open(score_log_filename, "wb"))
   
 if __name__ == "__main__":
   main(sys.argv[1])
