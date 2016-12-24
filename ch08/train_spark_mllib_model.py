@@ -137,11 +137,12 @@ def main(base_path):
   vector_assembler_path = "{}/models/numeric_vector_assembler.bin".format(base_path)
   vector_assembler.write().overwrite().save(vector_assembler_path)
   
-  # Drop the original columns
+  # Drop the index columns
   for column in index_columns:
     final_vectorized_features = final_vectorized_features.drop(column)
   
   # Inspect the finalized features
+  final_vectorized_features = final_vectorized_features.limit(100000) # remove me, I am for the author's development
   final_vectorized_features.show()
   
   # Instantiate and fit random forest classifier on all the data
@@ -159,6 +160,15 @@ def main(base_path):
     base_path
   )
   model.write().overwrite().save(model_output_path)
+
+  # Evaluate model using test data
+  predictions = model.transform(final_vectorized_features)
+
+  # Check the distribution of predictions
+  predictions.groupBy("Prediction").count().show()
+
+  # Check a sample
+  predictions.sample(False, 0.001, 18).orderBy("CRSDepTime").show(6)
 
 if __name__ == "__main__":
   main(sys.argv[1])
