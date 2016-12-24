@@ -102,8 +102,7 @@ def main(base_path):
   from pyspark.ml.feature import StringIndexer, VectorAssembler
   
   # Turn category fields into indexes
-  for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-                 "Origin", "Dest", "Route"]:
+  for column in ["Carrier", "Origin", "Dest", "Route"]:
     string_indexer = StringIndexer(
       inputCol=column,
       outputCol=column + "_index"
@@ -122,11 +121,14 @@ def main(base_path):
     )
     string_indexer_model.write().overwrite().save(string_indexer_output_path)
   
-  # Handle continuous, numeric fields by combining them into one feature vector
-  numeric_columns = ["DepDelay", "Distance"]
-  index_columns = ["Carrier_index", "DayOfMonth_index",
-                   "DayOfWeek_index", "DayOfYear_index", "Origin_index",
-                   "Origin_index", "Dest_index", "Route_index"]
+  # Combine continuous, numeric fields with indexes of nominal ones
+  # ...into one feature vector
+  numeric_columns = [
+    "DepDelay", "Distance",
+    "DayOfMonth", "DayOfWeek",
+    "DayOfYear"]
+  index_columns = ["Carrier_index", "Origin_index",
+                   "Dest_index", "Route_index"]
   vector_assembler = VectorAssembler(
     inputCols=numeric_columns + index_columns,
     outputCol="Features_vec"
