@@ -149,64 +149,114 @@ def main(base_path):
   #
 
   from collections import defaultdict
-  metric_names = ["f1", "accuracy", "weightedPrecision", "weightedRecall"]
-  accuracies = defaultdict(list)
+  scores = defaultdict(list)
+  metric_names = ["accuracy", "weightedPrecision", "weightedRecall", "f1"]
   split_count = 3
 
-  for metric_name in metric_names:
-    for i in range(1, split_count + 1):
-      print("Metric {}, run {} out of {} of test/train splits in cross validation...".format(
-        metric_name,
+  for i in range(1, split_count + 1):
+    print("Run {} out of {} of test/train splits in cross validation...".format(
         i,
         split_count,
       )
-      )
+    )
+  
+    # Test/train split
+    training_data, test_data = final_vectorized_features.randomSplit([0.8, 0.2])
+  
+    # Instantiate and fit random forest classifier on all the data
+    from pyspark.ml.classification import RandomForestClassifier
+    rfc = RandomForestClassifier(
+      featuresCol="Features_vec",
+      labelCol="ArrDelayBucket",
+      predictionCol="Prediction",
+      maxBins=4657,
+    )
+    model = rfc.fit(training_data)
+  
+    # Save the new model over the old one
+    model_output_path = "{}/models/spark_random_forest_classifier.flight_delays.baseline.bin".format(
+      base_path
+    )
+    model.write().overwrite().save(model_output_path)
+  
+    # Evaluate model using test data
+    predictions = model.transform(test_data)
     
-      # Test/train split
-      training_data, test_data = final_vectorized_features.randomSplit([0.8, 0.2])
-    
-      # Instantiate and fit random forest classifier on all the data
-      from pyspark.ml.classification import RandomForestClassifier
-      rfc = RandomForestClassifier(
-        featuresCol="Features_vec",
-        labelCol="ArrDelayBucket",
-        predictionCol="Prediction",
-        maxBins=4657,
-      )
-      model = rfc.fit(training_data)
-    
-      # Save the new model over the old one
-      model_output_path = "{}/models/spark_random_forest_classifier.flight_delays.baseline.bin".format(
-        base_path
-      )
-      model.write().overwrite().save(model_output_path)
-    
-      # Evaluate model using test data
-      predictions = model.transform(test_data)
-    
-      from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+    # Evaluate this split's results for each metric
+    from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+    for metric_name in metric_names:
+      
       evaluator = MulticlassClassificationEvaluator(
         labelCol="ArrDelayBucket",
         predictionCol="Prediction",
         metricName=metric_name
       )
       score = evaluator.evaluate(predictions)
-    
-      accuracies[metric_name].append(score)
+
+      scores[metric_name].append(score)
       print("{} = {}".format(metric_name, score))
 
   #
   # Evaluate average and STD of each metric
   #
+  import numpy as np
   for metric_name in metric_names:
-    average_accuracy = sum(accuracies[metric_name]) \
-                       / \
-                       len(accuracies[metric_names])
-    print("Average {} = {:.3f}".format(metric_name, average_accuracy))
+    metric_scores = scores[metric_name]
+    
+    average_accuracy = sum(metric_scores) / len(metric_scores)
+    print("AVG {} = {:.3f}".format(metric_name, average_accuracy))
   
-    import numpy as np
-    std_accuracy = np.std(accuracies[metric_name])
+    std_accuracy = np.std(metric_scores)
     print("STD {} = {:.3f}".format(metric_name, std_accuracy))
+
+  #
+  # Evaluate average and STD of each metric
+  #
+  import numpy as np
+  score_averages = defaultdict(float)
+
+  for metric_name in metric_names:
+    metric_scores = scores[metric_name]
+  
+    average_accuracy = sum(metric_scores) / len(metric_scores)
+    print("AVG {} = {:.4f}".format(metric_name, average_accuracy))
+    score_averages[metric_name] = average_accuracy
+  
+    std_accuracy = np.std(metric_scores)
+    print("STD {} = {:.4f}".format(metric_name, std_accuracy))
+
+  #
+  # Persist the score to a sccore log that exists between runs
+  #
+  import pickle
+
+  # Load the score log or initialize an empty one
+  try:
+    score_log_filename = "{}/models/score_log.pickle".format(base_path)
+    score_log = pickle.load(open(score_log_filename, "rb"))
+    if not isinstance(score_log, list):
+      score_log = []
+  except IOError:
+    score_log = []
+
+  # Compute the existing score log entry
+  score_log_entry = {metric_name: score_averages[metric_name] for metric_name in metric_names}
+
+  # Compute and display the change in score for each metric
+  try:
+    last_log = score_log[-1]
+  except (IndexError, TypeError, AttributeError):
+    last_log = score_log_entry
+
+  for metric_name in metric_names:
+    run_delta = score_log_entry[metric_name] - last_log[metric_name]
+    print("{} delta: {:.4f}".format(metric_name, run_delta))
+
+  # Append the existing average scores to the log
+  score_log.append(score_log_entry)
+
+  # Persist the log for next run
+  pickle.dump(score_log, open(score_log_filename, "wb"))
 
 if __name__ == "__main__":
   main(sys.argv[1])
