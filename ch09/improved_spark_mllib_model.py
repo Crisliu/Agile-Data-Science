@@ -311,7 +311,9 @@ def main(base_path):
   try:
     last_feature_log = feature_log[-1]
   except (IndexError, TypeError, AttributeError):
-    last_feature_log = feature_importance_entry
+    last_feature_log = defaultdict(float)
+    for feature_name, importance in feature_importance_entry.items():
+      last_feature_log[feature_name] = importance
 
   # Compute the deltas
   feature_deltas = {}
