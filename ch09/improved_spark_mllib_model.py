@@ -80,7 +80,7 @@ def main(base_path):
     "CRSArrHourOfDay",
     hour(features.CRSArrTime)
   )
-  features_with_hour.select("CRSDepTime", "CRSDepHourOfDay", "CRSArrTime", "CRSArrHourOfDay").show()
+  features_with_hour.select("CRSDepTime", "e", "CRSArrTime", "CRSArrHourOfDay").show()
 
   #
   # Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
@@ -161,7 +161,7 @@ def main(base_path):
   split_count = 3
 
   for i in range(1, split_count + 1):
-    print("Run {} out of {} of test/train splits in cross validation...".format(
+    print("\nRun {} out of {} of test/train splits in cross validation...".format(
       i,
       split_count,
     )
