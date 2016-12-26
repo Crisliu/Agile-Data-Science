@@ -208,6 +208,8 @@ def main(base_path):
   import numpy as np
   score_averages = defaultdict(float)
   
+  print("\nExperiment Log")
+  print("----------------------------------")
   for metric_name in metric_names:
     metric_scores = scores[metric_name]
   
@@ -217,7 +219,7 @@ def main(base_path):
   
     std_accuracy = np.std(metric_scores)
     print("STD {} = {:.4f}".format(metric_name, std_accuracy))
-    
+  print("----------------------------------")
   #
   # Persist the score to a sccore log that exists between runs
   #
@@ -241,7 +243,7 @@ def main(base_path):
   except (IndexError, TypeError, AttributeError):
     last_log = score_log_entry
   
-  print("Experiment Report")
+  print("\nExperiment Report")
   print("----------------------------------")
   for metric_name in metric_names:
     run_delta = score_log_entry[metric_name] - last_log[metric_name]
