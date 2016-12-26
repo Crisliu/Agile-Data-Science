@@ -3,7 +3,7 @@
 import sys, os, re
 import json
 import datetime, iso8601
-
+from tabulate import tabulate
 
 # Pass date and base path to main() from airflow
 def main(base_path):
@@ -80,7 +80,7 @@ def main(base_path):
     "CRSArrHourOfDay",
     hour(features.CRSArrTime)
   )
-  features_with_hour.select("CRSDepTime", "e", "CRSArrTime", "CRSArrHourOfDay").show()
+  features_with_hour.select("CRSDepTime", "CRSDepHourOfDay", "CRSArrTime", "CRSArrHourOfDay").show()
 
   #
   # Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
@@ -157,18 +157,19 @@ def main(base_path):
 
   from collections import defaultdict
   scores = defaultdict(list)
+  feature_importances = defaultdict(list)
   metric_names = ["accuracy", "weightedPrecision", "weightedRecall", "f1"]
   split_count = 3
 
   for i in range(1, split_count + 1):
     print("\nRun {} out of {} of test/train splits in cross validation...".format(
-      i,
-      split_count,
-    )
+        i,
+        split_count,
+      )
     )
   
     # Test/train split
-    training_data, test_data = final_vectorized_features.limit(1000000).randomSplit([0.8, 0.2])
+    training_data, test_data = final_vectorized_features.randomSplit([0.8, 0.2])
   
     # Instantiate and fit random forest classifier on all the data
     from pyspark.ml.classification import RandomForestClassifier
@@ -202,24 +203,37 @@ def main(base_path):
       scores[metric_name].append(score)
       print("{} = {}".format(metric_name, score))
 
+    #
+    # Collect feature importances
+    #
+    feature_names = vector_assembler.getInputCols()
+    feature_importance_list = model.featureImportances
+    for feature_name, feature_importance in zip(feature_names, feature_importance_list):
+      feature_importances[feature_name].append(feature_importance)
+
   #
-  # Evaluate average and STD of each metric
+  # Evaluate average and STD of each metric and print a table
   #
   import numpy as np
   score_averages = defaultdict(float)
   
-  print("\nExperiment Log")
-  print("----------------------------------")
+  # Compute the table data
+  average_stds = [] # ha
   for metric_name in metric_names:
     metric_scores = scores[metric_name]
-  
+    
     average_accuracy = sum(metric_scores) / len(metric_scores)
-    print("AVG {} = {:.4f}".format(metric_name, average_accuracy))
     score_averages[metric_name] = average_accuracy
-  
+    
     std_accuracy = np.std(metric_scores)
-    print("STD {} = {:.4f}".format(metric_name, std_accuracy))
-  print("----------------------------------")
+    
+    average_stds.append((metric_name, average_accuracy, std_accuracy))
+  
+  # Print the table
+  print("\nExperiment Log")
+  print("--------------")
+  print(tabulate(average_stds, headers=["Metric", "Average", "STD"]))
+  
   #
   # Persist the score to a sccore log that exists between runs
   #
@@ -243,18 +257,86 @@ def main(base_path):
   except (IndexError, TypeError, AttributeError):
     last_log = score_log_entry
   
-  print("\nExperiment Report")
-  print("----------------------------------")
+  experiment_report = []
   for metric_name in metric_names:
     run_delta = score_log_entry[metric_name] - last_log[metric_name]
-    print("{} delta: {:.4f}".format(metric_name, run_delta))
-  print("----------------------------------")
+    experiment_report.append((metric_name, run_delta))
+  
+  print("\nExperiment Report")
+  print("-----------------")
+  print(tabulate(experiment_report, headers=["Metric", "Score"]))
   
   # Append the existing average scores to the log
   score_log.append(score_log_entry)
   
   # Persist the log for next run
   pickle.dump(score_log, open(score_log_filename, "wb"))
+  
+  #
+  # Analyze and report feature importance changes
+  #
+  
+  # Compute averages for each feature
+  feature_importance_entry = defaultdict(float)
+  for feature_name, value_list in feature_importances.items():
+    average_importance = sum(value_list) / len(value_list)
+    feature_importance_entry[feature_name] = average_importance
+  
+  # Sort the feature importances in descending order and print
+  import operator
+  sorted_feature_importances = sorted(
+    feature_importance_entry.items(),
+    key=operator.itemgetter(1),
+    reverse=True
+  )
+  
+  print("\nFeature Importances")
+  print("-------------------")
+  print(tabulate(sorted_feature_importances, headers=['Name', 'Importance']))
+  
+  #
+  # Compare this run's feature importances with the previous run's
+  #
+    
+  # Load the feature importance log or initialize an empty one
+  try:
+    feature_log_filename = "{}/models/feature_log.pickle".format(base_path)
+    feature_log = pickle.load(open(feature_log_filename, "rb"))
+    if not isinstance(feature_log, list):
+      feature_log = []
+  except IOError:
+    feature_log = []
+  
+  # Compute and display the change in score for each feature
+  try:
+    last_feature_log = feature_log[-1]
+  except (IndexError, TypeError, AttributeError):
+    last_feature_log = feature_importance_entry
+
+  # Compute the deltas
+  feature_deltas = {}
+  for feature_name in feature_importances.keys():
+    run_delta = feature_importance_entry[feature_name] - last_feature_log[feature_name]
+    feature_deltas[feature_name] = run_delta
+  
+  # Sort feature deltas, biggest change first
+  import operator
+  sorted_feature_deltas = sorted(
+    feature_deltas.items(),
+    key=operator.itemgetter(1),
+    reverse=True
+  )
+  
+  # Display sorted feature deltas
+  print("\nFeature Importance Delta Report")
+  print("-------------------------------")
+  print(tabulate(sorted_feature_deltas, headers=["Feature", "Delta"]))
+
+  # Append the existing average deltas to the log
+  feature_log.append(feature_importance_entry)
+
+  # Persist the log for next run
+  pickle.dump(feature_log, open(feature_log_filename, "wb"))
   
 if __name__ == "__main__":
   main(sys.argv[1])
