@@ -14,3 +14,4 @@ sklearn
 matplotlib
 kafka-python
 airflow
+tabulate
