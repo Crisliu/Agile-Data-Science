@@ -115,8 +115,7 @@ def main(base_path):
   string_columns = ["Carrier", "Origin", "Dest", "Route",
                     "TailNum", "EngineManufacturer",
                     "EngineModel", "Manufacturer",
-                    "ManufacturerYear", "Owner",
-                    "OwnerState"]
+                    "ManufacturerYear", "OwnerState"]
   for column in string_columns:
     string_indexer = StringIndexer(
       inputCol=column,
