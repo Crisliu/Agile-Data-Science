@@ -254,7 +254,9 @@ def main(base_path):
     score_log = []
   
   # Compute the existing score log entry
-  score_log_entry = {metric_name: score_averages[metric_name] for metric_name in metric_names}
+  score_log_entry = {
+    metric_name: score_averages[metric_name] for metric_name in metric_names
+  }
   
   # Compute and display the change in score for each metric
   try:
