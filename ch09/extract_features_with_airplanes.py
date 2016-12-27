@@ -155,7 +155,7 @@ def main(base_path):
     "CRSArrTime",
     "Route",
     timestamp_df["TailNum"],
-    "EngineManufacturer",
+    "COALESCE(EngineManufacturer, 'Empty')",
     "EngineModel",
     "Manufacturer",
     "ManufacturerYear",
