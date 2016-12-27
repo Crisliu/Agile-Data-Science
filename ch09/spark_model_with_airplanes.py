@@ -113,9 +113,7 @@ def main(base_path):
   
   # Turn category fields into indexes
   string_columns = ["Carrier", "Origin", "Dest", "Route",
-                    "TailNum", "EngineManufacturer",
-                    "EngineModel", "Manufacturer",
-                    "ManufacturerYear", "OwnerState"]
+                    "TailNum"]
   for column in string_columns:
     string_indexer = StringIndexer(
       inputCol=column,
@@ -126,7 +124,7 @@ def main(base_path):
     ml_bucketized_features = string_indexer_model.transform(ml_bucketized_features)
     
     # Save the pipeline model
-    string_indexer_output_path = "{}/models/string_indexer_model_3.0.{}.bin".format(
+    string_indexer_output_path = "{}/models/string_indexer_model_4.0.{}.bin".format(
       base_path,
       column
     )
@@ -136,8 +134,8 @@ def main(base_path):
   # ...into one feature vector
   numeric_columns = [
     "DepDelay", "Distance",
-    "DayOfMonth", "DayOfWeek",
-    "DayOfYear", "CRSDepHourOfDay",
+    "DayOfYear",
+    "CRSDepHourOfDay",
     "CRSArrHourOfDay"]
   index_columns = [column + "_index" for column in string_columns]
   
@@ -148,7 +146,7 @@ def main(base_path):
   final_vectorized_features = vector_assembler.transform(ml_bucketized_features)
   
   # Save the numeric vector assembler
-  vector_assembler_path = "{}/models/numeric_vector_assembler_4.0.bin".format(base_path)
+  vector_assembler_path = "{}/models/numeric_vector_assembler_5.0.bin".format(base_path)
   vector_assembler.write().overwrite().save(vector_assembler_path)
   
   # Drop the index columns
@@ -184,7 +182,7 @@ def main(base_path):
       featuresCol="Features_vec",
       labelCol="ArrDelayBucket",
       predictionCol="Prediction",
-      maxBins=4657,
+      maxBins=4896,
     )
     model = rfc.fit(training_data)
     
