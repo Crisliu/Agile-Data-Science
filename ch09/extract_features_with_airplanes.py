@@ -155,12 +155,12 @@ def main(base_path):
     "CRSArrTime",
     "Route",
     "FeatureTailNum AS TailNum",
-    "COALESCE(EngineManufacturer, 'Empty')",
-    "COALESCE(EngineModel, 'Empty')",
-    "COALESCE(Manufacturer, 'Empty')",
-    "COALESCE(ManufacturerYear, 'Empty')",
-    "COALESCE(Model, 'Empty')",
-    "COALESCE(OwnerState, 'Empty')"
+    "COALESCE(EngineManufacturer, 'Empty') AS EngineManufacturer",
+    "COALESCE(EngineModel, 'Empty') AS EngineModel",
+    "COALESCE(Manufacturer, 'Empty') AS Manufacturer",
+    "COALESCE(ManufacturerYear, 'Empty') AS ManufacturerYear",
+    "COALESCE(Model, 'Empty') AS Model",
+    "COALESCE(OwnerState, 'Empty') AS OwnerState"
   )
   
   # Explicitly sort the data and keep it sorted throughout. Leave nothing to chance.
