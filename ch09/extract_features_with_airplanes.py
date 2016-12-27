@@ -45,13 +45,13 @@ def main(base_path):
     CRSDepTime,
     CRSArrTime,
     CONCAT(Origin, '-', Dest) AS Route,
-    TailNum
+    TailNum AS FeatureTailNum
   FROM on_time_performance
   """)
   simple_on_time_features.select(
     "FlightNum",
     "FlightDate",
-    "TailNum"
+    "FeatureTailNum"
   ).show(10)
   
   # Filter nulls, they can't help us
@@ -121,7 +121,7 @@ def main(base_path):
       'CRSDepTime': scheduled_dep_time,
       'CRSArrTime': scheduled_arr_time,
       'Route': row['Route'],
-      'TailNum': row['TailNum'],
+      'FeatureTailNum': row['FeatureTailNum'],
     }
   
   timestamp_features = filled_on_time_features.rdd.map(alter_feature_datetimes)
@@ -135,11 +135,11 @@ def main(base_path):
 
   features_with_airplanes = timestamp_df.join(
     airplanes,
-    on=timestamp_df.TailNum == airplanes.TailNum,
+    on=timestamp_df.FeatureTailNum == airplanes.TailNum,
     how="left_outer"
   )
   
-  features_with_airplanes = features_with_airplanes.select(
+  features_with_airplanes = features_with_airplanes.selectExpr(
     "FlightNum",
     "FlightDate",
     "DayOfWeek",
@@ -154,13 +154,13 @@ def main(base_path):
     "CRSDepTime",
     "CRSArrTime",
     "Route",
-    timestamp_df["TailNum"],
+    "FeatureTailNum AS TailNum",
     "COALESCE(EngineManufacturer, 'Empty')",
-    "EngineModel",
-    "Manufacturer",
-    "ManufacturerYear",
-    "Model",
-    "OwnerState"
+    "COALESCE(EngineModel, 'Empty')",
+    "COALESCE(Manufacturer, 'Empty')",
+    "COALESCE(ManufacturerYear, 'Empty')",
+    "COALESCE(Model, 'Empty')",
+    "COALESCE(OwnerState, 'Empty')"
   )
   
   # Explicitly sort the data and keep it sorted throughout. Leave nothing to chance.
