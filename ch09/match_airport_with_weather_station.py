@@ -33,8 +33,9 @@ features = spark.read.json(
 features.registerTempTable("features")
 
 # Get the origins and dests into one relation and count the distinct codes
-origins = features.select("Origin").alias("Airport")
-dests = features.select("Dest").alias("Airport")
+from pyspark.sql.functions import col
+origins = features.select(col("Origin").alias("Airport"))
+dests = features.select(col("Dest").alias("Airport"))
 distinct_airports = origins.union(dests).distinct()
 distinct_airports.count() # 322
 
@@ -170,8 +171,8 @@ non_null_wbans_geocoded.count() # 1,299
 non_null_wbans_geocoded.show()
 
 # Save the WBANs, they take a long time to compute
-output_path = "{}/data/wban_address_with_lat_lon.json".format(base_path)
-non_null_wbans_geocoded.repartition(1).write.mode("overwrite").json(output_path)
+geocoded_wban_output_path = "{}/data/wban_address_with_lat_lon.json".format(base_path)
+non_null_wbans_geocoded.repartition(1).write.mode("overwrite").json(geocoded_wban_output_path)
 
 # Combine the original wban_with_lat_lon with our non_null_wbans_geocoded
 trimmed_geocoded_wbans = non_null_wbans_geocoded.select(
@@ -186,28 +187,71 @@ comparable_wbans.count() # 1,692
 comparable_wbans.show()
 
 #
+# Limit the size of the airports to those in the data
+#
+feature_airports = airports.join(
+  distinct_airports,
+  on=airports.FAA == distinct_airports.Airport
+)
+feature_airports.count() # 322
+
+# Only retain the essential columns
+trimmed_feature_airports = feature_airports.select(
+  "Airport",
+  "Latitude",
+  "Longitude"
+)
+trimmed_feature_airports.show(10)
+
+#
 # Associate weather stations with airports
 #
 
 # Do a cartesian join to pair all
-airport_wban_combinations = airports.rdd.cartesian(wban_with_location.rdd)
+airport_wban_combinations = trimmed_feature_airports.rdd.cartesian(comparable_wbans.rdd)
+airport_wban_combinations.count() # 544,824
 
-# Compare each pair of records
-import sys
+# Compute the geodesic distance between the airport and station
+from geopy.distance import vincenty
 def airport_station_distance(record):
+  
+  airport = record[0]
+  station = record[1]
+  
+  airport_lat_lon = (airport["Latitude"], airport["Longitude"])
+  station_lat_lon = (station["Latitude"], station["Longitude"])
+  
+  # Default to a huge distance
+  distance = sys.maxsize
   try:
-    airport = record[0]
-    station = record[1]
-    
-    airport_lat = airport["Latitude"]
-    airport_lon = airport["Longitude"]
-    
-    station_lat_lon = station["LOCATION"].split(",")
-    station_lat = station_lat_lon[0].strip()
-    station_lon = station_lat_lon[1].strip()
-  
+    distance = round(vincenty(airport_lat_lon, station_lat_lon).miles)
   except:
-    return sys.maxsize
-  
-  
-  
+    distance = 24902 # equitorial circumference
+
+  distance_record = Row(
+    WBAN_ID=station["WBAN_ID"],
+    StationLatitude=station["Latitude"],
+    StationLongitude=station["Longitude"],
+    Airport=airport["Airport"],
+    AirportLatitude=airport["Latitude"],
+    AirportLongitude=airport["Longitude"],
+    Distance=distance,
+  )
+  return distance_record
+
+# Apply calculation to our comparison pairs
+distances = airport_wban_combinations.map(
+  airport_station_distance
+)
+airport_station_distances = distances.toDF()
+
+# Order by distance and show
+airport_station_distances.orderBy("Distance").show()
+
+# Store them, they're expensive to calculate
+distances_output_path = "{}/data/airport_station_distances.json"
+airport_station_distances\
+  .repartition(1)\
+  .write\
+  .mode("overwrite")\
+  .json(distances_output_path)
