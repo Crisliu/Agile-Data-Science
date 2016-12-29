@@ -38,21 +38,21 @@ features.show()
 #
 
 spark.sql("""
-SELECT
-  HOUR(CRSDepTime) + 1 AS Hour,
-  AVG(ArrDelay),
-  STD(ArrDelay)
-FROM features
-GROUP BY HOUR(CRSDepTime)
-ORDER BY HOUR(CRSDepTime)
+  SELECT
+    HOUR(CRSDepTime) + 1 AS Hour,
+    AVG(ArrDelay),
+    STD(ArrDelay)
+  FROM features
+  GROUP BY HOUR(CRSDepTime)
+  ORDER BY HOUR(CRSDepTime)
 """).show(24)
 
 spark.sql("""
-SELECT
-  HOUR(CRSArrTime) + 1 AS Hour,
-  AVG(ArrDelay),
-  STD(ArrDelay)
-FROM features
-GROUP BY HOUR(CRSArrTime)
-ORDER BY HOUR(CRSArrTime)
+  SELECT
+    HOUR(CRSArrTime) + 1 AS Hour,
+    AVG(ArrDelay),
+    STD(ArrDelay)
+  FROM features
+  GROUP BY HOUR(CRSArrTime)
+  ORDER BY HOUR(CRSArrTime)
 """).show(24)
