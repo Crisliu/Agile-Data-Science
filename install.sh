@@ -166,6 +166,7 @@ tar -xvzf /tmp/kafka_2.11-0.10.1.0.tgz -C kafka --strip-components=1
 
 # Install Apache Incubating Airflow
 pip install airflow
+mkdir ~/airflow
 mkdir ~/airflow/dags
 mkdir ~/airflow/logs
 mkdir ~/airflow/plugins
