@@ -24,7 +24,7 @@ elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
 fi
 
 # Download and install Anaconda Python
-curl -o "/tmp/Anaconda3-4.2.0-${ANADONCA_OS_NAME}-x86_64.sh" "http://repo.continuum.io/archive/Anaconda3-4.2.0-${ANADONCA_OS_NAME}-x86_64.sh"
+curl -Lko "/tmp/Anaconda3-4.2.0-${ANADONCA_OS_NAME}-x86_64.sh" "http://repo.continuum.io/archive/Anaconda3-4.2.0-${ANADONCA_OS_NAME}-x86_64.sh"
 bash "/tmp/Anaconda3-4.2.0-${ANADONCA_OS_NAME}-x86_64.sh" -b -p $HOME/anaconda
 export PATH="$HOME/anaconda/bin:$PATH"
 echo 'export PATH="$HOME/anaconda/bin:$PATH"' >> ~/.bash_profile
@@ -38,7 +38,7 @@ pip install -r requirements.txt
 #
 
 # May need to update this link... see http://hadoop.apache.org/releases.html
-curl -o /tmp/hadoop-2.7.3.tar.gz http://apache.osuosl.org/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
+curl -Lko /tmp/hadoop-2.7.3.tar.gz http://apache.osuosl.org/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
 
 mkdir hadoop
 tar -xvf /tmp/hadoop-2.7.3.tar.gz -C hadoop --strip-components=1
@@ -58,7 +58,7 @@ echo 'export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop' >> ~/.bash_profile
 #
 
 # May need to update this link... see http://spark.apache.org/downloads.html
-curl -o /tmp/spark-2.1.0-bin-without-hadoop.tgz http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-without-hadoop.tgz
+curl -Lko /tmp/spark-2.1.0-bin-without-hadoop.tgz http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-without-hadoop.tgz
 
 mkdir spark
 tar -xvf /tmp/spark-2.1.0-bin-without-hadoop.tgz -C spark --strip-components=1
@@ -92,7 +92,7 @@ sed -i .bak 's/INFO/ERROR/g' $SPARK_HOME/conf/log4j.properties
 # and the mongo-hadoop project.
 #
 
-curl -o /tmp/$MONGO_FILENAME $MONGO_DOWNLOAD_URL
+curl -Lko /tmp/$MONGO_FILENAME $MONGO_DOWNLOAD_URL
 mkdir mongodb
 tar -xvf /tmp/$MONGO_FILENAME -C mongodb --strip-components=1
 export PATH=$PATH:$PROJECT_HOME/mongodb/bin
@@ -103,10 +103,10 @@ mkdir -p mongodb/data/db
 mongodb/bin/mongod --dbpath mongodb/data/db & # re-run if you shutdown your computer
 
 # Get the MongoDB Java Driver
-curl -o lib/mongo-java-driver-3.4.0.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.0/mongo-java-driver-3.4.0.jar
+curl -Lko lib/mongo-java-driver-3.4.0.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.0/mongo-java-driver-3.4.0.jar
 
 # Install the mongo-hadoop project in the mongo-hadoop directory in the root of our project.
-curl -o /tmp/r1.5.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r1.5.2.tar.gz
+curl -Lko /tmp/r1.5.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r1.5.2.tar.gz
 mkdir mongo-hadoop
 tar -xvzf /tmp/r1.5.2.tar.gz -C mongo-hadoop --strip-components=1
 
@@ -131,7 +131,7 @@ echo 'export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib' >> ~/.bash_profile
 #
 # Install ElasticSearch in the elasticsearch directory in the root of our project, and the Elasticsearch for Hadoop package
 #
-curl -o /tmp/elasticsearch-2.3.5.tar.gz https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.5/elasticsearch-2.3.5.tar.gz
+curl -Lko /tmp/elasticsearch-2.3.5.tar.gz https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.5/elasticsearch-2.3.5.tar.gz
 mkdir elasticsearch
 tar -xvzf /tmp/elasticsearch-2.3.5.tar.gz -C elasticsearch --strip-components=1
 
@@ -139,7 +139,7 @@ tar -xvzf /tmp/elasticsearch-2.3.5.tar.gz -C elasticsearch --strip-components=1
 elasticsearch/bin/elasticsearch 2>1 > /dev/null & # re-run if you shutdown your computer
 
 # Install Elasticsearch for Hadoop
-curl -o /tmp/elasticsearch-hadoop-5.0.0-alpha5.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.0.0-alpha5.zip
+curl -Lko /tmp/elasticsearch-hadoop-5.0.0-alpha5.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.0.0-alpha5.zip
 unzip /tmp/elasticsearch-hadoop-5.0.0-alpha5.zip
 mv elasticsearch-hadoop-5.0.0-alpha5 elasticsearch-hadoop
 cp elasticsearch-hadoop/dist/elasticsearch-hadoop-5.0.0-alpha5.jar lib/
@@ -147,8 +147,8 @@ cp elasticsearch-hadoop/dist/elasticsearch-spark-20_2.10-5.0.0-alpha5.jar lib/
 echo "spark.speculation false" >> $PROJECT_HOME/spark/conf/spark-defaults.conf
 
 # Install and add snappy-java and lzo-java to our classpath below via spark.jars
-curl -o lib/snappy-java-1.1.2.6.jar http://central.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.2.6/snappy-java-1.1.2.6.jar
-curl -o lib/lzo-hadoop-1.0.0.jar http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.0/lzo-hadoop-1.0.0.jar
+curl -Lko lib/snappy-java-1.1.2.6.jar http://central.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.2.6/snappy-java-1.1.2.6.jar
+curl -Lko lib/lzo-hadoop-1.0.0.jar http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.0/lzo-hadoop-1.0.0.jar
 
 # Setup mongo and elasticsearch jars for Spark
 echo "spark.jars $PROJECT_HOME/lib/mongo-hadoop-spark-2.0.0-rc0.jar,\
@@ -166,7 +166,7 @@ echo "SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" >> spark/conf/s
 # pip install pyelasticsearch
 
 # Install Apache Kafka
-curl -o /tmp/kafka_2.11-0.10.1.0.tgz http://www-us.apache.org/dist/kafka/0.10.1.0/kafka_2.11-0.10.1.0.tgz
+curl -Lko /tmp/kafka_2.11-0.10.1.0.tgz http://www-us.apache.org/dist/kafka/0.10.1.0/kafka_2.11-0.10.1.0.tgz
 mkdir kafka
 tar -xvzf /tmp/kafka_2.11-0.10.1.0.tgz -C kafka --strip-components=1
 
@@ -180,7 +180,7 @@ airflow initdb
 airflow webserver -D
 
 # Install Apache Zeppelin
-curl -o /tmp/zeppelin-0.6.2-bin-all.tgz http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-all.tgz
+curl -Lko /tmp/zeppelin-0.6.2-bin-all.tgz http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-all.tgz
 mkdir zeppelin
 tar -xvzf /tmp/zeppelin-0.6.2-bin-all.tgz -C zeppelin --strip-components=1
 
