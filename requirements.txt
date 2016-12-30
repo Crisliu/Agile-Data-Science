@@ -16,3 +16,4 @@ kafka-python
 airflow
 tabulate
 geopy
+ipython
