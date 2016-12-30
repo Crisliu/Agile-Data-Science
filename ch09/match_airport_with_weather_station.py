@@ -339,19 +339,4 @@ distance_histogram = closest_stations.select("Distance")\
   .histogram(
     [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 500, 1100]
   )
-print(distance_histogram)
-
-import numpy as np
-import matplotlib.mlab as mlab
-import matplotlib.pyplot as plt
-
-def create_hist(rdd_histogram_data):
-  """Given an RDD.histogram, plot a pyplot histogram"""
-  heights = np.array(rdd_histogram_data[1])
-  full_bins = rdd_histogram_data[0]
-  mid_point_bins = full_bins[:-1]
-  widths = [abs(i - j) for i, j in zip(full_bins[:-1], full_bins[1:])]
-  bar = plt.bar(mid_point_bins, heights, width=widths, color='b')
-  return bar
-
-create_hist(distance_histogram)
+distance_histogram
