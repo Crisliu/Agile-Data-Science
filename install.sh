@@ -36,6 +36,8 @@ pip install -r requirements.txt
 # Install Hadoop in the hadoop directory in the root of our project. Also, setup
 # our Hadoop environment for Spark to run
 #
+
+# May need to update this link... see http://hadoop.apache.org/releases.html
 curl -o /tmp/hadoop-2.7.3.tar.gz http://apache.osuosl.org/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
 
 mkdir hadoop
