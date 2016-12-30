@@ -4,9 +4,35 @@
 on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
 on_time_dataframe.registerTempTable("on_time_performance")
 
+from pyspark.sql.types import StringType, IntegerType, DoubleType
+from pyspark.sql.types import StructType, StructField
+
+wban_schema = StructType([
+  StructField("REGION", StringType(), True),
+  StructField("WBAN_ID", StringType(), True),
+  StructField("STATION_NAME", StringType(), True),
+  StructField("STATE_PROVINCE", StringType(), True),
+  StructField("COUNTY", StringType(), True),
+  StructField("COUNTRY", StringType(), True),
+  StructField("EXTENDED_NAME", StringType(), True),
+  StructField("CALL_SIGN", StringType(), True),
+  StructField("STATION_TYPE", StringType(), True),
+  StructField("DATE_ASSIGNED", StringType(), True),
+  StructField("BEGIN_DATE", StringType(), True),
+  StructField("COMMENTS", StringType(), True),
+  StructField("LOCATION", StringType(), True),
+  StructField("ELEV_OTHER", StringType(), True),
+  StructField("ELEV_GROUND", StringType(), True),
+  StructField("ELEV_RUNWAY", StringType(), True),
+  StructField("ELEV_BAROMETRIC", StringType(), True),
+  StructField("ELEV_STATION", StringType(), True),
+  StructField("ELEV_UPPER_AIR", StringType(), True)
+])
+
 # Load the WBAN station master list
 wban_master_list = spark.read.format('com.databricks.spark.csv')\
-  .options(header='true', inferschema='true', delimiter='|')\
+  .options(header='true', inferschema='false', delimiter='|')\
+  .schema(wban_schema)\
   .load('data/wbanmasterlist.psv')
 wban_master_list.show(5)
 
