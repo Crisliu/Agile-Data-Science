@@ -1,5 +1,4 @@
 # Loads CSV with header parsing and type inference, in one line!
-# Must use 'pyspark --packages com.databricks:spark-csv_2.10:1.4.0' for this to work
 on_time_dataframe = spark.read.format('com.databricks.spark.csv')\
   .options(
     header='true',
