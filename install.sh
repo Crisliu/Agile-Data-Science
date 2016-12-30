@@ -70,7 +70,7 @@ echo 'export PATH=$PATH:$SPARK_HOME/bin' >> ~/.bash_profile
 cp spark/conf/spark-defaults.conf.template spark/conf/spark-defaults.conf
 echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' >> spark/conf/spark-defaults.conf
 
-# Give Spark 6GB of RAM
+# Give Spark 8GB of RAM
 echo "spark.driver.memory 8g" >> $SPARK_HOME/conf/spark-defaults.conf
 
 echo "PYSPARK_PYTHON=python3" >> $SPARK_HOME/conf/spark-env.sh
