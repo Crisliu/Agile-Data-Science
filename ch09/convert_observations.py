@@ -67,6 +67,7 @@ hourly_columns = ["WBAN", "Date", "Time", "SkyCondition",
                   "SeaLevelPressure", "HourlyPrecip", "Altimeter"]
 
 trimmed_hourly_records = hourly_weather_records.select(hourly_columns)
+trimmed_hourly_records.show()
 
 #
 # Add an ISO8601 formatted ISODate column using DataFrame udfs
@@ -105,7 +106,7 @@ hourly_weather_with_iso_time = hourly_weather_with_iso_date.withColumn(
 
 from pyspark.sql.functions import concat, lit
 hourly_weather_with_iso_datetime = hourly_weather_with_iso_time.withColumn(
-  "DateTime",
+  "Datetime",
   concat(
     hourly_weather_with_iso_time.ISODate,
     lit("T"),
@@ -116,16 +117,20 @@ hourly_weather_with_iso_datetime = hourly_weather_with_iso_time.withColumn(
 #
 # Trim the final records, lose the original Date/Time fields and save
 #
-final_hourly_columns = ["WBAN", "DateTime", "SkyCondition",
-                  "Visibility", "WeatherType", "DryBulbCelsius",
-                  "WetBulbCelsius", "DewPointCelsius",
-                  "RelativeHumidity", "WindSpeed", "WindDirection",
-                  "ValueForWindCharacter", "StationPressure",
-                  "SeaLevelPressure", "HourlyPrecip", "Altimeter"]
+from pyspark.sql.functions import col
+final_hourly_columns = ["WBAN", col("ISODate").alias("Date"), "Datetime", "SkyCondition",
+                        "Visibility", "WeatherType", "DryBulbCelsius",
+                        "WetBulbCelsius", "DewPointCelsius",
+                        "RelativeHumidity", "WindSpeed", "WindDirection",
+                        "ValueForWindCharacter", "StationPressure",
+                        "SeaLevelPressure", "HourlyPrecip", "Altimeter"]
 final_trimmed_hourly_records = hourly_weather_with_iso_datetime.select(
   final_hourly_columns
 )
-final_trimmed_hourly_records.show()
+final_trimmed_hourly_records.show(5)
 
 # Save cleaned up records using Parquet for improved performance
-final_trimmed_hourly_records.write.mode("overwrite").parquet("data/2015_hourly_observations.parquet")
+final_trimmed_hourly_records\
+  .write\
+  .mode("overwrite")\
+  .parquet("data/2015_hourly_observations.parquet")
