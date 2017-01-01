@@ -6,7 +6,7 @@ hourly_weather_records.show()
 # then gather a list of of hourly observations for that day
 from frozendict import frozendict
 records_per_station_per_day = hourly_weather_records\
-  .repartition(1)\
+  .repartition(3)\
   .rdd\
   .map(
     lambda row: (
@@ -57,8 +57,15 @@ records_per_station_per_day\
 records_per_station_per_day = sc\
   .textFile(per_day_output)\
   .map(json.loads)
-
 records_per_station_per_day.first()
+
+# Wrap our observation records in a tuple with a WBAN join key
+wrapped_daily_records = records_per_station_per_day.map(
+  lambda record: (
+    record['WBAN'],
+    record
+  )
+)
 
 # Load the WBAN station master list
 wban_master_list = spark.read.format('com.databricks.spark.csv')\
@@ -68,9 +75,9 @@ wban_master_list.show(5)
 
 # What do the WBAN IDs in both sets of records look like?
 wbans_one = wban_master_list.select('WBAN_ID').distinct().sort('WBAN_ID')
-wbans_one.show()
+wbans_one.show(6, False)
 wbans_two = hourly_weather_records.select('WBAN').distinct().sort('WBAN')
-wbans_two.show()
+wbans_two.show(6, False)
 
 # Lets trim the wban master list to things we care about
 trimmed_wban_master_list = wban_master_list.select(
@@ -86,32 +93,41 @@ trimmed_wban_master_list = wban_master_list.select(
 )
 trimmed_wban_master_list.show()
 
-# Now make it into (key, value) tuple format
+# Now make it into (join_key, value) tuple format
 joinable_wban_master_list = trimmed_wban_master_list.rdd.map(
-  lambda x:
+  lambda record:
     (
-      wban_float_to_string(x.WBAN_ID),
+      record.WBAN_ID,
       {
-        'WBAN_ID': wban_float_to_string(x.WBAN_ID),
-        'STATION_NAME': x.STATION_NAME,
-        'STATE_PROVINCE': x.STATE_PROVINCE,
-        'COUNTRY': x.COUNTRY,
-        'EXTENDED_NAME': x.EXTENDED_NAME,
-        'CALL_SIGN': x.CALL_SIGN,
-        'STATION_TYPE': x.STATION_TYPE,
-        'LOCATION': x.LOCATION,
-        'ELEV_GROUND': x.ELEV_GROUND,
+        'WBAN_ID': record.WBAN_ID,
+        'STATION_NAME': record.STATION_NAME,
+        'STATE_PROVINCE': record.STATE_PROVINCE,
+        'COUNTRY': record.COUNTRY,
+        'EXTENDED_NAME': record.EXTENDED_NAME,
+        'CALL_SIGN': record.CALL_SIGN,
+        'STATION_TYPE': record.STATION_TYPE,
+        'LOCATION': record.LOCATION,
+        'ELEV_GROUND': record.ELEV_GROUND,
       }
     )
 )
 joinable_wban_master_list.take(1)
 
 # Now we're ready to join...
-station_profile_with_observations = records_per_station_per_day.join(joinable_wban_master_list)
-station_profile_with_observations.take(1)
+profile_with_observations = wrapped_daily_records.join(joinable_wban_master_list)
 
-# Now transform this monstrosity into something we want to consume in Mongo...
-def cleanup_joined_wbans(record):
+# Store and load them for performance reasons
+joined_output = "data/joined_profile_observations.json"
+profile_with_observations\
+  .map(json.dumps)\
+  .saveAsTextFile(joined_output)
+profile_with_observations = sc.textFile(joined_output)\
+  .map(json.loads)
+
+profile_with_observations.take(1)
+
+# Now transform this monstrosity into something we want to go in Mongo...
+def cleanup_joined_records(record):
   wban = record[0]
   join_record = record[1]
   observations = join_record[0]
@@ -124,8 +140,8 @@ def cleanup_joined_wbans(record):
   }
 
 # pyspark.RDD.foreach() runs a function on all records in the RDD
-cleaned_station_observations = station_profile_with_observations.map(cleanup_joined_wbans)
-one_record = cleaned_station_observations.take(1)[0]
+cleaned_station_observations = profile_with_observations.map(cleanup_joined_records)
+one_record = cleaned_station_observations.take(5)[2]
 
 # Print it in a way we can actually see it
 import json
@@ -135,4 +151,3 @@ print(json.dumps(one_record, indent=2))
 import pymongo_spark
 pymongo_spark.activate()
 cleaned_station_observations.saveToMongoDB('mongodb://localhost:27017/agile_data_science.daily_station_observations')
-
