@@ -38,23 +38,35 @@
     <table class="table table-condensed table-striped">
       <thead>
         <th>Time</th>
-        <th>Temperature (C)</th>
+        <th>Dry Bulb (C)</th>
+        <th>Wet Bulb (C)</th>
+        <th>Dew Point (C)</th>
+        <th>Relative Humidity</th>
         <th>Sky Condition</th>
         <th>Visibility</th>
         <th>Weather Type</th>
+        <th>Barometric Pressure</th>
         <th>Wind Direction</th>
         <th>Wind Speed</th>
+        <th>Wind Character</th>
+        <th>Precipitation</th>
       </thead>
       <tbody>
         {% for observation in profile_observations.Observations %}
         <tr>
-          <td>{{observation.Time}}</td>
+          <td>{{observation.Datetime}}</td>
           <td>{{observation.DryBulbCelsius}}</td>
+          <td>{{observation.WetBulbCelsius}}</td>
+          <td>{{observation.DewPointCelsius}}</td>
+          <td>{{observation.RelativeHumidity}}</td>
           <td>{{observation.SkyCondition}}</td>
           <td>{{observation.Visibility}}</td>
           <td>{{observation.WeatherType}}</td>
+          <td>{{observation.StationPressure}}</td>
           <td>{{observation.WindDirection}}</td>
           <td>{{observation.WindSpeed}}</td>
+          <td>{{observation.ValueForWindCharacter}}</td>
+          <td>{{observation.HourlyPrecip}}</td>
         </tr>
         {% endfor %}
       </tbody>
