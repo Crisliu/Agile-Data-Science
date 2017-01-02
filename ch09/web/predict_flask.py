@@ -291,23 +291,6 @@ def search_flights():
 def delays():
   return render_template('delays.html')
 
-@app.route("/weather_delay_histogram.json")
-def weather_delay_json():
-  record = client.agile_data_science.weather_delay_histogram.find_one()
-  return json_util.dumps(record)
-
-@app.route("/weather/station/<wban>/observations/daily/<iso_date>")
-def daily_station_observations(wban, iso_date):
-  profile_observations = client.agile_data_science.daily_station_observations.find_one(
-    {'WBAN': wban, 'Date': iso_date}
-  )
-  return render_template('daily_weather_station.html', profile_observations=profile_observations)
-
-@app.route("/weather/station/<wban>")
-def weather_station(wban):
-  weather_station_summary = client.weather_station_summary.find({'WBAN': wban})
-  return render_template('weather_station.html', weather_station_summary=weather_station_summary)
-
 # Load our regression model
 from sklearn.externals import joblib
 project_home = os.environ["PROJECT_HOME"]
