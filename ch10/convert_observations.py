@@ -56,7 +56,7 @@ hourly_schema = StructType([
 hourly_weather_records = spark.read.format('com.databricks.spark.csv')\
   .options(header='true', inferschema='false', delimiter=',')\
   .schema(hourly_schema)\
-  .load('data/2015*hourly.txt')
+  .load('data/2015*hourly.txt.gz')
 hourly_weather_records.show()
 
 hourly_columns = ["WBAN", "Date", "Time", "SkyCondition",
