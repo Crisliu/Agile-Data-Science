@@ -234,6 +234,7 @@ RUN cp /root/zeppelin/conf/zeppelin-env.sh.template /root/zeppelin/conf/zeppelin
     echo "export SPARK_CLASSPATH=" >> /root/zeppelin/conf/zeppelin-env.sh
 
 # Cleanup
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Done!
