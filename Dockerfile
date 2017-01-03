@@ -143,7 +143,7 @@ RUN echo "PYSPARK_PYTHON=python3" >> /root/spark/conf/spark-env.sh && \
 
 # Setup log4j config to reduce logging output
 RUN cp /root/spark/conf/log4j.properties.template /root/spark/conf/log4j.properties && \
-    sed -i .bak 's/INFO/ERROR/g' /root/spark/conf/log4j.properties
+    sed -i 's/INFO/ERROR/g' /root/spark/conf/log4j.properties
 
 #
 # Install Mongo, Mongo Java driver, and mongo-hadoop and start MongoDB
