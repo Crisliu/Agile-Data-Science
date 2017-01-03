@@ -10,3 +10,4 @@ spark-warehouse
 tmp
 zeppelin
 elasticsearch-hadoop
+models
