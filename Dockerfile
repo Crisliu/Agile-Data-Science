@@ -68,32 +68,44 @@ ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201511.zip /tmp/QCLCD201511.zip
 ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201512.zip /tmp/QCLCD201512.zip
 
 RUN unzip -o /tmp/wbanmasterlist.psv.zip && \
-    unzip -o /tmp/QCLCD201501.zip && \
-    unzip -o /tmp/QCLCD201502.zip && \
-    unzip -o /tmp/QCLCD201503.zip && \
-    unzip -o /tmp/QCLCD201504.zip && \
-    unzip -o /tmp/QCLCD201505.zip && \
-    unzip -o /tmp/QCLCD201506.zip && \
-    unzip -o /tmp/QCLCD201507.zip && \
-    unzip -o /tmp/QCLCD201508.zip && \
-    unzip -o /tmp/QCLCD201509.zip && \
-    unzip -o /tmp/QCLCD201510.zip && \
-    unzip -o /tmp/QCLCD201511.zip && \
-    unzip -o /tmp/QCLCD201512.zip && \
+    gzip wbanmasterlist.psv && \
     rm -f /tmp/wbanmasterlist.psv.zip && \
+    unzip -o /tmp/QCLCD201501.zip && \
+    gzip 201501*.txt && \
     rm -f /tmp/QCLCD201501.zip && \
+    unzip -o /tmp/QCLCD201502.zip && \
+    gzip 201502*.txt && \
     rm -f /tmp/QCLCD201502.zip && \
+    unzip -o /tmp/QCLCD201503.zip && \
+    gzip 201503*.txt && \
     rm -f /tmp/QCLCD201503.zip && \
+    unzip -o /tmp/QCLCD201504.zip && \
+    gzip 201504*.txt && \
     rm -f /tmp/QCLCD201504.zip && \
+    unzip -o /tmp/QCLCD201505.zip && \
+    gzip 201505*.txt && \
     rm -f /tmp/QCLCD201505.zip && \
+    unzip -o /tmp/QCLCD201506.zip && \
+    gzip 201506*.txt && \
     rm -f /tmp/QCLCD201506.zip && \
+    unzip -o /tmp/QCLCD201507.zip && \
+    gzip 201507*.txt && \
     rm -f /tmp/QCLCD201507.zip && \
+    unzip -o /tmp/QCLCD201508.zip && \
+    gzip 201508*.txt && \
     rm -f /tmp/QCLCD201508.zip && \
+    unzip -o /tmp/QCLCD201509.zip && \
+    gzip 201509*.txt && \
     rm -f /tmp/QCLCD201509.zip && \
+    unzip -o /tmp/QCLCD201510.zip && \
+    gzip 201510*.txt && \
     rm -f /tmp/QCLCD201510.zip && \
+    unzip -o /tmp/QCLCD201511.zip && \
+    gzip 201511*.txt && \
     rm -f /tmp/QCLCD201511.zip && \
-    rm -f /tmp/QCLCD201512.zip && \
-    gzip 2015*.txt
+    unzip -o /tmp/QCLCD201512.zip && \
+    gzip 201512*.txt && \
+    rm -f /tmp/QCLCD201512.zip
 
 # Back to /root
 WORKDIR /root
