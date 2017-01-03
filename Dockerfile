@@ -7,7 +7,7 @@ WORKDIR /root
 
 # Update apt-get
 RUN apt-get update && \
-    apt-get install -y zip unzip curl bzip2 python-dev build-essential git
+    apt-get install -y zip unzip curl bzip2 python-dev build-essential git libssl1.0.0 libssl-dev
 
 # Setup Oracle Java8
 RUN apt-get install -y software-properties-common debconf-utils && \
@@ -151,8 +151,8 @@ RUN cp /root/spark/conf/log4j.properties.template /root/spark/conf/log4j.propert
 ADD https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.4.1.tgz /tmp/mongodb-linux-x86_64-amazon-3.4.1.tgz
 RUN mkdir mongodb && \
     tar -xvf /tmp/mongodb-linux-x86_64-amazon-3.4.1.tgz -C mongodb --strip-components=1 && \
-    mkdir -p /root/mongodb/data/db && \
-    /root/mongodb/bin/mongod --dbpath /root/mongodb/data/db
+    mkdir -p /root/mongodb/data/db
+RUN /root/mongodb/bin/mongod --dbpath /root/mongodb/data/db
 ENV PATH=$PATH:/root/mongodb/bin
 
 # Get the MongoDB Java Driver and put it in Agile_Data_Code_2
