@@ -5,7 +5,8 @@ MAINTAINER Russell Jurney, russell.jurney@gmail.com
 
 WORKDIR /root
 
-# Update apt-get
+# Update apt-get and install things
+RUN apt-get autoclean
 RUN apt-get update && \
     apt-get install -y zip unzip curl bzip2 python-dev build-essential git libssl1.0.0 libssl-dev
 
@@ -152,6 +153,9 @@ ADD https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.4.1.tgz /tmp/
 RUN mkdir mongodb && \
     tar -xvf /tmp/mongodb-linux-x86_64-amazon-3.4.1.tgz -C mongodb --strip-components=1 && \
     mkdir -p /root/mongodb/data/db
+# Put the ssl libs where mongo expects
+RUN ln -s /lib/x86_64-linux-gnu/libssl.so.1.0.0 /usr/lib/libssl.so.10 && \
+    ln -s /lib/x86_64-linux-gnu/libcrypto.so.1.0.0 /usr/lib/libcrypto.so.10
 RUN /root/mongodb/bin/mongod --dbpath /root/mongodb/data/db
 ENV PATH=$PATH:/root/mongodb/bin
 
