@@ -92,7 +92,8 @@ RUN unzip -o /tmp/wbanmasterlist.psv.zip && \
     rm -f /tmp/QCLCD201509.zip && \
     rm -f /tmp/QCLCD201510.zip && \
     rm -f /tmp/QCLCD201511.zip && \
-    rm -f /tmp/QCLCD201512.zip
+    rm -f /tmp/QCLCD201512.zip && \
+    gzip 2015*.txt
 
 # Back to /root
 WORKDIR /root
