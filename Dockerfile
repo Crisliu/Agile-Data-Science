@@ -31,84 +31,6 @@ WORKDIR /root/Agile_Data_Code_2
 ENV PROJECT_HOME=/Agile_Data_Code_2
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
-
-#
-# Download the data
-#
-WORKDIR /root/Agile_Data_Code_2/data
-
-# On-time performance records
-ADD http://s3.amazonaws.com/agile_data_science/On_Time_On_Time_Performance_2015.csv.gz /root/Agile_Data_Code_2/data/On_Time_On_Time_Performance_2015.csv.gz
-
-# Openflights data
-ADD https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat /root/Agile_Data_Code_2/data/airports.dat
-ADD https://raw.githubusercontent.com/jpatokal/openflights/master/data/airlines.dat /root/Agile_Data_Code_2/data/airlines.dat
-ADD https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat /root/Agile_Data_Code_2/data/routes.dat
-ADD https://raw.githubusercontent.com/jpatokal/openflights/master/data/countries.dat /root/Agile_Data_Code_2/data/countries.dat
-
-# FAA data
-ADD http://av-info.faa.gov/data/ACRef/tab/aircraft.txt /root/Agile_Data_Code_2/data/aircraft.txt
-ADD http://av-info.faa.gov/data/ACRef/tab/ata.txt /root/Agile_Data_Code_2/data/ata.txt
-ADD http://av-info.faa.gov/data/ACRef/tab/compt.txt /root/Agile_Data_Code_2/data/compt.txt
-ADD http://av-info.faa.gov/data/ACRef/tab/engine.txt /root/Agile_Data_Code_2/data/engine.txt
-ADD http://av-info.faa.gov/data/ACRef/tab/prop.txt /root/Agile_Data_Code_2/data/prop.txt
-
-# WBAN Master List
-ADD http://www.ncdc.noaa.gov/homr/file/wbanmasterlist.psv.zip /tmp/wbanmasterlist.psv.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201501.zip /tmp/QCLCD201501.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201502.zip /tmp/QCLCD201502.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201503.zip /tmp/QCLCD201503.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201504.zip /tmp/QCLCD201504.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201505.zip /tmp/QCLCD201505.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201506.zip /tmp/QCLCD201506.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201507.zip /tmp/QCLCD201507.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201508.zip /tmp/QCLCD201508.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201509.zip /tmp/QCLCD201509.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201510.zip /tmp/QCLCD201510.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201511.zip /tmp/QCLCD201511.zip
-ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201512.zip /tmp/QCLCD201512.zip
-
-RUN unzip -o /tmp/wbanmasterlist.psv.zip && \
-    gzip wbanmasterlist.psv && \
-    rm -f /tmp/wbanmasterlist.psv.zip && \
-    unzip -o /tmp/QCLCD201501.zip && \
-    gzip 201501*.txt && \
-    rm -f /tmp/QCLCD201501.zip && \
-    unzip -o /tmp/QCLCD201502.zip && \
-    gzip 201502*.txt && \
-    rm -f /tmp/QCLCD201502.zip && \
-    unzip -o /tmp/QCLCD201503.zip && \
-    gzip 201503*.txt && \
-    rm -f /tmp/QCLCD201503.zip && \
-    unzip -o /tmp/QCLCD201504.zip && \
-    gzip 201504*.txt && \
-    rm -f /tmp/QCLCD201504.zip && \
-    unzip -o /tmp/QCLCD201505.zip && \
-    gzip 201505*.txt && \
-    rm -f /tmp/QCLCD201505.zip && \
-    unzip -o /tmp/QCLCD201506.zip && \
-    gzip 201506*.txt && \
-    rm -f /tmp/QCLCD201506.zip && \
-    unzip -o /tmp/QCLCD201507.zip && \
-    gzip 201507*.txt && \
-    rm -f /tmp/QCLCD201507.zip && \
-    unzip -o /tmp/QCLCD201508.zip && \
-    gzip 201508*.txt && \
-    rm -f /tmp/QCLCD201508.zip && \
-    unzip -o /tmp/QCLCD201509.zip && \
-    gzip 201509*.txt && \
-    rm -f /tmp/QCLCD201509.zip && \
-    unzip -o /tmp/QCLCD201510.zip && \
-    gzip 201510*.txt && \
-    rm -f /tmp/QCLCD201510.zip && \
-    unzip -o /tmp/QCLCD201511.zip && \
-    gzip 201511*.txt && \
-    rm -f /tmp/QCLCD201511.zip && \
-    unzip -o /tmp/QCLCD201512.zip && \
-    gzip 201512*.txt && \
-    rm -f /tmp/QCLCD201512.zip
-
-# Back to /root
 WORKDIR /root
 
 #
@@ -149,15 +71,12 @@ RUN cp /root/spark/conf/log4j.properties.template /root/spark/conf/log4j.propert
 #
 # Install Mongo, Mongo Java driver, and mongo-hadoop and start MongoDB
 #
-ADD https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.4.1.tgz /tmp/mongodb-linux-x86_64-amazon-3.4.1.tgz
-RUN mkdir mongodb && \
-    tar -xvf /tmp/mongodb-linux-x86_64-amazon-3.4.1.tgz -C mongodb --strip-components=1 && \
-    mkdir -p /root/mongodb/data/db
-# Put the ssl libs where mongo expects
-RUN ln -s /lib/x86_64-linux-gnu/libssl.so.1.0.0 /usr/lib/libssl.so.10 && \
-    ln -s /lib/x86_64-linux-gnu/libcrypto.so.1.0.0 /usr/lib/libcrypto.so.10
-RUN /root/mongodb/bin/mongod --dbpath /root/mongodb/data/db
-ENV PATH=$PATH:/root/mongodb/bin
+RUN echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.4.list
+RUN apt-get update && \
+    apt-get install -y --allow-unauthenticated mongodb-org && \
+    mkdir -p /data/db
+# apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6 && \
+RUN /usr/bin/mongod --fork --logpath /var/log/mongodb.log
 
 # Get the MongoDB Java Driver and put it in Agile_Data_Code_2
 ADD http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.0/mongo-java-driver-3.4.0.jar /tmp/mongo-java-driver-3.4.0.jar
@@ -172,8 +91,7 @@ WORKDIR /root/mongo-hadoop
 RUN /root/mongo-hadoop/gradlew jar
 WORKDIR /root
 RUN cp /root/mongo-hadoop/spark/build/libs/mongo-hadoop-spark-*.jar /root/Agile_Data_Code_2/lib/ && \
-    cp /root/mongo-hadoop/build/libs/mongo-hadoop-*.jar /root/Agile_Data_Code_2/lib/ && \
-    rm -rf /root/mongo-hadoop
+    cp /root/mongo-hadoop/build/libs/mongo-hadoop-*.jar /root/Agile_Data_Code_2/lib/
 
 # Install pymongo_spark
 WORKDIR /root/mongo-hadoop/spark/src/main/python
@@ -182,13 +100,16 @@ WORKDIR /root
 RUN cp /root/mongo-hadoop/spark/src/main/python/pymongo_spark.py /root/Agile_Data_Code_2/lib/
 ENV PYTHONPATH=$PYTHONPATH:/root/Agile_Data_Code_2/lib
 
+# Cleanup mongo-hadoop
+RUN rm -rf /root/mongo-hadoop
+
 #
 # Install ElasticSearch in the elasticsearch directory in the root of our project, and the Elasticsearch for Hadoop package
 #
 ADD https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.tar.gz /tmp/elasticsearch-5.1.1.tar.gz
 RUN mkdir /root/elasticsearch && \
     tar -xvzf /tmp/elasticsearch-5.1.1.tar.gz -C elasticsearch --strip-components=1 && \
-    /root/elasticsearch/bin/elasticsearch && \
+    /root/elasticsearch/bin/elasticsearch -d && \
     rm -f /tmp/elasticsearch-5.1.1.tar.gz
 
 # Install Elasticsearch for Hadoop
@@ -219,8 +140,8 @@ RUN mkdir -p /root/kafka && \
     rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 
 # Run zookeeper (which kafka depends on), then Kafka
-RUN /root/kafka/bin/zookeeper-server-start.sh /root/kafka/config/zookeeper.properties && \
-    /root/kafka/bin/kafka-server-start.sh /root/kafka/config/server.properties
+RUN /root/kafka/bin/zookeeper-server-start.sh -daemon /root/kafka/config/zookeeper.properties && \
+    /root/kafka/bin/kafka-server-start.sh -daemon /root/kafka/config/server.properties
 
 #
 # Install and set up Airflow
@@ -233,7 +154,7 @@ RUN pip install airflow && \
     mkdir /root/airflow/plugins && \
     airflow initdb && \
     airflow webserver -D && \
-    airflow scheduler -D
+    airflow scheduler -D &
 
 #
 # Install and setup Zeppelin
@@ -249,6 +170,91 @@ RUN cp /root/zeppelin/conf/zeppelin-env.sh.template /root/zeppelin/conf/zeppelin
     echo "export SPARK_HOME=/root/spark" >> /root/zeppelin/conf/zeppelin-env.sh && \
     echo "export SPARK_MASTER=local" >> /root/zeppelin/conf/zeppelin-env.sh && \
     echo "export SPARK_CLASSPATH=" >> /root/zeppelin/conf/zeppelin-env.sh
+
+#
+# Download the data
+#
+WORKDIR /root/Agile_Data_Code_2/data
+
+# On-time performance records
+ADD http://s3.amazonaws.com/agile_data_science/On_Time_On_Time_Performance_2015.csv.gz /root/Agile_Data_Code_2/data/On_Time_On_Time_Performance_2015.csv.gz
+
+# Openflights data
+ADD https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat /root/Agile_Data_Code_2/data/airports.dat
+ADD https://raw.githubusercontent.com/jpatokal/openflights/master/data/airlines.dat /root/Agile_Data_Code_2/data/airlines.dat
+ADD https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat /root/Agile_Data_Code_2/data/routes.dat
+ADD https://raw.githubusercontent.com/jpatokal/openflights/master/data/countries.dat /root/Agile_Data_Code_2/data/countries.dat
+
+# FAA data
+ADD http://av-info.faa.gov/data/ACRef/tab/aircraft.txt /root/Agile_Data_Code_2/data/aircraft.txt
+ADD http://av-info.faa.gov/data/ACRef/tab/ata.txt /root/Agile_Data_Code_2/data/ata.txt
+ADD http://av-info.faa.gov/data/ACRef/tab/compt.txt /root/Agile_Data_Code_2/data/compt.txt
+ADD http://av-info.faa.gov/data/ACRef/tab/engine.txt /root/Agile_Data_Code_2/data/engine.txt
+ADD http://av-info.faa.gov/data/ACRef/tab/prop.txt /root/Agile_Data_Code_2/data/prop.txt
+
+# WBAN Master List
+ADD http://www.ncdc.noaa.gov/homr/file/wbanmasterlist.psv.zip /tmp/wbanmasterlist.psv.zip
+
+RUN for i in $(seq -w 1 12); do curl -Lko /tmp/QCLCD2015${i}.zip http://www.ncdc.noaa.gov/orders/qclcd/QCLCD2015${i}.zip && \
+    unzip -o /tmp/QCLCD2015${i}.zip && \
+    gzip 2015${i}*.txt && \
+    rm -f /tmp/QCLCD2015${i}.zip; done
+
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201501.zip /tmp/QCLCD201501.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201502.zip /tmp/QCLCD201502.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201503.zip /tmp/QCLCD201503.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201504.zip /tmp/QCLCD201504.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201505.zip /tmp/QCLCD201505.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201506.zip /tmp/QCLCD201506.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201507.zip /tmp/QCLCD201507.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201508.zip /tmp/QCLCD201508.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201509.zip /tmp/QCLCD201509.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201510.zip /tmp/QCLCD201510.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201511.zip /tmp/QCLCD201511.zip
+#ADD https://www.ncdc.noaa.gov/orders/qclcd/QCLCD201512.zip /tmp/QCLCD201512.zip
+#
+#RUN unzip -o /tmp/wbanmasterlist.psv.zip && \
+#    gzip wbanmasterlist.psv && \
+#    rm -f /tmp/wbanmasterlist.psv.zip && \
+#    unzip -o /tmp/QCLCD201501.zip && \
+#    gzip 201501*.txt && \
+#    rm -f /tmp/QCLCD201501.zip && \
+#    unzip -o /tmp/QCLCD201502.zip && \
+#    gzip 201502*.txt && \
+#    rm -f /tmp/QCLCD201502.zip && \
+#    unzip -o /tmp/QCLCD201503.zip && \
+#    gzip 201503*.txt && \
+#    rm -f /tmp/QCLCD201503.zip && \
+#    unzip -o /tmp/QCLCD201504.zip && \
+#    gzip 201504*.txt && \
+#    rm -f /tmp/QCLCD201504.zip && \
+#    unzip -o /tmp/QCLCD201505.zip && \
+#    gzip 201505*.txt && \
+#    rm -f /tmp/QCLCD201505.zip && \
+#    unzip -o /tmp/QCLCD201506.zip && \
+#    gzip 201506*.txt && \
+#    rm -f /tmp/QCLCD201506.zip && \
+#    unzip -o /tmp/QCLCD201507.zip && \
+#    gzip 201507*.txt && \
+#    rm -f /tmp/QCLCD201507.zip && \
+#    unzip -o /tmp/QCLCD201508.zip && \
+#    gzip 201508*.txt && \
+#    rm -f /tmp/QCLCD201508.zip && \
+#    unzip -o /tmp/QCLCD201509.zip && \
+#    gzip 201509*.txt && \
+#    rm -f /tmp/QCLCD201509.zip && \
+#    unzip -o /tmp/QCLCD201510.zip && \
+#    gzip 201510*.txt && \
+#    rm -f /tmp/QCLCD201510.zip && \
+#    unzip -o /tmp/QCLCD201511.zip && \
+#    gzip 201511*.txt && \
+#    rm -f /tmp/QCLCD201511.zip && \
+#    unzip -o /tmp/QCLCD201512.zip && \
+#    gzip 201512*.txt && \
+#    rm -f /tmp/QCLCD201512.zip
+
+# Back to /root
+WORKDIR /root
 
 # Cleanup
 RUN apt-get clean && \
