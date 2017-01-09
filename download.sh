@@ -47,6 +47,8 @@ for i in $(seq -w 1 12)
 do
   curl -Lko /tmp/QCLCD2015${i}.zip http://www.ncdc.noaa.gov/orders/qclcd/QCLCD2015${i}.zip
   unzip -o /tmp/QCLCD2015${i}.zip
+  gzip 2015${i}*.txt
+  rm -f /tmp/QCLCD2015${i}.zip
 done
 
 cd ..
