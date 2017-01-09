@@ -11,16 +11,16 @@ echo "export PROJECT_HOME=$PROJECT_HOME" >> ~/.bash_profile
 
 if [ "$(uname)" == "Darwin" ]; then
     ANADONCA_OS_NAME='MacOSX'
-    MONGO_FILENAME='mongodb-osx-x86_64-3.2.4.tgz'
-    MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/osx/mongodb-osx-x86_64-3.2.4.tgz'
+    MONGO_FILENAME='mongodb-osx-x86_64-3.4.1.tgz'
+    MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/osx/mongodb-osx-x86_64-3.4.1.tgz'
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     ANADONCA_OS_NAME='Linux'
-    MONGO_FILENAME='mongodb-linux-x86_64-amazon-3.2.4.tgz'
-    MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.2.4.tgz'
+    MONGO_FILENAME='mongodb-linux-x86_64-amazon-3.4.1.tgz'
+    MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.4.1.tgz'
 elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
     ANADONCA_OS_NAME='Windows'
-    MONGO_FILENAME='mongodb-win32-x86_64-3.2.4-signed.msi'
-    MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-3.2.4-signed.msi'
+    MONGO_FILENAME='mongodb-win32-x86_64-3.4.1-signed.msi'
+    MONGO_DOWNLOAD_URL='https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-3.4.1-signed.msi'
 fi
 
 # Download and install Anaconda Python
@@ -131,9 +131,9 @@ echo 'export PYTHONPATH=$PYTHONPATH:$PROJECT_HOME/lib' >> ~/.bash_profile
 #
 # Install ElasticSearch in the elasticsearch directory in the root of our project, and the Elasticsearch for Hadoop package
 #
-curl -Lko /tmp/elasticsearch-2.3.5.tar.gz https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.5/elasticsearch-2.3.5.tar.gz
+curl -Lko /tmp/elasticsearch-5.1.1.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.tar.gz
 mkdir elasticsearch
-tar -xvzf /tmp/elasticsearch-2.3.5.tar.gz -C elasticsearch --strip-components=1
+tar -xvzf /tmp/elasticsearch-5.1.1.tar.gz -C elasticsearch --strip-components=1
 
 # Run elasticsearch
 elasticsearch/bin/elasticsearch 2>1 > /dev/null & # re-run if you shutdown your computer
@@ -148,7 +148,7 @@ echo "spark.speculation false" >> $PROJECT_HOME/spark/conf/spark-defaults.conf
 
 # Install and add snappy-java and lzo-java to our classpath below via spark.jars
 curl -Lko lib/snappy-java-1.1.2.6.jar http://central.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.2.6/snappy-java-1.1.2.6.jar
-curl -Lko lib/lzo-hadoop-1.0.0.jar http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.0/lzo-hadoop-1.0.0.jar
+curl -Lko lib/lzo-hadoop-1.0.5.jar http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.0/lzo-hadoop-1.0.0.jar
 
 # Setup mongo and elasticsearch jars for Spark
 echo "spark.jars $PROJECT_HOME/lib/mongo-hadoop-spark-2.0.0-rc0.jar,\
@@ -165,10 +165,16 @@ echo "SPARK_CLASSPATH=$PROJECT_HOME/lib/snappy-java-1.1.2.6.jar" >> spark/conf/s
 # Install pyelasticsearch and p
 # pip install pyelasticsearch
 
-# Install Apache Kafka
-curl -Lko /tmp/kafka_2.11-0.10.1.0.tgz http://www-us.apache.org/dist/kafka/0.10.1.0/kafka_2.11-0.10.1.0.tgz
+#
+# Install Apache Kafka and dependencies
+#
+
+# Install Kafka
+curl -Lko /tmp/kafka_2.11-0.10.1.1.tgz http://www-us.apache.org/dist/kafka/0.10.1.1/kafka_2.11-0.10.1.1.tgz
 mkdir kafka
-tar -xvzf /tmp/kafka_2.11-0.10.1.0.tgz -C kafka --strip-components=1
+tar -xvzf /tmp/kafka_2.11-0.10.1.1.tgz -C kafka --strip-components=1
+
+# Run kafka
 
 # Install Apache Incubating Airflow
 pip install airflow
