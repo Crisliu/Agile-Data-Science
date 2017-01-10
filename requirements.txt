@@ -1,6 +1,7 @@
 Flask
 airflow
 bs4
+frozendict
 geopy
 ipython
 kafka-python
