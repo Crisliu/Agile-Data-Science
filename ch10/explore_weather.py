@@ -153,4 +153,4 @@ pymongo_spark.activate()
 cleaned_station_observations.saveToMongoDB('mongodb://localhost:27017/agile_data_science.daily_station_observations')
 
 # Store to disk as well
-cleaned_station_observations.saveAsTextFile("data/daily_station_observations.json")
+cleaned_station_observations.map(json.dumps).saveAsTextFile("data/daily_station_observations.json")
