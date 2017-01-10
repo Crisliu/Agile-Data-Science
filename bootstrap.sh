@@ -26,6 +26,9 @@ chmod +x /tmp/Anaconda3-4.2.0-Linux-x86_64.sh
 export PATH=/home/vagrant/anaconda/bin:$PATH
 echo 'export PATH=/home/vagrant/anaconda/bin:$PATH' | sudo tee -a /home/vagrant/.bash_profile
 
+sudo chown -R vagrant /home/vagrant/anaconda
+sudo chgrp -R vagrant /home/vagrant/anaconda
+
 #
 # Install Clone repo, install Python dependencies
 #
