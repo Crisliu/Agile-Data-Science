@@ -203,51 +203,6 @@ airflow webserver -D
 airflow scheduler -D
 
 #
-# Install and configure zeppelin
-#
-curl -Lko /tmp/zeppelin-0.6.2-bin-all.tgz http://www-us.apache.org/dist/zeppelin/zeppelin-0.6.2/zeppelin-0.6.2-bin-all.tgz
-mkdir -p /home/vagrant/zeppelin
-tar -xvzf /tmp/zeppelin-0.6.2-bin-all.tgz -C /home/vagrant/zeppelin --strip-components=1
-rm -f /tmp/zeppelin-0.6.2-bin-all.tgz
-
-# Configure Zeppelin
-cp /home/vagrant/zeppelin/conf/zeppelin-env.sh.template /home/vagrant/zeppelin/conf/zeppelin-env.sh
-echo "export SPARK_HOME=/home/vagrant/spark" | sudo tee -a /home/vagrant/zeppelin/conf/zeppelin-env.sh
-echo "export SPARK_MASTER=local" | sudo tee -a /home/vagrant/zeppelin/conf/zeppelin-env.sh
-echo "export SPARK_CLASSPATH=" | sudo tee -a /home/vagrant/zeppelin/conf/zeppelin-env.sh
-
-# Give to vagrant
-sudo chown -R vagrant /home/vagrant/zeppelin
-sudo chgrp -R vagrant /home/vagrant/zeppelin
-
-#
-# Get airplane data
-#
-
-# Get on-time records for all flights in 2015 - 273MB
-curl -Lko $PROJECT_HOME/data/On_Time_On_Time_Performance_2015.csv.gz http://s3.amazonaws.com/agile_data_science/On_Time_On_Time_Performance_2015.csv.gz
-
-# Get openflights data
-curl -Lko /tmp/airports.dat https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat
-mv /tmp/airports.dat $PROJECT_HOME/data/airports.csv
-
-curl -Lko /tmp/airlines.dat https://raw.githubusercontent.com/jpatokal/openflights/master/data/airlines.dat
-mv /tmp/airlines.dat $PROJECT_HOME/data/airlines.csv
-
-curl -Lko /tmp/routes.dat https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat
-mv /tmp/routes.dat $PROJECT_HOME/data/routes.csv
-
-curl -Lko /tmp/countries.dat https://raw.githubusercontent.com/jpatokal/openflights/master/data/countries.dat
-mv /tmp/countries.dat $PROJECT_HOME/data/countries.csv
-
-# Get FAA data
-curl -Lko $PROJECT_HOME/data/aircraft.txt http://av-info.faa.gov/data/ACRef/tab/aircraft.txt
-curl -Lko $PROJECT_HOME/data/ata.txt http://av-info.faa.gov/data/ACRef/tab/ata.txt
-curl -Lko $PROJECT_HOME/data/compt.txt http://av-info.faa.gov/data/ACRef/tab/compt.txt
-curl -Lko $PROJECT_HOME/data/engine.txt http://av-info.faa.gov/data/ACRef/tab/engine.txt
-curl -Lko $PROJECT_HOME/data/prop.txt http://av-info.faa.gov/data/ACRef/tab/prop.txt
-
-#
 # Cleanup
 #
 apt-get clean
