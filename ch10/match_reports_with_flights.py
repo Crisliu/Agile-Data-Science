@@ -2,30 +2,8 @@ base_path = "."
 
 # Load the on-time parquet file
 on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
+on_time_dataframe = on_time_dataframe.limit(100000)
 on_time_dataframe.registerTempTable("on_time_performance")
-
-from pyspark.sql.types import StringType, IntegerType, DoubleType
-from pyspark.sql.types import StructType, StructField
-
-# Load airports
-airport_schema = StructType([
-  StructField("AirportID", StringType(), True),
-  StructField("Name", StringType(), True),
-  StructField("City", StringType(), True),
-  StructField("Country", StringType(), True),
-  StructField("FAA", StringType(), True),
-  StructField("ICAO", StringType(), True),
-  StructField("Latitude", DoubleType(), True),
-  StructField("Longitude", DoubleType(), True),
-  StructField("Altitude", IntegerType(), True),
-  StructField("Timezone", StringType(), True),
-  StructField("DST", StringType(), True),
-  StructField("TimezoneOlson", StringType(), True)
-])
-airports = spark.read.format('com.databricks.spark.csv')\
-  .options(header='false', inferschema='false')\
-  .schema(airport_schema)\
-  .load("data/airports.csv")
 
 # Load airport/station mappings
 closest_stations_path = "{}/data/airport_station_pairs.json".format(
@@ -33,14 +11,17 @@ closest_stations_path = "{}/data/airport_station_pairs.json".format(
 )
 closest_stations = spark.read.json(closest_stations_path)
 
-# flights -> airports @ time -> stations @ time
-
+import json
+from pyspark.sql.types import StringType
 from pyspark.sql.functions import col, udf, lit, concat
 
 # Convert station time to ISO time
 def crs_time_to_iso(station_time):
   hour = station_time[0:2]
   minute = station_time[2:4]
+  if int(hour) == 24:
+    hour = "23"
+    minute = "59"
   iso_time = "{hour}:{minute}:00".format(
     hour=hour,
     minute=minute
@@ -110,23 +91,90 @@ flights_with_both_stations = flights_with_dest_station.select(
   col("WBAN_ID").alias("Dest_WBAN_ID")
 )
 
-# Daily observation groupings
-daily_station_observations_raw = sc.textFile("data/daily_station_observations.json")
-import json
-daily_station_observations = daily_station_observations_raw.map(json.loads)
-
-
+# Prepare for join on with that day's station's observations
 from frozendict import frozendict
 joinable_departure = flights_with_both_stations\
   .rdd\
-  .repartition(3)\
+  .repartition(1)\
   .map(
     lambda row: (
       frozendict({
-        'Origin_WBAN_ID': row.Origin_WBAN_ID,  # compound key
-        'CRSDepDate': row.CRSDepDate,
+        'WBAN': row.Origin_WBAN_ID,  # compound key
+        'Date': iso8601.parse_date(row.CRSDepDatetime).date().isoformat(),
       }),
       row
     )
+  )
+
+# Daily observation groupings
+daily_station_observations_raw = sc.textFile("data/daily_station_observations.json")
+daily_station_observations = daily_station_observations_raw.map(json.loads)
+
+# Prepare for RDD join
+def make_observations_joinable(daily_observations):
+  return (
+    frozendict({
+      "Date": daily_observations["Date"],
+      "WBAN": daily_observations["WBAN"],
+    }),
+    daily_observations
+  )
+joinable_observations = daily_station_observations.map(make_observations_joinable)
+
+# Do the join, store and load to/from disk
+flights_with_observations = joinable_departure.join(joinable_observations)
+#flights_with_observations.map(json.dumps).saveAsTextFile("data/flights_with_observations.json")
+#flights_with_observations = sc.textFile("data/flights_with_observations.json").map(json.loads)
+
+from pyspark.sql import Row
+# Unwrap the join, find the nearest observation to our flight from the list for that day
+def find_closest_observation(flight_with_observations, input_key, output_key):
+  key = flight_with_observations[0]
+  record = flight_with_observations[1]
+  flight_record = record[0]
+  observation_record = record[1]
+  
+  flight_departure_time = flight_record[input_key]
+  flight_dt = iso8601.parse_date(flight_departure_time)
+  
+  observations = observation_record["Observations"]
+  
+  closest_observation = None
+  closest_diff = timedelta(days=30)
+  for observation in observations:
+    observation_dt = iso8601.parse_date(observation["Datetime"])
+    diff = flight_dt - observation_dt
+    if diff < closest_diff:
+      closest_observation = observation
+      closest_diff = diff
+  
+  # Now emit final record
+  if isinstance(flight_record, Row):
+    new_record = flight_record.asDict()
+  else:
+    new_record = flight_record
+  new_record[output_key] = closest_observation
+  return new_record
+
+flight_with_closest_dep_observation = flights_with_observations\
+  .map(
+    lambda x: find_closest_observation(x, "CRSDepDatetime", "DepObservation")
+  )
+
+# Now repeat for the scheduled arrival observation
+joinable_arrivals = flight_with_closest_dep_observation\
+  .map(
+    lambda row: (
+      frozendict({
+        'WBAN': row["Dest_WBAN_ID"],  # compound key
+        'Date': iso8601.parse_date(row["CRSArrDatetime"]).date().isoformat(),
+      }),
+      row
+    )
+  )
+flights_with_both_observations = joinable_arrivals.join(joinable_observations)
+final_observations = flights_with_both_observations\
+  .map(
+    lambda x: find_closest_observation(x, "CRSArrDatetime", "ArrObservation")
   )
 
