@@ -8,7 +8,8 @@ ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_
 ABSOLUTE_DIR=$(dirname "${ABSOLUTE_PATH}")
 
 # Extract to Agile_Data_Code_2/data/on_time_performance.parquet, wherever we are executed from
-tar -xvzf /tmp/on_time_performance.parquet.tgz -C $ABSOLUTE_DIR/../data/on_time_performance.parquet --strip-components=1
+cd $ABSOLUTE_DIR/../data/
+tar -xvzf /tmp/on_time_performance.parquet.tgz -C on_time_performance.parquet --strip-components=1
 
 # Cleanup
 rm -f /tmp/on_time_performance.parquet.tgz
