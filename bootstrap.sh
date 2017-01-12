@@ -48,7 +48,8 @@ cd /home/vagrant
 #
 curl -Lko /tmp/hadoop-2.7.3.tar.gz http://apache.osuosl.org/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
 mkdir -p /home/vagrant/hadoop
-tar -xvf /tmp/hadoop-2.7.3.tar.gz -C /home/vagrant/hadoop --strip-components=1
+cd /home/vagrant/
+tar -xvf /tmp/hadoop-2.7.3.tar.gz -C hadoop --strip-components=1
 
 echo '# Hadoop environment setup' | sudo tee -a /home/vagrant/.bash_profile
 export HADOOP_HOME=/home/vagrant/hadoop
@@ -69,7 +70,8 @@ sudo chgrp -R vagrant /home/vagrant/hadoop
 #
 curl -Lko /tmp/spark-2.1.0-bin-without-hadoop.tgz http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-without-hadoop.tgz
 mkdir -p /home/vagrant/spark
-tar -xvf /tmp/spark-2.1.0-bin-without-hadoop.tgz -C /home/vagrant/spark --strip-components=1
+cd /home/vagrant
+tar -xvf /tmp/spark-2.1.0-bin-without-hadoop.tgz -C spark --strip-components=1
 
 echo "" >> /home/vagrant/.bash_profile
 echo "# Spark environment setup" | sudo tee -a /home/vagrant/.bash_profile
@@ -119,7 +121,9 @@ curl -Lko /home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.0.jar http:/
 # Install the mongo-hadoop project in the mongo-hadoop directory in the root of our project.
 curl -Lko /tmp/mongo-hadoop-r1.5.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r1.5.2.tar.gz
 mkdir /home/vagrant/mongo-hadoop
-tar -xvzf /tmp/mongo-hadoop-r1.5.2.tar.gz -C /home/vagrant/mongo-hadoop --strip-components=1
+cd /home/vagrant
+tar -xvzf /tmp/mongo-hadoop-r1.5.2.tar.gz -C mongo-hadoop --strip-components=1
+rm -rf /tmp/mongo-hadoop-r1.5.2.tar.gz
 
 # Now build the mongo-hadoop-spark jars
 cd /home/vagrant/mongo-hadoop
@@ -143,7 +147,8 @@ rm -rf /home/vagrant/mongo-hadoop
 #
 curl -Lko /tmp/elasticsearch-5.1.1.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.tar.gz
 mkdir /home/vagrant/elasticsearch
-tar -xvzf /tmp/elasticsearch-5.1.1.tar.gz -C /home/vagrant/elasticsearch --strip-components=1
+cd /home/vagrant
+tar -xvzf /tmp/elasticsearch-5.1.1.tar.gz -C elasticsearch --strip-components=1
 sudo chown -R vagrant /home/vagrant/elasticsearch
 sudo chgrp -R vagrant /home/vagrant/elasticsearch
 sudo chown -R vagrant /home/vagrant/elasticsearch/logs
@@ -180,7 +185,8 @@ echo "spark.jars /home/vagrant/Agile_Data_Code_2/lib/mongo-hadoop-spark-1.5.2.ja
 #
 curl -Lko /tmp/kafka_2.11-0.10.1.1.tgz http://www-us.apache.org/dist/kafka/0.10.1.1/kafka_2.11-0.10.1.1.tgz
 mkdir -p /home/vagrant/kafka
-tar -xvzf /tmp/kafka_2.11-0.10.1.1.tgz -C /home/vagrant/kafka --strip-components=1 && rm -f /tmp/kafka_2.11-0.10.1.1.tgz
+cd /home/vagrant/
+tar -xvzf /tmp/kafka_2.11-0.10.1.1.tgz -C kafka --strip-components=1 && rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 
 # Run zookeeper (which kafka depends on), then Kafka
 /home/vagrant/kafka/bin/zookeeper-server-start.sh -daemon /home/vagrant/kafka/config/zookeeper.properties
