@@ -1,13 +1,18 @@
+#!/usr/bin/env bash
+
+sudo chown -R vagrant /home/vagrant
+sudo chgrp -R vagrant /home/vagrant
+
 #
 # Update & install dependencies
 #
 sudo apt-get update
-sudo apt-get install -y zip unzip curl bzip2 python-dev build-essential git libssl1.0.0 libssl-dev
+sudo apt-get install -y zip unzip curl bzip2 python-dev build-essential git libssl1.0.0 libssl-dev \
+    software-properties-common debconf-utils python-software-properties
 
 #
 # Install Java and setup ENV
 #
-sudo apt-get install -y software-properties-common debconf-utils python-software-properties
 sudo add-apt-repository -y ppa:webupd8team/java
 sudo apt-get update
 echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
@@ -19,15 +24,26 @@ echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" | sudo tee -a /home/vagrant/.
 #
 # Install Anaconda
 #
-curl -Lko /tmp/Anaconda3-4.2.0-Linux-x86_64.sh http://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh
-chmod +x /tmp/Anaconda3-4.2.0-Linux-x86_64.sh
-/tmp/Anaconda3-4.2.0-Linux-x86_64.sh -b -p /home/vagrant/anaconda
+#curl -Lko /tmp/Anaconda3-4.2.0-Linux-x86_64.sh http://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh
+#chmod +x /tmp/Anaconda3-4.2.0-Linux-x86_64.sh
+#/tmp/Anaconda3-4.2.0-Linux-x86_64.sh -b -p /home/vagrant/anaconda
+
+#export PATH=/home/vagrant/anaconda/bin:$PATH
+#echo 'export PATH=/home/vagrant/anaconda/bin:$PATH' | sudo tee -a /home/vagrant/.bash_profile
+#
+
+curl -Lko /tmp/Miniconda3-latest-Linux-x86_64.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+chmod +x /tmp/Miniconda3-latest-Linux-x86_64.sh
+/tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /home/vagrant/anaconda
 
 export PATH=/home/vagrant/anaconda/bin:$PATH
 echo 'export PATH=/home/vagrant/anaconda/bin:$PATH' | sudo tee -a /home/vagrant/.bash_profile
 
-sudo chown -R vagrant /home/vagrant/anaconda
-sudo chgrp -R vagrant /home/vagrant/anaconda
+#sudo chown -R vagrant /home/vagrant/anaconda
+#sudo chgrp -R vagrant /home/vagrant/anaconda
+
+#sudo apt-get install -y python3 python3-dev python3-numpy python3-scipy python3-setuptools
+#sudo easy_install3 pip
 
 #
 # Install Clone repo, install Python dependencies
@@ -36,7 +52,7 @@ cd /home/vagrant
 git clone https://github.com/rjurney/Agile_Data_Code_2
 cd /home/vagrant/Agile_Data_Code_2
 export PROJECT_HOME=/home/vagrant/Agile_Data_Code_2
-echo "export PROJECT_HOME=/home/vagrant/Agile_Data_Code_2" >> /home/vagrant/.bash_profile
+echo "export PROJECT_HOME=/home/vagrant/Agile_Data_Code_2" | sudo tee -a /home/vagrant/.bash_profile
 pip install --upgrade pip
 pip install -r requirements.txt
 sudo chown -R vagrant /home/vagrant/Agile_Data_Code_2
@@ -151,6 +167,7 @@ cd /home/vagrant
 tar -xvzf /tmp/elasticsearch-5.1.1.tar.gz -C elasticsearch --strip-components=1
 sudo chown -R vagrant /home/vagrant/elasticsearch
 sudo chgrp -R vagrant /home/vagrant/elasticsearch
+sudo mkdir -p /home/vagrant/elasticsearch/logs
 sudo chown -R vagrant /home/vagrant/elasticsearch/logs
 sudo chgrp -R vagrant /home/vagrant/elasticsearch/logs
 
