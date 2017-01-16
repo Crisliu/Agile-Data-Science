@@ -9,6 +9,7 @@ ABSOLUTE_DIR=$(dirname "${ABSOLUTE_PATH}")
 
 # Extract to Agile_Data_Code_2/data/on_time_performance.parquet, wherever we are executed from
 cd $ABSOLUTE_DIR/../data/
+mkdir simple_flight_delay_features.parquet
 tar -xvzf /tmp/simple_flight_delay_features.parquet.tgz -C simple_flight_delay_features.parquet --strip-components=1
 
 # Cleanup
