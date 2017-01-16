@@ -33,10 +33,10 @@ Vagrant.configure("2") do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
-  #  # Customize the amount of memory on the VM:
-  #  vb.memory = "9216"
-  # end
+  config.vm.provider "virtualbox" do |vb|
+      # Customize the amount of memory on the VM:
+      vb.memory = "4096"
+  end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
