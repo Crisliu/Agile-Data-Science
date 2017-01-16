@@ -9,7 +9,7 @@ mkdir data
 #
 
 # Get on-time records for all flights in 2015 - 273MB
-curl -Lko $PROJECT_HOME/data/On_Time_On_Time_Performance_2015.csv.gz \
+curl -Lko $PROJECT_HOME/data/On_Time_On_Time_Performance_2015.csv.bz2 \
     http://s3.amazonaws.com/agile_data_science/On_Time_On_Time_Performance_2015.csv.bz2
 
 # Get openflights data
