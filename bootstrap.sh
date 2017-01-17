@@ -105,7 +105,7 @@ cp /home/vagrant/spark/conf/spark-defaults.conf.template /home/vagrant/spark/con
 echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' | sudo tee -a /home/vagrant/spark/conf/spark-defaults.conf
 
 # Give Spark 8GB of RAM, used Python3
-echo "spark.driver.memory 6g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
+echo "spark.driver.memory 7g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "PYSPARK_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
 echo "PYSPARK_DRIVER_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
 
