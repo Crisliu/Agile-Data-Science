@@ -22,16 +22,8 @@ export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" | sudo tee -a /home/vagrant/.bash_profile
 
 #
-# Install Anaconda
+# Install Miniconda
 #
-#curl -Lko /tmp/Anaconda3-4.2.0-Linux-x86_64.sh http://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh
-#chmod +x /tmp/Anaconda3-4.2.0-Linux-x86_64.sh
-#/tmp/Anaconda3-4.2.0-Linux-x86_64.sh -b -p /home/vagrant/anaconda
-
-#export PATH=/home/vagrant/anaconda/bin:$PATH
-#echo 'export PATH=/home/vagrant/anaconda/bin:$PATH' | sudo tee -a /home/vagrant/.bash_profile
-#
-
 curl -Lko /tmp/Miniconda3-latest-Linux-x86_64.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 chmod +x /tmp/Miniconda3-latest-Linux-x86_64.sh
 /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /home/vagrant/anaconda
