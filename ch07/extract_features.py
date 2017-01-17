@@ -28,9 +28,9 @@ simple_on_time_features.show()
 
 # Filter nulls, they can't help us
 filled_on_time_features = simple_on_time_features.filter(
-  (simple_on_time_features.ArrDelay != None)
+  simple_on_time_features.ArrDelay.isNotNull()
   &
-  (simple_on_time_features.DepDelay != None)
+  simple_on_time_features.DepDelay.isNotNull()
 )
 
 # We need to turn timestamps into timestamps, and not strings or numbers
@@ -108,6 +108,8 @@ sorted_features = timestamp_df.sort(
   timestamp_df.CRSArrTime,
 )
 
-# Store as a single json file
+# Store as a single json file and bzip2 it
 sorted_features.repartition(1).write.mode("overwrite").json("data/simple_flight_delay_features.json")
 os.system("cp data/simple_flight_delay_features.json/part* data/simple_flight_delay_features.jsonl")
+os.system("bzip2 --best data/simple_flight_delay_features.jsonl")
+os.system("bzcat data/simple_flight_delay_features.jsonl.bz2 >> data/simple_flight_delay_features.jsonl")
