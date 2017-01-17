@@ -25,7 +25,7 @@ schema = StructType([
   StructField("Origin", StringType(), True),      # "Origin":"TUS"
 ])
 
-features = spark.read.json("data/simple_flight_delay_features.json", schema=schema)
+features = spark.read.json("data/simple_flight_delay_features.jsonl.bz2", schema=schema)
 features.first()
 
 #
