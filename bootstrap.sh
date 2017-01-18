@@ -196,6 +196,7 @@ curl -Lko /tmp/kafka_2.11-0.10.1.1.tgz http://www-us.apache.org/dist/kafka/0.10.
 mkdir -p /home/vagrant/kafka
 cd /home/vagrant/
 tar -xvzf /tmp/kafka_2.11-0.10.1.1.tgz -C kafka --strip-components=1 && rm -f /tmp/kafka_2.11-0.10.1.1.tgz
+rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 
 # Run zookeeper (which kafka depends on), then Kafka
 /home/vagrant/kafka/bin/zookeeper-server-start.sh -daemon /home/vagrant/kafka/config/zookeeper.properties
@@ -208,7 +209,7 @@ sudo chgrp -R vagrant /home/vagrant/kafka
 #
 # Install and setup Airflow
 #
-pip install airflow
+pip install airflow[hive]
 mkdir /home/vagrant/airflow
 mkdir /home/vagrant/airflow/dags
 mkdir /home/vagrant/airflow/logs
