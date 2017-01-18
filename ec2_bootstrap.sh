@@ -48,6 +48,7 @@ mkdir -p /home/ubuntu/hadoop
 cd /home/ubuntu/
 tar -xvf /tmp/hadoop-2.7.3.tar.gz -C hadoop --strip-components=1
 
+echo "" >> /home/ubuntu/.bash_profile
 echo '# Hadoop environment setup' | sudo tee -a /home/ubuntu/.bash_profile
 export HADOOP_HOME=/home/ubuntu/hadoop
 echo 'export HADOOP_HOME=/home/ubuntu/hadoop' | sudo tee -a /home/ubuntu/.bash_profile
@@ -86,7 +87,7 @@ cp /home/ubuntu/spark/conf/spark-defaults.conf.template /home/ubuntu/spark/conf/
 echo 'spark.io.compression.codec org.apache.spark.io.SnappyCompressionCodec' | sudo tee -a /home/ubuntu/spark/conf/spark-defaults.conf
 
 # Give Spark 8GB of RAM, used Python3
-echo "spark.driver.memory 12g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
+echo "spark.driver.memory 25g" | sudo tee -a $SPARK_HOME/conf/spark-defaults.conf
 echo "PYSPARK_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
 echo "PYSPARK_DRIVER_PYTHON=python3" | sudo tee -a $SPARK_HOME/conf/spark-env.sh
 
@@ -101,9 +102,6 @@ sudo chgrp -R ubuntu /home/ubuntu/spark
 #
 # Install MongoDB and dependencies
 #
-#echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
-#sudo apt-get update
-#sudo apt-get install -y --allow-unauthenticated mongodb-org-shell mongodb-org-server mongodb-org-mongos mongodb-org-tools mongodb-org
 sudo apt-get install -y mongodb
 sudo mkdir -p /data/db
 sudo chown -R mongodb /data/db
@@ -155,6 +153,9 @@ sudo chgrp -R ubuntu /home/ubuntu/elasticsearch/logs
 # Run elasticsearch
 sudo -u ubuntu /home/ubuntu/elasticsearch/bin/elasticsearch -d # re-run if you shutdown your computer
 
+# Run a query to test - it will error but should return json
+curl 'localhost:9200/agile_data_science/on_time_performance/_search?q=Origin:ATL&pretty'
+
 # Install Elasticsearch for Hadoop
 curl -Lko /tmp/elasticsearch-hadoop-5.1.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.1.1.zip
 unzip /tmp/elasticsearch-hadoop-5.1.1.zip
@@ -185,6 +186,7 @@ curl -Lko /tmp/kafka_2.11-0.10.1.1.tgz http://www-us.apache.org/dist/kafka/0.10.
 mkdir -p /home/ubuntu/kafka
 cd /home/ubuntu/
 tar -xvzf /tmp/kafka_2.11-0.10.1.1.tgz -C kafka --strip-components=1 && rm -f /tmp/kafka_2.11-0.10.1.1.tgz
+rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 
 # Run zookeeper (which kafka depends on), then Kafka
 /home/ubuntu/kafka/bin/zookeeper-server-start.sh -daemon /home/ubuntu/kafka/config/zookeeper.properties
@@ -197,7 +199,7 @@ sudo chgrp -R ubuntu /home/ubuntu/kafka
 #
 # Install and setup Airflow
 #
-pip install airflow
+pip install airflow[hive]
 mkdir /home/ubuntu/airflow
 mkdir /home/ubuntu/airflow/dags
 mkdir /home/ubuntu/airflow/logs
@@ -209,5 +211,5 @@ airflow scheduler -D
 #
 # Cleanup
 #
-apt-get clean
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+sudo apt-get clean
+sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
