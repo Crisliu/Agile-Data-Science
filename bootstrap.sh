@@ -221,5 +221,5 @@ airflow scheduler -D
 #
 # Cleanup
 #
-apt-get clean
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+sudo apt-get clean
+sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
