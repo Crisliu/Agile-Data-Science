@@ -88,11 +88,11 @@ def main(base_path):
     outputCol="ArrDelayBucket"
   )
 
-  # Save the model
+  # Save the bucketizer
   arrival_bucketizer_path = "{}/models/arrival_bucketizer_2.0.bin".format(base_path)
   arrival_bucketizer.write().overwrite().save(arrival_bucketizer_path)
   
-  # Apply the model
+  # Apply the bucketizer
   ml_bucketized_features = arrival_bucketizer.transform(features_with_route)
   ml_bucketized_features.select("ArrDelay", "ArrDelayBucket").show()
   
@@ -153,6 +153,7 @@ def main(base_path):
     labelCol="ArrDelayBucket",
     predictionCol="Prediction",
     maxBins=4657,
+    maxMemoryInMB=1024
   )
   model = rfc.fit(final_vectorized_features)
   

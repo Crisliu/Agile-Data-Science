@@ -25,7 +25,10 @@ schema = StructType([
   StructField("Origin", StringType(), True),      # "Origin":"TUS"
 ])
 
-features = spark.read.json("data/simple_flight_delay_features.jsonl.bz2", schema=schema)
+features = spark.read.json(
+  "data/simple_flight_delay_features.jsonl.bz2",
+  schema=schema
+)
 features.first()
 
 #
@@ -48,7 +51,7 @@ features_with_route = features.withColumn(
     features.Dest
   )
 )
-features_with_route.show(6)
+features_with_route.select("Origin", "Dest", "Route").show(5)
 
 #
 # Categorize or 'bucketize' the arrival delay field using a DataFrame UDF
@@ -133,11 +136,16 @@ final_vectorized_features.show()
 #
 
 # Test/train split
-training_data, test_data = final_vectorized_features.randomSplit([0.8, 0.2])
+training_data, test_data = final_vectorized_features.randomSplit([0.7, 0.3])
 
 # Instantiate and fit random forest classifier
 from pyspark.ml.classification import RandomForestClassifier
-rfc = RandomForestClassifier(featuresCol="Features_vec", labelCol="ArrDelayBucket", maxBins=4657)
+rfc = RandomForestClassifier(
+  featuresCol="Features_vec",
+  labelCol="ArrDelayBucket",
+  maxBins=4657,
+  maxMemoryInMB=1024
+)
 model = rfc.fit(training_data)
 
 # Evaluate model using test data
