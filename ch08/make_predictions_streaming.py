@@ -49,10 +49,10 @@ def main(base_path):
   from pyspark.ml.feature import Bucketizer
   arrival_bucketizer_path = "{}/models/arrival_bucketizer_2.0.bin".format(base_path)
   arrival_bucketizer = Bucketizer.load(arrival_bucketizer_path)
-
+  
   # Load all the string field vectorizer pipelines into a dict
   from pyspark.ml.feature import StringIndexerModel
-
+  
   string_indexer_models = {}
   for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
                  "Origin", "Dest", "Route"]:
@@ -80,7 +80,6 @@ def main(base_path):
   #
   # Process Prediction Requests in Streaming
   #
-  
   stream = KafkaUtils.createDirectStream(
     ssc,
     [PREDICTION_TOPIC],
