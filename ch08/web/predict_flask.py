@@ -444,6 +444,8 @@ def flight_delays_batch_results_page(iso_date):
 @app.route("/flights/delays/predict/classify_realtime", methods=['POST'])
 def classify_flight_delays_realtime():
   """POST API for classifying flight delays"""
+  
+  # Define the form fields to process
   api_field_type_map = \
     {
       "DepDelay": float,
@@ -453,7 +455,8 @@ def classify_flight_delays_realtime():
       "FlightNum": str,
       "Origin": str
     }
-  
+
+  # Fetch the values for each field from the form object
   api_form_values = {}
   for api_field_name, api_field_type in api_field_type_map.items():
     api_form_values[api_field_name] = request.form.get(api_field_name, type=api_field_type)
