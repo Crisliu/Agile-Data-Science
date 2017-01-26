@@ -29,7 +29,7 @@ def main(base_path):
     import findspark
 
     # Add the streaming package and initialize
-    findspark.add_packages(["org.apache.spark:spark-streaming-kafka-0-10_2.11:2.1.0"])
+    findspark.add_packages(["org.apache.spark:spark-streaming-kafka-0-8_2.11:2.1.0"])
     findspark.init()
     
     import pyspark
