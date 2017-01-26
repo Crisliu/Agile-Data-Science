@@ -1,4 +1,4 @@
-from Kafka import KafkaProducer
+from kafka import KafkaProducer
 producer = KafkaProducer()
 
 producer.send(

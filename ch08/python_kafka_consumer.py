@@ -3,7 +3,7 @@ import json
 
 from kafka import KafkaConsumer, TopicPartition
 consumer = KafkaConsumer()
-consumer.assign([TopicPartition('test', 0)])
+consumer.assign([TopicPartition('flight_delay_classification_request', 0)])
 consumer.seek_to_beginning()
 
 for message in consumer:
