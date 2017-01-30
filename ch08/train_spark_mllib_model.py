@@ -1,11 +1,12 @@
 # !/usr/bin/env python
 
 import sys, os, re
-import json
-import datetime, iso8601
 
 # Pass date and base path to main() from airflow
 def main(base_path):
+  
+  try: base_path
+  except NameError: base_path = "."
   
   APP_NAME = "train_spark_mllib_model.py"
   
