@@ -5,6 +5,9 @@ import sys, os, re
 # Pass date and base path to main() from airflow
 def main(base_path):
   
+  # Default to "."
+  try: base_path
+  except NameError: base_path = "."
   if not base_path:
     base_path = "."
   
