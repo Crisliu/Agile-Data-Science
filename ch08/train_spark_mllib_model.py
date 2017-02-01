@@ -24,7 +24,7 @@ def main(base_path):
     
     sc = pyspark.SparkContext()
     spark = pyspark.sql.SparkSession(sc).builder.appName(APP_NAME).getOrCreate()
-
+  
   #
   # {
   #   "ArrDelay":5.0,"CRSArrTime":"2015-12-31T03:20:00.000-08:00","CRSDepTime":"2015-12-31T03:05:00.000-08:00",
@@ -83,7 +83,7 @@ def main(base_path):
   # Use pysmark.ml.feature.Bucketizer to bucketize ArrDelay into on-time, slightly late, very late (0, 1, 2)
   #
   from pyspark.ml.feature import Bucketizer
-
+  
   # Setup the Bucketizer
   splits = [-float("inf"), -15.0, 0, 30.0, float("inf")]
   arrival_bucketizer = Bucketizer(
@@ -91,7 +91,7 @@ def main(base_path):
     inputCol="ArrDelay",
     outputCol="ArrDelayBucket"
   )
-
+  
   # Save the bucketizer
   arrival_bucketizer_path = "{}/models/arrival_bucketizer_2.0.bin".format(base_path)
   arrival_bucketizer.write().overwrite().save(arrival_bucketizer_path)
@@ -138,7 +138,7 @@ def main(base_path):
     outputCol="Features_vec"
   )
   final_vectorized_features = vector_assembler.transform(ml_bucketized_features)
-
+  
   # Save the numeric vector assembler
   vector_assembler_path = "{}/models/numeric_vector_assembler.bin".format(base_path)
   vector_assembler.write().overwrite().save(vector_assembler_path)
@@ -166,13 +166,22 @@ def main(base_path):
     base_path
   )
   model.write().overwrite().save(model_output_path)
-
+  
   # Evaluate model using test data
   predictions = model.transform(final_vectorized_features)
-
+  
+  from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+  evaluator = MulticlassClassificationEvaluator(
+    predictionCol="Prediction",
+    labelCol="ArrDelayBucket",
+    metricName="accuracy"
+  )
+  accuracy = evaluator.evaluate(predictions)
+  print("Accuracy = {}".format(accuracy))
+  
   # Check the distribution of predictions
   predictions.groupBy("Prediction").count().show()
-
+  
   # Check a sample
   predictions.sample(False, 0.001, 18).orderBy("CRSDepTime").show(6)
 
