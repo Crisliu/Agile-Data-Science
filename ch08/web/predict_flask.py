@@ -24,7 +24,7 @@ import iso8601
 import datetime
 
 # Setup Kafka
-from kafka import KafkaProducer, TopicPartition
+from kafka import KafkaProducer
 producer = KafkaProducer(bootstrap_servers=['localhost:9092'],api_version=(0,10))
 PREDICTION_TOPIC = 'flight_delay_classification_request'
 
