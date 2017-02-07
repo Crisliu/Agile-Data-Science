@@ -7,7 +7,7 @@ import datetime, iso8601
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SparkSession, Row
 from pyspark.streaming import StreamingContext
-from pyspark.streaming.kafka import KafkaUtils, OffsetRange, TopicAndPartition
+from pyspark.streaming.kafka import KafkaUtils
 
 # Save to Mongo
 from bson import json_util
