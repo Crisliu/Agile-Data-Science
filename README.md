@@ -10,7 +10,7 @@ There are two methods of installation: Vagrant/Virtualboc or Amazon EC2.
 
 Amazon EC2 is the preferred environment for this book/course, because it is simple and painless.
 
-Installation takes just a few moments using Amazon EC2. The script [ec2.sh](ec2.sh) uses the file [aws/ec2_bootstrap.sh](aws/ec2_bootstrap.sh) as `--user-data` to boot a single r3.xlarge EC2 instance with all dependencies installed.
+Installation takes just a few moments using Amazon EC2. The script [ec2.sh](ec2.sh) uses the file [aws/ec2_bootstrap.sh](aws/ec2_bootstrap.sh) as `--user-data` to boot a single r3.xlarge EC2 instance in the us-east-1 region with all dependencies installed and running.
 
 ```
 # Launch our instance, which ec2_bootstrap.sh will initialize
@@ -30,6 +30,8 @@ Once the server comes up, download the data and you are ready to go:
 cd Agile_Data_Code_2
 ./download.sh
 ```
+
+Note: if you change the zone from us-east-1, you will need to update to a new image that corresponds to that region. This is explained in chapter 2. Go to [https://cloud-images.ubuntu.com/locator/ec2/](https://cloud-images.ubuntu.com/locator/ec2/) to find the Ubuntu image for your desired region.
 
 ### Vagrant/Virtualbox Install
 
