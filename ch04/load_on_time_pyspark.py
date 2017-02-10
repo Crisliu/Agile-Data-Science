@@ -17,7 +17,7 @@ airport_pair_totals = spark.sql("""SELECT
 )
 
 # Use dataflows
-airport_pair_totals.limit(10).collect()
+airport_pair_totals.limit(10).show()
 
 # We can go back and forth as we see fit!
 
