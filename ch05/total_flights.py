@@ -11,7 +11,7 @@ total_flights_by_month = spark.sql(
 )
 
 # This map/asDict trick makes the rows print a little prettier. It is optional.
-flights_chart_data = total_flights_by_month.map(lambda row: row.asDict())
+flights_chart_data = total_flights_by_month.rdd.map(lambda row: row.asDict())
 flights_chart_data.collect()
 
 # Save chart to MongoDB
