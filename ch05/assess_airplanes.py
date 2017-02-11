@@ -3,7 +3,7 @@ on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
 on_time_dataframe.registerTempTable("on_time_performance")
 
 # Dump the unneeded fields
-tail_numbers = on_time_dataframe.map(lambda x: x.TailNum)
+tail_numbers = on_time_dataframe.rdd.map(lambda x: x.TailNum)
 tail_numbers = tail_numbers.filter(lambda x: x != '')
 
 # distinct() gets us unique tail numbers
