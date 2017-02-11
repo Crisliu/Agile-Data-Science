@@ -16,7 +16,7 @@ airplanes_per_carrier = carrier_airplane.rdd\
         'Carrier': tuple[0], 
         'TailNumbers': sorted(
           filter(
-            lambda x: x != '', tuple[1] # empty string tail numbers were getting through
+            lambda x: x is not None and x != '', tuple[1] # empty string tail numbers were getting through
             )
           ),
         'FleetCount': len(tuple[1])
