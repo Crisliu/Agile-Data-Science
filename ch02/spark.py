@@ -1,4 +1,4 @@
-# Load the text file
+# Load the text file using the SparkContext
 csv_lines = sc.textFile("data/example.csv")
 
 # Map the data to split the lines into a list
