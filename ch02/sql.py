@@ -22,7 +22,13 @@ rows_df = rows.toDF()
 rows_df.registerTempTable("executives")
 
 # Generate a new DataFrame with SQL using the SparkSession
-job_counts = spark.sql("SELECT name, COUNT(*) FROM executives GROUP BY name")
+job_counts = spark.sql("""
+SELECT
+  name,
+  COUNT(*) AS total
+  FROM executives
+  GROUP BY name
+""")
 job_counts.show()
 
 # Go back to an RDD
