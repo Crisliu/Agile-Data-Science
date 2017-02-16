@@ -29,7 +29,6 @@ print("Late arrivals:   {:,}".format(total_late_arrivals))
 print("Recoveries:      {:,}".format(total_on_time_heros))
 print("Percentage Late: {}%".format(pct_late))
 
-
 # Get the average minutes late departing and arriving
 spark.sql("""
 SELECT
