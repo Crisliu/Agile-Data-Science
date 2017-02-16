@@ -4,7 +4,7 @@ Code for Agile Data Science, O'Reilly 2016, Second Edition.
 
 ## Installation
 
-There are two methods of installation: Vagrant/Virtualboc or Amazon EC2.
+There are two methods of installation: Vagrant/Virtualbox or Amazon EC2.
 
 ### Amazon EC2
 
