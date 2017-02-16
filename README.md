@@ -61,3 +61,17 @@ For a manual install read Appendix A for further setup instructions. Checkout [m
 ## Running Examples
 
 All scripts run from the base directory, except the web app which runs in ex. `ch08/web/`.
+
+# Screenshots
+
+![Airline Page](images/airline_page_enriched_wikipedia.png)
+![Airplane Fleet Page](images/airplanes_page_chart_v1_v2.png)
+![Predicting Flight Delays UI](images/predicting_flight_kafka_waiting.png)
+
+# Architecture Diagrams
+
+Pulled from the book, the basic concepts are expressed by these.
+
+![Backend Architecture](images/back_end_realtime_architecture.png)
+![Data Value Pyramid](images/climbing_the_pyramid_chapter_intro.png)
+![Front End Architecture](images/front_end_realtime_architecture.png)
