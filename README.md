@@ -1,6 +1,6 @@
 # Agile_Data_Code_2
 
-Code for Agile Data Science, O'Reilly 2016, Second Edition.
+Code for Agile Data Science 2.0, O'Reilly 2017.
 
 ## Installation
 
@@ -68,10 +68,15 @@ All scripts run from the base directory, except the web app which runs in ex. `c
 ![Airplane Fleet Page](images/airplanes_page_chart_v1_v2.png)
 ![Predicting Flight Delays UI](images/predicting_flight_kafka_waiting.png)
 
+# The Data Value Pyramid
+
+Originally by Pete Warden, the data value pyramid is how the book is organized and structured. We climb it as we go forward each chapter.
+
+![Data Value Pyramid](images/climbing_the_pyramid_chapter_intro.png)
+
 # Architecture Diagrams
 
 Pulled from the book, the basic concepts are expressed by these.
 
-![Backend Architecture](images/back_end_realtime_architecture.png)
-![Data Value Pyramid](images/climbing_the_pyramid_chapter_intro.png)
 ![Front End Architecture](images/front_end_realtime_architecture.png)
+![Backend Architecture](images/back_end_realtime_architecture.png)
