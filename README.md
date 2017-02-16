@@ -8,7 +8,7 @@ Have problems? Please file an issue!
 
 Like my work? I am Principal Consultant at [Data Syndrome](http://datasyndrome.com), a consultancy offering assistance and training with building full-stack analytics products, applications and systems. Find us on the web at [datasyndrome.com](http://datasyndrome.com).
 
-![Data Syndrome Logo](images/data_syndrome_logo.png =250x)
+![Data Syndrome Logo](images/data_syndrome_logo.png)
 
 ## Realtime Predictive Analytics Course
 
