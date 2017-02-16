@@ -1,6 +1,6 @@
 # Agile_Data_Code_2
 
-Code for Agile Data Science, O'Reilly 2016, Second Edition.
+Code for Agile Data Science 2.0, O'Reilly 2017.
 
 ## Installation
 
