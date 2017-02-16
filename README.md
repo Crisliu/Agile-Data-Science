@@ -82,7 +82,7 @@ Originally by Pete Warden, the data value pyramid is how the book is organized a
 
 # System Architecture
 
-Pulled from the book, the basic concepts are expressed by these. The front and back end architectures work together to make a complete predictive system.
+The following diagrams are pulled from the book, and express the basic concepts in the system architecture. The front and back end architectures work together to make a complete predictive system.
 
 ## Front End Architecture
 
