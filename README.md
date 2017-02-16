@@ -1,6 +1,18 @@
 # Agile_Data_Code_2
 
-Code for Agile Data Science 2.0, O'Reilly 2017.
+Code for [Agile Data Science 2.0](http://shop.oreilly.com/product/0636920051619.do), O'Reilly 2017. Now available in [Preview on O'Reilly Safari](https://www.safaribooksonline.com/library/view/agile-data-science/9781491960103/).
+
+Have problems? Please file an issue!
+
+## Data Syndrome
+
+Like my work? I am Principal Consultant at [Data Syndrome](http://datasyndrome.com), a consultancy offering assistance and training with building full-stack analytics products, applications and systems. Find us on the web at [datasyndrome.com](http://datasyndrome.com).
+
+## Realtime Predictive Analytics Course
+
+There is now a video course using code from chapter 8, [Realtime Predictive Analytics with Kafka, PySpark, Spark MLlib and Spark Streaming](http://datasyndrome.com/video). Check it out now at [datasyndrome.com/video](http://datasyndrome.com/video).
+
+![Data Syndrome Logo](images/data_syndrome_logo.png)
 
 ## Installation
 
