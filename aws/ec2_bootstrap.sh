@@ -35,8 +35,9 @@ git clone https://github.com/rjurney/Agile_Data_Code_2
 cd /home/ubuntu/Agile_Data_Code_2
 export PROJECT_HOME=/home/ubuntu/Agile_Data_Code_2
 echo "export PROJECT_HOME=/home/ubuntu/Agile_Data_Code_2" | sudo tee -a /home/ubuntu/.bash_profile
-pip install --upgrade pip
-pip install -r requirements.txt
+conda install python=3.5
+conda install numpy scipy scikit-learn matplotlib ipython jupyter
+pip install Flask beautifulsoup4 airflow frozendict geopy kafka-python py4j pymongo pyelasticsearch requests selenium tabulate tldextract wikipedia findspark
 sudo chown -R ubuntu /home/ubuntu/Agile_Data_Code_2
 sudo chgrp -R ubuntu /home/ubuntu/Agile_Data_Code_2
 cd /home/ubuntu
@@ -112,14 +113,14 @@ sudo chgrp -R mongodb /data/db
 sudo /usr/bin/mongod --fork --logpath /var/log/mongodb.log
 
 # Get the MongoDB Java Driver
-curl -Lko /home/ubuntu/Agile_Data_Code_2/lib/mongo-java-driver-3.4.0.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.0/mongo-java-driver-3.4.0.jar
+curl -Lko /home/ubuntu/Agile_Data_Code_2/lib/mongo-java-driver-3.4.2.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.2/mongo-java-driver-3.4.2.jar
 
 # Install the mongo-hadoop project in the mongo-hadoop directory in the root of our project.
-curl -Lko /tmp/mongo-hadoop-r1.5.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r1.5.2.tar.gz
+curl -Lko /tmp/mongo-hadoop-r2.0.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r2.0.2.tar.gz
 mkdir /home/ubuntu/mongo-hadoop
 cd /home/ubuntu
-tar -xvzf /tmp/mongo-hadoop-r1.5.2.tar.gz -C mongo-hadoop --strip-components=1
-rm -rf /tmp/mongo-hadoop-r1.5.2.tar.gz
+tar -xvzf /tmp/mongo-hadoop-r2.0.2.tar.gz -C mongo-hadoop --strip-components=1
+rm -rf /tmp/mongo-hadoop-r2.0.2.tar.gz
 
 # Now build the mongo-hadoop-spark jars
 cd /home/ubuntu/mongo-hadoop
@@ -141,10 +142,10 @@ rm -rf /home/ubuntu/mongo-hadoop
 #
 # Install ElasticSearch in the elasticsearch directory in the root of our project, and the Elasticsearch for Hadoop package
 #
-curl -Lko /tmp/elasticsearch-5.1.1.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.tar.gz
+curl -Lko /tmp/elasticsearch-5.2.1.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.1.tar.gz
 mkdir /home/ubuntu/elasticsearch
 cd /home/ubuntu
-tar -xvzf /tmp/elasticsearch-5.1.1.tar.gz -C elasticsearch --strip-components=1
+tar -xvzf /tmp/elasticsearch-5.2.1.tar.gz -C elasticsearch --strip-components=1
 sudo chown -R ubuntu /home/ubuntu/elasticsearch
 sudo chgrp -R ubuntu /home/ubuntu/elasticsearch
 sudo mkdir -p /home/ubuntu/elasticsearch/logs
@@ -158,13 +159,13 @@ sudo -u ubuntu /home/ubuntu/elasticsearch/bin/elasticsearch -d # re-run if you s
 curl 'localhost:9200/agile_data_science/on_time_performance/_search?q=Origin:ATL&pretty'
 
 # Install Elasticsearch for Hadoop
-curl -Lko /tmp/elasticsearch-hadoop-5.1.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.1.1.zip
-unzip /tmp/elasticsearch-hadoop-5.1.1.zip
-mv /home/ubuntu/elasticsearch-hadoop-5.1.1 /home/ubuntu/elasticsearch-hadoop
-cp /home/ubuntu/elasticsearch-hadoop/dist/elasticsearch-hadoop-5.1.1.jar /home/ubuntu/Agile_Data_Code_2/lib/
-cp /home/ubuntu/elasticsearch-hadoop/dist/elasticsearch-spark-20_2.10-5.1.1.jar /home/ubuntu/Agile_Data_Code_2/lib/
+curl -Lko /tmp/elasticsearch-hadoop-5.2.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.2.1.zip
+unzip /tmp/elasticsearch-hadoop-5.2.1.zip
+mv /home/ubuntu/elasticsearch-hadoop-5.2.1 /home/ubuntu/elasticsearch-hadoop
+cp /home/ubuntu/elasticsearch-hadoop/dist/elasticsearch-hadoop-5.2.1.jar /home/ubuntu/Agile_Data_Code_2/lib/
+cp /home/ubuntu/elasticsearch-hadoop/dist/elasticsearch-spark-20_2.10-5.2.1.jar /home/ubuntu/Agile_Data_Code_2/lib/
 echo "spark.speculation false" | sudo tee -a /home/ubuntu/spark/conf/spark-defaults.conf
-rm -f /tmp/elasticsearch-hadoop-5.1.1.zip
+rm -f /tmp/elasticsearch-hadoop-5.2.1.zip
 rm -rf /home/ubuntu/elasticsearch-hadoop/conf/spark-defaults.conf
 
 #
@@ -178,7 +179,7 @@ curl -Lko lib/lzo-hadoop-1.0.5.jar http://central.maven.org/maven2/org/anarres/l
 cd /home/ubuntu
 
 # Set the spark.jars path
-echo "spark.jars /home/ubuntu/Agile_Data_Code_2/lib/mongo-hadoop-spark-1.5.2.jar,/home/ubuntu/Agile_Data_Code_2/lib/mongo-java-driver-3.4.0.jar,/home/ubuntu/Agile_Data_Code_2/lib/mongo-hadoop-1.5.2.jar,/home/ubuntu/Agile_Data_Code_2/lib/elasticsearch-spark-20_2.10-5.1.1.jar,/home/ubuntu/Agile_Data_Code_2/lib/snappy-java-1.1.2.6.jar,/home/ubuntu/Agile_Data_Code_2/lib/lzo-hadoop-1.0.5.jar" | sudo tee -a /home/ubuntu/spark/conf/spark-defaults.conf
+echo "spark.jars /home/ubuntu/Agile_Data_Code_2/lib/mongo-hadoop-spark-2.0.2.jar,/home/ubuntu/Agile_Data_Code_2/lib/mongo-java-driver-3.4.2.jar,/home/ubuntu/Agile_Data_Code_2/lib/mongo-hadoop-2.0.2.jar,/home/ubuntu/Agile_Data_Code_2/lib/elasticsearch-spark-20_2.10-5.2.1.jar,/home/ubuntu/Agile_Data_Code_2/lib/snappy-java-1.1.2.6.jar,/home/ubuntu/Agile_Data_Code_2/lib/lzo-hadoop-1.0.5.jar" | sudo tee -a /home/ubuntu/spark/conf/spark-defaults.conf
 
 #
 # Kafka install and setup
@@ -208,6 +209,23 @@ mkdir /home/ubuntu/airflow/plugins
 airflow initdb
 airflow webserver -D
 airflow scheduler -D
+
+# Install Apache Zeppelin
+curl -Lko /tmp/zeppelin-0.7.0-bin-all.tgz http://www-us.apache.org/dist/zeppelin/zeppelin-0.7.0/zeppelin-0.7.0-bin-all.tgz
+mkdir zeppelin
+tar -xvzf /tmp/zeppelin-0.7.0-bin-all.tgz -C zeppelin --strip-components=1
+
+# Configure Zeppelin
+cp zeppelin/conf/zeppelin-env.sh.template zeppelin/conf/zeppelin-env.sh
+echo "export SPARK_HOME=$PROJECT_HOME/spark" >> zeppelin/conf/zeppelin-env.sh
+echo "export SPARK_MASTER=local" >> zeppelin/conf/zeppelin-env.sh
+echo "export SPARK_CLASSPATH=" >> zeppelin/conf/zeppelin-env.sh
+
+# Jupyter server setup
+jupyter notebook --generate-config
+cp /home/ubuntu/Agile_Data_Code_2/jupyter_notebook_config.py /home/ubuntu/.jupyter/
+mkdir /home/ubuntu/certs
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:1024 -subj "/C=US" -keyout /home/ubuntu/certs/mycert.pem -out /home/ubuntu/certs/mycert.pem
 
 #
 # Cleanup
