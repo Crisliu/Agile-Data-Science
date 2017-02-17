@@ -102,6 +102,20 @@ This architecture is extremely powerful, and it is a huge benefit that we get to
 
 # Screenshots
 
+## Airline Entity Page
+
+Each airline gets its own entity page, complete with a summary of its fleet and a description pulled from Wikipedia.
+
 ![Airline Page](images/airline_page_enriched_wikipedia.png)
+
+## Airplane Fleet Page
+
+We demonstrate summarizing an entity with an airplane fleet page which describes the entire fleet.
+
 ![Airplane Fleet Page](images/airplanes_page_chart_v1_v2.png)
+
+## Flight Delay Prediction UI
+
+We create an entire realtime predictive system with a web front-end to submit prediction requests.
+
 ![Predicting Flight Delays UI](images/predicting_flight_kafka_waiting.png)
