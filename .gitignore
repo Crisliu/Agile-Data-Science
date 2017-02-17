@@ -21,3 +21,4 @@ zeppelin
 ch05/scrape_faa.py
 models
 .vagrant
+*.pem
