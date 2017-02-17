@@ -102,6 +102,8 @@ This architecture is extremely powerful, and it is a huge benefit that we get to
 
 # Screenshots
 
+Below are some examples of parts of the application we build in this book and in this repo. Check out the book for more!
+
 ## Airline Entity Page
 
 Each airline gets its own entity page, complete with a summary of its fleet and a description pulled from Wikipedia.
