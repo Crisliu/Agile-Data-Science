@@ -2,6 +2,8 @@
 
 Code for [Agile Data Science 2.0](http://shop.oreilly.com/product/0636920051619.do), O'Reilly 2017. Now available in [Preview on O'Reilly Safari](https://www.safaribooksonline.com/library/view/agile-data-science/9781491960103/).
 
+This is also the code for the [Realtime Predictive Analytics](http://datasyndrome.com/video) video course and [Introduction to PySpark](http://datasyndrome.com/training) live course!
+
 Have problems? Please file an issue!
 
 ## Data Syndrome
