@@ -14,6 +14,10 @@ Like my work? I am Principal Consultant at [Data Syndrome](http://datasyndrome.c
 
 There is now a video course using code from chapter 8, [Realtime Predictive Analytics with Kafka, PySpark, Spark MLlib and Spark Streaming](http://datasyndrome.com/video). Check it out now at [datasyndrome.com/video](http://datasyndrome.com/video).
 
+A free preview of the course is available at [https://vimeo.com/202336113](https://vimeo.com/202336113)
+
+[<img src="images/video_course_cover.png">](https://vimeo.com/202336113)
+
 ## Installation
 
 There are two methods of installation: Vagrant/Virtualbox or Amazon EC2.
