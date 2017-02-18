@@ -31,7 +31,7 @@ Installation takes just a few moments using Amazon EC2. The script [ec2.sh](ec2.
 **Note: If you must have two things setup for this script to work!**
 
 1. You must have a key called agile_data_science.pem in the project directory AND in us-east-1. If you don't have this, you can substitute a key that you do have in us-east-1, or you can change the zone in the command to the one you want. But that still means you need a key in that zone and you need the command to point at it.
-2. If you change zones, you need to change the image ID. Go to [https://cloud-images.ubuntu.com/locator/ec2/](https://cloud-images.ubuntu.com/locator/ec2/) and find a new image ID.
+2. If you change zones, you need to change the image ID. Go to [https://cloud-images.ubuntu.com/locator/ec2/](https://cloud-images.ubuntu.com/locator/ec2/) and find a new image ID, or use the table below.
 
 The images for `yakkety Ubuntu hvm:ebs-ssd` by zone to substitute for the `--image-id` value are:
 
@@ -52,6 +52,10 @@ The images for `yakkety Ubuntu hvm:ebs-ssd` by zone to substitute for the `--ima
 
 [<img src="images/ubuntu_images.png">](https://cloud-images.ubuntu.com/locator/ec2/)
 
+#### Amazon EC2 Launch Command
+
+This is the command to alter to match your zone and key setup.
+
 ```
 # Launch our instance, which ec2_bootstrap.sh will initialize
 aws ec2 run-instances \
@@ -65,14 +69,7 @@ aws ec2 run-instances \
     --count 1
 ```
 
-Once the server comes up, download the data and you are ready to go:
-
-```
-cd Agile_Data_Code_2
-./download.sh
-```
-
-Note: if you change the zone from us-east-1, you will need to update to a new image that corresponds to that region. This is explained in chapter 2. Go to [https://cloud-images.ubuntu.com/locator/ec2/](https://cloud-images.ubuntu.com/locator/ec2/) to find the Ubuntu image for your desired region.
+Now jump ahead to "Downloading Data".
 
 ### Vagrant/Virtualbox Install
 
@@ -85,16 +82,38 @@ vagrant up
 vagrant ssh
 ```
 
-Then download the data:
-
-```
-cd Agile_Data_Code_2
-./download.sh
-```
+Now jump ahead to Downloading Data.
 
 ### Manual Install
 
 For a manual install read Appendix A for further setup instructions. Checkout [manual_install.sh](manual_install.sh) if you want to install the tools yourself and run the example code. 
+
+## Downloading Data
+
+Once the server comes up, download the data and you are ready to go. First change directory into the `Agile_Data_Code_2` directory.
+
+```
+cd Agile_Data_Code_2
+```
+Now download the data, depending on which activity this is for.
+
+For the book Agile Data Science 2.0, run: 
+
+```
+./download.sh
+```
+
+For the [Introduction to Python](http://datasyndrome.com/training) course, run:
+
+```
+./intro_download.sh
+```
+
+For the [Realtime Predictive Analytics](http://datasyndrome.com/video) video course, or to skip ahead to chapter 8 in the book, run: 
+
+```
+ch08/download_data.sh
+```
 
 ## Running Examples
 
