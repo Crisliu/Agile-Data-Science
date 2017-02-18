@@ -28,6 +28,30 @@ Amazon EC2 is the preferred environment for this book/course, because it is simp
 
 Installation takes just a few moments using Amazon EC2. The script [ec2.sh](ec2.sh) uses the file [aws/ec2_bootstrap.sh](aws/ec2_bootstrap.sh) as `--user-data` to boot a single r3.xlarge EC2 instance in the us-east-1 region with all dependencies installed and running.
 
+**Note: If you must have two things setup for this script to work!**
+
+1. You must have a key called agile_data_science.pem in the project directory AND in us-east-1. If you don't have this, you can substitute a key that you do have in us-east-1, or you can change the zone in the command to the one you want. But that still means you need a key in that zone and you need the command to point at it.
+2. If you change zones, you need to change the image ID. Go to [https://cloud-images.ubuntu.com/locator/ec2/](https://cloud-images.ubuntu.com/locator/ec2/) and find a new image ID.
+
+The images for `yakkety Ubuntu hvm:ebs-ssd` by zone to substitute for the `--image-id` value are:
+
+| Zone           | Image ID     |
+|----------------|--------------|
+| us-east-1      | ami-4ae1fb5d |
+| ap-south-1     | ami-4d542222 |
+| ap-northeast-1 | ami-65750502 |
+| eu-west-1      | ami-cbfcd2b8 |
+| ap-southeast-1 | ami-93a800f0 |
+| us-west-1      | ami-818fdfe1 |
+| eu-central-1   | ami-5175b73e |
+| sa-east-1      | ami-1937ac75 |
+| ap-southeast-2 | ami-a87c79cb |
+| ap-northeast-2 | ami-9325f3fd |
+| us-west-2      | ami-a41eaec4 |
+| us-east-2      | ami-d5e7bdb0 |
+
+[<img src="images/ubuntu_images.png">](https://cloud-images.ubuntu.com/locator/ec2/)
+
 ```
 # Launch our instance, which ec2_bootstrap.sh will initialize
 aws ec2 run-instances \
@@ -40,8 +64,6 @@ aws ec2 run-instances \
     --block-device-mappings '{"DeviceName":"/dev/sda1","Ebs":{"DeleteOnTermination":false,"VolumeSize":1024}}' \
     --count 1
 ```
-
-
 
 Once the server comes up, download the data and you are ready to go:
 
