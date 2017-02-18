@@ -105,7 +105,7 @@ For the book Agile Data Science 2.0, run:
 ./download.sh
 ```
 
-For the [Introduction to Python](http://datasyndrome.com/training) course, run:
+For the [Introduction to PySpark](http://datasyndrome.com/training) course, run:
 
 ```
 ./intro_download.sh
