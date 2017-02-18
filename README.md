@@ -14,6 +14,10 @@ Like my work? I am Principal Consultant at [Data Syndrome](http://datasyndrome.c
 
 There is now a video course using code from chapter 8, [Realtime Predictive Analytics with Kafka, PySpark, Spark MLlib and Spark Streaming](http://datasyndrome.com/video). Check it out now at [datasyndrome.com/video](http://datasyndrome.com/video).
 
+A free preview of the course is available at [https://vimeo.com/202336113](https://vimeo.com/202336113)
+
+[<img src="images/video_course_cover.png">](https://vimeo.com/202336113)
+
 ## Installation
 
 There are two methods of installation: Vagrant/Virtualbox or Amazon EC2.
@@ -102,6 +106,22 @@ This architecture is extremely powerful, and it is a huge benefit that we get to
 
 # Screenshots
 
+Below are some examples of parts of the application we build in this book and in this repo. Check out the book for more!
+
+## Airline Entity Page
+
+Each airline gets its own entity page, complete with a summary of its fleet and a description pulled from Wikipedia.
+
 ![Airline Page](images/airline_page_enriched_wikipedia.png)
+
+## Airplane Fleet Page
+
+We demonstrate summarizing an entity with an airplane fleet page which describes the entire fleet.
+
 ![Airplane Fleet Page](images/airplanes_page_chart_v1_v2.png)
+
+## Flight Delay Prediction UI
+
+We create an entire realtime predictive system with a web front-end to submit prediction requests.
+
 ![Predicting Flight Delays UI](images/predicting_flight_kafka_waiting.png)
