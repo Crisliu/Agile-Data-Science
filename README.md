@@ -16,7 +16,7 @@ There is now a video course using code from chapter 8, [Realtime Predictive Anal
 
 A free preview of the course is available at [https://vimeo.com/202336113](https://vimeo.com/202336113)
 
-[<img src="images/video_course_cover.png">](https://vimeo.com/202336113)
+[<img src="images/video_course_cover.png">](http://datasyndrome.com/video)
 
 ## Installation
 
