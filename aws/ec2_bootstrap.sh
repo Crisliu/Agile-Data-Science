@@ -27,6 +27,9 @@ chmod +x /tmp/Miniconda3-latest-Linux-x86_64.sh
 export PATH=/home/ubuntu/anaconda/bin:$PATH
 echo 'export PATH=/home/ubuntu/anaconda/bin:$PATH' | sudo tee -a /home/ubuntu/.bash_profile
 
+sudo chown -R ubuntu /home/ubuntu/anaconda
+sudo chgrp -R ubuntu /home/ubuntu/anaconda
+
 #
 # Install Clone repo, install Python dependencies
 #

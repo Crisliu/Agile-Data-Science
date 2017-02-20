@@ -31,8 +31,8 @@ chmod +x /tmp/Miniconda3-latest-Linux-x86_64.sh
 export PATH=/home/vagrant/anaconda/bin:$PATH
 echo 'export PATH=/home/vagrant/anaconda/bin:$PATH' | sudo tee -a /home/vagrant/.bash_profile
 
-#sudo chown -R vagrant /home/vagrant/anaconda
-#sudo chgrp -R vagrant /home/vagrant/anaconda
+sudo chown -R vagrant /home/vagrant/anaconda
+sudo chgrp -R vagrant /home/vagrant/anaconda
 
 #sudo apt-get install -y python3 python3-dev python3-numpy python3-scipy python3-setuptools
 #sudo easy_install3 pip
