@@ -45,8 +45,9 @@ git clone https://github.com/rjurney/Agile_Data_Code_2
 cd /home/vagrant/Agile_Data_Code_2
 export PROJECT_HOME=/home/vagrant/Agile_Data_Code_2
 echo "export PROJECT_HOME=/home/vagrant/Agile_Data_Code_2" | sudo tee -a /home/vagrant/.bash_profile
-pip install --upgrade pip
-pip install -r requirements.txt
+conda install python=3.5
+conda install numpy scipy scikit-learn matplotlib ipython jupyter
+pip install Flask beautifulsoup4 airflow frozendict geopy kafka-python py4j pymongo pyelasticsearch requests selenium tabulate tldextract wikipedia findspark
 sudo chown -R vagrant /home/vagrant/Agile_Data_Code_2
 sudo chgrp -R vagrant /home/vagrant/Agile_Data_Code_2
 cd /home/vagrant
@@ -124,14 +125,14 @@ sudo chgrp -R mongodb /data/db
 sudo /usr/bin/mongod --fork --logpath /var/log/mongodb.log
 
 # Get the MongoDB Java Driver
-curl -Lko /home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.0.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.0/mongo-java-driver-3.4.0.jar
+curl -Lko /home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.2.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.2/mongo-java-driver-3.4.2.jar
 
 # Install the mongo-hadoop project in the mongo-hadoop directory in the root of our project.
-curl -Lko /tmp/mongo-hadoop-r1.5.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r1.5.2.tar.gz
+curl -Lko /tmp/mongo-hadoop-r2.0.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r2.0.2.tar.gz
 mkdir /home/vagrant/mongo-hadoop
 cd /home/vagrant
-tar -xvzf /tmp/mongo-hadoop-r1.5.2.tar.gz -C mongo-hadoop --strip-components=1
-rm -rf /tmp/mongo-hadoop-r1.5.2.tar.gz
+tar -xvzf /tmp/mongo-hadoop-r2.0.2.tar.gz -C mongo-hadoop --strip-components=1
+rm -rf /tmp/mongo-hadoop-r2.0.2.tar.gz
 
 # Now build the mongo-hadoop-spark jars
 cd /home/vagrant/mongo-hadoop
@@ -153,10 +154,10 @@ rm -rf /home/vagrant/mongo-hadoop
 #
 # Install ElasticSearch in the elasticsearch directory in the root of our project, and the Elasticsearch for Hadoop package
 #
-curl -Lko /tmp/elasticsearch-5.1.1.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.tar.gz
+curl -Lko /tmp/elasticsearch-5.2.1.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.1.tar.gz
 mkdir /home/vagrant/elasticsearch
 cd /home/vagrant
-tar -xvzf /tmp/elasticsearch-5.1.1.tar.gz -C elasticsearch --strip-components=1
+tar -xvzf /tmp/elasticsearch-5.2.1.tar.gz -C elasticsearch --strip-components=1
 sudo chown -R vagrant /home/vagrant/elasticsearch
 sudo chgrp -R vagrant /home/vagrant/elasticsearch
 sudo mkdir -p /home/vagrant/elasticsearch/logs
@@ -167,13 +168,13 @@ sudo chgrp -R vagrant /home/vagrant/elasticsearch/logs
 sudo -u vagrant /home/vagrant/elasticsearch/bin/elasticsearch -d # re-run if you shutdown your computer
 
 # Install Elasticsearch for Hadoop
-curl -Lko /tmp/elasticsearch-hadoop-5.1.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.1.1.zip
-unzip /tmp/elasticsearch-hadoop-5.1.1.zip
-mv /home/vagrant/elasticsearch-hadoop-5.1.1 /home/vagrant/elasticsearch-hadoop
-cp /home/vagrant/elasticsearch-hadoop/dist/elasticsearch-hadoop-5.1.1.jar /home/vagrant/Agile_Data_Code_2/lib/
-cp /home/vagrant/elasticsearch-hadoop/dist/elasticsearch-spark-20_2.10-5.1.1.jar /home/vagrant/Agile_Data_Code_2/lib/
+curl -Lko /tmp/elasticsearch-hadoop-5.2.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.2.1.zip
+unzip /tmp/elasticsearch-hadoop-5.2.1.zip
+mv /home/vagrant/elasticsearch-hadoop-5.2.1 /home/vagrant/elasticsearch-hadoop
+cp /home/vagrant/elasticsearch-hadoop/dist/elasticsearch-hadoop-5.2.1.jar /home/vagrant/Agile_Data_Code_2/lib/
+cp /home/vagrant/elasticsearch-hadoop/dist/elasticsearch-spark-20_2.10-5.2.1.jar /home/vagrant/Agile_Data_Code_2/lib/
 echo "spark.speculation false" | sudo tee -a /home/vagrant/spark/conf/spark-defaults.conf
-rm -f /tmp/elasticsearch-hadoop-5.1.1.zip
+rm -f /tmp/elasticsearch-hadoop-5.2.1.zip
 rm -rf /home/vagrant/elasticsearch-hadoop/conf/spark-defaults.conf
 
 #
@@ -187,7 +188,7 @@ curl -Lko lib/lzo-hadoop-1.0.5.jar http://central.maven.org/maven2/org/anarres/l
 cd /home/vagrant
 
 # Set the spark.jars path
-echo "spark.jars /home/vagrant/Agile_Data_Code_2/lib/mongo-hadoop-spark-1.5.2.jar,/home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.0.jar,/home/vagrant/Agile_Data_Code_2/lib/mongo-hadoop-1.5.2.jar,/home/vagrant/Agile_Data_Code_2/lib/elasticsearch-spark-20_2.10-5.1.1.jar,/home/vagrant/Agile_Data_Code_2/lib/snappy-java-1.1.2.6.jar,/home/vagrant/Agile_Data_Code_2/lib/lzo-hadoop-1.0.5.jar" | sudo tee -a /home/vagrant/spark/conf/spark-defaults.conf
+echo "spark.jars /home/vagrant/Agile_Data_Code_2/lib/mongo-hadoop-spark-1.5.2.jar,/home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.2.jar,/home/vagrant/Agile_Data_Code_2/lib/mongo-hadoop-1.5.2.jar,/home/vagrant/Agile_Data_Code_2/lib/elasticsearch-spark-20_2.10-5.1.1.jar,/home/vagrant/Agile_Data_Code_2/lib/snappy-java-1.1.2.6.jar,/home/vagrant/Agile_Data_Code_2/lib/lzo-hadoop-1.0.5.jar" | sudo tee -a /home/vagrant/spark/conf/spark-defaults.conf
 
 #
 # Kafka install and setup
