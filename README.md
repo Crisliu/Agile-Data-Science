@@ -121,6 +121,10 @@ ch08/download_data.sh
 
 All scripts run from the base directory, except the web app which runs in ex. `ch08/web/`.
 
+### Jupyter Notebooks
+
+All notebooks assume you have run the jupyter notebook command from the project root directory `Agile_Data_Code_2`. If you are using a virtual machine image (Vagrant/Virtualbox or EC2), jupyter notebook is already running. See directions on port mapping to proceed.
+
 # The Data Value Pyramid
 
 Originally by Pete Warden, the data value pyramid is how the book is organized and structured. We climb it as we go forward each chapter.
