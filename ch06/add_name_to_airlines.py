@@ -1,3 +1,5 @@
+import sys, os, re
+
 # Load the on-time parquet file
 on_time_dataframe = spark.read.parquet('data/on_time_performance.parquet')
 
@@ -42,5 +44,7 @@ our_airlines.show()
 
 # Store as JSON objects via a dataframe. Repartition to 1 to get 1 json file.
 our_airlines.repartition(1).write.mode("overwrite").json("data/our_airlines.json")
+
+os.system("cp data/our_airlines.json/part* data/our_airlines.jsonl")
 
 #wikidata = spark.read.json('data/wikidata-20160404-all.json.bz2')
