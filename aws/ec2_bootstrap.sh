@@ -227,6 +227,8 @@ cp /home/ubuntu/Agile_Data_Code_2/jupyter_notebook_config.py /home/ubuntu/.jupyt
 mkdir /home/ubuntu/certs
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:1024 -subj "/C=US" -keyout /home/ubuntu/certs/mycert.pem -out /home/ubuntu/certs/mycert.pem
 
+jupyter notebook --ip=0.0.0.0
+
 #
 # Cleanup
 #
