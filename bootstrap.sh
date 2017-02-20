@@ -219,6 +219,25 @@ airflow initdb
 airflow webserver -D
 airflow scheduler -D
 
+# Install Apache Zeppelin
+curl -Lko /tmp/zeppelin-0.7.0-bin-all.tgz http://www-us.apache.org/dist/zeppelin/zeppelin-0.7.0/zeppelin-0.7.0-bin-all.tgz
+mkdir zeppelin
+tar -xvzf /tmp/zeppelin-0.7.0-bin-all.tgz -C zeppelin --strip-components=1
+
+# Configure Zeppelin
+cp zeppelin/conf/zeppelin-env.sh.template zeppelin/conf/zeppelin-env.sh
+echo "export SPARK_HOME=$PROJECT_HOME/spark" >> zeppelin/conf/zeppelin-env.sh
+echo "export SPARK_MASTER=local" >> zeppelin/conf/zeppelin-env.sh
+echo "export SPARK_CLASSPATH=" >> zeppelin/conf/zeppelin-env.sh
+
+# Jupyter server setup
+jupyter notebook --generate-config
+cp /home/vagrant/Agile_Data_Code_2/jupyter_notebook_config.py /home/vagrant/.jupyter/
+mkdir /home/vagrant/certs
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:1024 -subj "/C=US" -keyout /home/ubuntu/certs/mycert.pem -out /home/ubuntu/certs/mycert.pem
+
+jupyter notebook --ip=0.0.0.0
+
 #
 # Cleanup
 #
