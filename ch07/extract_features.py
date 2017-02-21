@@ -37,11 +37,11 @@ filled_on_time_features = simple_on_time_features.filter(
 def convert_hours(hours_minutes):
   hours = hours_minutes[:-2]
   minutes = hours_minutes[-2:]
-
+  
   if hours == '24':
     hours = '23'
     minutes = '59'
-
+  
   time_string = "{}:{}:00Z".format(hours, minutes)
   return time_string
 
@@ -67,17 +67,17 @@ def day_of_year(iso_date_string):
   return doy
 
 def alter_feature_datetimes(row):
-
+  
   flight_date = iso8601.parse_date(row['FlightDate'])
   scheduled_dep_time = convert_datetime(row['FlightDate'], row['CRSDepTime'])
   scheduled_arr_time = convert_datetime(row['FlightDate'], row['CRSArrTime'])
-
+  
   # Handle overnight flights
   if scheduled_arr_time < scheduled_dep_time:
     scheduled_arr_time += datetime.timedelta(days=1)
-
+  
   doy = day_of_year(row['FlightDate'])
-
+  
   return {
     'FlightNum': row['FlightNum'],
     'FlightDate': flight_date,
