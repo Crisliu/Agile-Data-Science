@@ -19,24 +19,24 @@ print("Size of training data in RAM: {:,} Bytes".format(sys.getsizeof(training_d
 print(training_data[0])
 
 # # Sample down our training data at first...
-# sampled_training_data = training_data#np.random.choice(training_data, 1000000)
-# print("Sampled items: {:,} Bytes".format(len(training_data)))
-# print("Data sampled...")
+sampled_training_data = training_data#np.random.choice(training_data, 1000000)
+print("Sampled items: {:,} Bytes".format(len(training_data)))
+print("Data sampled...")
 
 # Separate our results from the rest of the data, vectorize and size up
-results = [record['ArrDelay'] for record in training_data]
+results = [record['ArrDelay'] for record in sampled_training_data]
 results_vector = np.array(results)
 sys.getsizeof(results_vector) # 45,712,160 Bytes
 print("Results vectorized...")
 
 # Remove the two delay fields and the flight date from our training data
-for item in training_data:
+for item in sampled_training_data:
   item.pop('ArrDelay', None)
   item.pop('FlightDate', None)
 print("ArrDelay and FlightDate removed from training data...")
 
 # Must convert datetime strings to unix times
-for item in training_data:
+for item in sampled_training_data:
   if isinstance(item['CRSArrTime'], str):
     dt = iso8601.parse_date(item['CRSArrTime'])
     unix_time = int(dt.timestamp())
@@ -129,14 +129,14 @@ import pickle
 project_home = os.environ["PROJECT_HOME"]
 
 # Dump the model itself
-regressor_path = "{}/data/sklearn_regressor.pkl".format(project_home)
+regressor_path = "{}/models/sklearn_regressor.pkl".format(project_home)
 
 regressor_bytes = pickle.dumps(regressor)
 model_f = open(regressor_path, 'wb')
 model_f.write(regressor_bytes)
 
 # Dump the DictVectorizer that vectorizes the features
-vectorizer_path = "{}/data/sklearn_vectorizer.pkl".format(project_home)
+vectorizer_path = "{}/models/sklearn_vectorizer.pkl".format(project_home)
 
 vectorizer_bytes = pickle.dumps(vectorizer)
 vectorizer_f = open(vectorizer_path, 'wb')
