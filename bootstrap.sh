@@ -46,8 +46,8 @@ cd /home/vagrant/Agile_Data_Code_2
 export PROJECT_HOME=/home/vagrant/Agile_Data_Code_2
 echo "export PROJECT_HOME=/home/vagrant/Agile_Data_Code_2" | sudo tee -a /home/vagrant/.bash_profile
 conda install python=3.5
-conda install numpy scipy scikit-learn matplotlib ipython jupyter
-pip install iso8601 Flask beautifulsoup4 airflow frozendict geopy kafka-python py4j pymongo pyelasticsearch requests selenium tabulate tldextract wikipedia findspark
+conda install iso8601 numpy scipy scikit-learn matplotlib ipython jupyter
+pip install bs4 Flask beautifulsoup4 airflow frozendict geopy kafka-python py4j pymongo pyelasticsearch requests selenium tabulate tldextract wikipedia findspark
 sudo chown -R vagrant /home/vagrant/Agile_Data_Code_2
 sudo chgrp -R vagrant /home/vagrant/Agile_Data_Code_2
 cd /home/vagrant
