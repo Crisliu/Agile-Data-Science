@@ -10,3 +10,7 @@ curl -Lko ./simple_flight_delay_features.jsonl.bz2 http://s3.amazonaws.com/agile
 
 # Get the distances between pairs of airports
 curl -Lko ./origin_dest_distances.jsonl http://s3.amazonaws.com/agile_data_science/origin_dest_distances.jsonl
+
+# Get the models to make ch08/web/predict_flask.py go
+curl -Lko ./sklearn_vectorizer.pkl http://s3.amazonaws.com/agile_data_science/sklearn_vectorizer.pkl
+curl -Lko ./sklearn_regressor.pkl http://s3.amazonaws.com/agile_data_science/sklearn_regressor.pkl
