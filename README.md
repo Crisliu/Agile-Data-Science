@@ -30,9 +30,9 @@ Amazon EC2 is the preferred environment for this book/course, because it is simp
 
 Installation takes just a few moments using Amazon EC2. The script [ec2.sh](ec2.sh) uses the file [aws/ec2_bootstrap.sh](aws/ec2_bootstrap.sh) as `--user-data` to boot a single r3.xlarge EC2 instance in the us-east-1 region with all dependencies installed and running.
 
-**Note: If you must have two things setup for this script to work!**
+**Note: You must have two things setup for this script to work!**
 
-1. You must have a key called agile_data_science.pem in the project directory AND in us-east-1. If you don't have this, you can substitute a key that you do have in us-east-1, or you can change the zone in the command to the one you want. But that still means you need a key in that zone and you need the command to point at it.
+1. You must alter the key setup to match your own keys. You can do this by having a key called agile_data_science.pem in the project directory AND in us-east-1. Or you can substitute a key that you do have in whatever zone, and you can change the zone in the command to the one you want.
 2. If you change zones, you need to change the image ID. Go to [https://cloud-images.ubuntu.com/locator/ec2/](https://cloud-images.ubuntu.com/locator/ec2/) and find a new image ID, or use the table below.
 
 The images for `yakkety Ubuntu hvm:ebs-ssd` by zone to substitute for the `--image-id` value are:
