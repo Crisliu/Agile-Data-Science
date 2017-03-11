@@ -12,6 +12,17 @@ export PROJECT_HOME=`pwd`
 echo "export PROJECT_HOME=$PROJECT_HOME" >> ~/.bash_profile
 
 #
+# Check if Java is installed and halt if not
+#
+if [ -z `which java` ]; then
+  echo "ERROR: JAVA IS REQUIRED TO CONTINUE INSTALL!"
+  echo "Please install Java, which you can find at https://www.java.com/en/download/help/download_options.xml"
+  exit;
+else
+  echo "Java detected, continuing install..."
+fi
+
+#
 # Define the right url for Anaconda and Mongo
 #
 if [ "$(uname)" == "Darwin" ]; then
