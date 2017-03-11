@@ -90,6 +90,8 @@ Now jump ahead to Downloading Data.
 
 For a manual install read Appendix A for further setup instructions. Checkout [manual_install.sh](manual_install.sh) if you want to install the tools yourself and run the example code. 
 
+Note: You must have Java installed on your computer for these instructions to work. You can find more information about how to install Java here: [https://www.java.com/en/download/help/download_options.xml](https://www.java.com/en/download/help/download_options.xml)
+
 ## Downloading Data
 
 Once the server comes up, download the data and you are ready to go. First change directory into the `Agile_Data_Code_2` directory.
