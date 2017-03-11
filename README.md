@@ -90,6 +90,8 @@ Now jump ahead to Downloading Data.
 
 For a manual install read Appendix A for further setup instructions. Checkout [manual_install.sh](manual_install.sh) if you want to install the tools yourself and run the example code. 
 
+Note: You must READ THE MANUAL INSTALL SCRIPT BEFORE RUNNING IT. It does things to your `~/.bash_profile` that you should know about. Again, this is not recommended for beginners.
+
 Note: You must have Java installed on your computer for these instructions to work. You can find more information about how to install Java here: [https://www.java.com/en/download/help/download_options.xml](https://www.java.com/en/download/help/download_options.xml)
 
 ## Downloading Data
