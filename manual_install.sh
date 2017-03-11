@@ -23,6 +23,12 @@ else
 fi
 
 #
+# Make backup of ~/.bash_profile
+#
+echo "Backing up ~/.bash_profile to ~/.bash_profile.agile_data_science.bak"
+cp ~/.bash_profile ~/.bash_profile.agile_data_science.bak
+
+#
 # Define the right url for Anaconda and Mongo
 #
 if [ "$(uname)" == "Darwin" ]; then
