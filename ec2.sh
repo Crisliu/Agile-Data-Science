@@ -39,8 +39,8 @@ echo "Authorizing port 22 to your external IP ($EXTERNAL_IP) in security group '
 aws ec2 authorize-security-group-ingress --group-name agile_data_science --protocol tcp --cidr $EXTERNAL_IP/32 --port 22
 
 echo ""
-echo "Generating keypair called 'agile_data_science' ..."
-aws ec2 create-key-pair --key-name agile_data_science|jq .KeyMaterial|sed -e 's/^"//' -e 's/"$//'|sed 's/\\n/\n/g' > ./agile_data_science.pem
+echo "Generating keypair called 'agile_data_science' ..."             # Lose start "  # Lose end " # Make '\n' a newline
+aws ec2 create-key-pair --key-name agile_data_science|jq .KeyMaterial|sed -e 's/^"//' -e 's/"$//'| awk '{gsub(/\\n/,"\n")}1' > ./agile_data_science.pem
 echo "Changing permissions of 'agile_data_science.pem' to 0600 ..."
 chmod 0600 ./agile_data_science.pem
 
@@ -97,11 +97,14 @@ RESERVATION_ID=`cat ./.reservation_id`
 echo "Got reservation ID '$RESERVATION_ID' ..."
 
 # Use the ReservationId to get the public hostname to ssh to
+echo ""
 echo "Sleeping 10 seconds before inquiring to get the public hostname of the instance we just created ..."
 sleep 5
 echo "..."
 sleep 5
-echo "Awake! Using the reservation ID to get the public hostname ..."
+echo "Awake!"
+echo ""
+echo "Using the reservation ID to get the public hostname ..."
 INSTANCE_PUBLIC_HOSTNAME=`aws ec2 describe-instances | jq -c ".Reservations[] | select(.ReservationId | contains(\"$RESERVATION_ID\"))| .Instances[0].PublicDnsName" | tr -d '"'`
 
 echo "The public hostname of the instance we just created is '$INSTANCE_PUBLIC_HOSTNAME' ..."
@@ -121,8 +124,8 @@ echo ""
 echo "Thanks for trying Agile Data Science 2.0!"
 echo "If you have ANY problems, please file an issue on Github at https://github.com/rjurney/Agile_Data_Code_2/issues and I will resolve them."
 echo ""
-echo "Enjoy! Russell Jurney <@rjurney> <russell.jurney@gmail.com> <http://linkedin.com/in/russelljurney>"
-echo ""
-echo "If you need help creating your own applications, or with on-site or video training, help is available!"
+echo "If you need help creating your own applications, or with on-site or video training..."
 echo "Check out Data Syndrome at http://datasyndrome.com"
 echo ""
+echo "Enjoy! Russell Jurney <@rjurney> <russell.jurney@gmail.com> <http://linkedin.com/in/russelljurney>"
+
