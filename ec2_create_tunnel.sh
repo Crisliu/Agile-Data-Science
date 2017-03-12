@@ -18,4 +18,4 @@ echo ""
 
 # Create a tunnel to our ssh instance, port 5000 and map it to localhost:5000
 echo 'Executing: ssh -N -i ./agile_data_science.pem -L 5000:localhost:5000 ubuntu@$EC2_HOSTNAME &'
-ssh -N -i ./agile_data_science.pem -L 5000:localhost:5000 ubuntu@$EC2_HOSTNAME &
+ssh -N -i ./agile_data_science.pem -o StrictHostKeyChecking=no -L 5000:localhost:5000 ubuntu@$EC2_HOSTNAME &
