@@ -7,7 +7,7 @@ sudo apt-get install -y zip unzip curl bzip2 python-dev build-essential git libs
     software-properties-common debconf-utils python-software-properties
 
 # Update the motd message to create instructions for users when they ssh in
-sudo apt-get install update-motd
+sudo apt-get install -y update-motd
 cat > /home/ubuntu/agile_data_science.message << END_HELLO
 
 
