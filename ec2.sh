@@ -111,7 +111,7 @@ echo "The public hostname of the instance we just created is '$INSTANCE_PUBLIC_H
 echo "Writing hostname to '.ec2_hostname' ..."
 echo $INSTANCE_PUBLIC_HOSTNAME > .ec2_hostname
 echo ""
-echo "After a few minutes (for it to initialize), you may ssh to this machine via: "
+echo "After a few minutes (for it to initialize), you may ssh to this machine via the command in red: "
 # Make the ssh instructions red
 RED='\033[0;31m'
 NC='\033[0m' # No Color
