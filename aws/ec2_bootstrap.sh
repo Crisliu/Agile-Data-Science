@@ -263,7 +263,7 @@ If you have problems, please file an issue at https://github.com/rjurney/Agile_D
 
 For help building 'big data' applications like this one, or for training regarding same, contact Russell Jurney <rjurney@datasyndrome.com> or find more information at http://datasyndrome.com
 
-Enjoy!
+Enjoy! Russell Jurney @rjurney <russell.jurney@gmail.com> http://linkedin.com/in/russelljurney
 
 END_HELLO
 
