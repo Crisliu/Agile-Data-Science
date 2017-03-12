@@ -40,7 +40,7 @@ aws ec2 authorize-security-group-ingress --group-name agile_data_science --proto
 
 echo ""
 echo "Generating keypair called 'agile_data_science' ..."
-aws ec2 create-key-pair --key-name agile_data_science|jq .KeyMaterial|sed -e 's/^"//' -e 's/"$//' > ./agile_data_science.pem
+aws ec2 create-key-pair --key-name agile_data_science|jq .KeyMaterial|sed -e 's/^"//' -e 's/"$//'|sed 's/\\n/\n/g' > ./agile_data_science.pem
 echo "Changing permissions of 'agile_data_science.pem' to 0600 ..."
 chmod 0600 ./agile_data_science.pem
 
@@ -109,9 +109,14 @@ echo "Writing hostname to '.ec2_hostname' ..."
 echo $INSTANCE_PUBLIC_HOSTNAME > .ec2_hostname
 echo ""
 echo "After a few minutes (for it to initialize), you may ssh to this machine via: "
-echo "ssh -i ./agile_data_science.pem ubuntu@$INSTANCE_PUBLIC_HOSTNAME"
+# Make the ssh instructions red
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+echo -e "${RED}ssh -i ./agile_data_science.pem ubuntu@$INSTANCE_PUBLIC_HOSTNAME${NC}"
 echo "Note: only your IP of '$EXTERNAL_IP' is authorized to connect to this machine."
 
+echo ""
+echo "---------------------------------------------------------------------------------------------------------------------"
 echo ""
 echo "Thanks for trying Agile Data Science 2.0!"
 echo "If you have ANY problems, please file an issue on Github at https://github.com/rjurney/Agile_Data_Code_2/issues and I will resolve them."
