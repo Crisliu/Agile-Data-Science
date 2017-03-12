@@ -117,6 +117,13 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 echo -e "${RED}ssh -i ./agile_data_science.pem ubuntu@$INSTANCE_PUBLIC_HOSTNAME${NC}"
 echo "Note: only your IP of '$EXTERNAL_IP' is authorized to connect to this machine."
+echo "Note: if you ssh to this machine after a few minutes and there is no software in \$HOME, please wait a few minutes for the install to finish."
+
+echo ""
+echo "Once you ssh in, the exercise code is in the Agile_Data_Code_2 directory! Run all files from this directory, with the exception of the web applications, which you will run from ex. ch08/web"
+
+echo ""
+echo "Note: now you will need to run ./ec2_create_tunnel.sh to forward port 5000 on the ec2 instance to your local port 5000. This way you can run the example web applications on the ec2 instance and browse them at http://localhost:5000"
 
 echo ""
 echo "---------------------------------------------------------------------------------------------------------------------"
