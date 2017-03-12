@@ -117,6 +117,9 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 echo -e "${RED}ssh -i ./agile_data_science.pem ubuntu@$INSTANCE_PUBLIC_HOSTNAME${NC}"
 echo "Note: only your IP of '$EXTERNAL_IP' is authorized to connect to this machine."
+echo ""
+echo "NOTE: IT WILL TAKE SEVERAL MINUTES FOR THIS MACHINE TO INITIALIZE. PLEASE WAIT FIVE MINUTES BEFORE LOGGING IN."
+echo ""
 echo "Note: if you ssh to this machine after a few minutes and there is no software in \$HOME, please wait a few minutes for the install to finish."
 
 echo ""
