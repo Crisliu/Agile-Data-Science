@@ -26,50 +26,39 @@ There are two methods of installation: Vagrant/Virtualbox or Amazon EC2.
 
 ### Amazon EC2
 
-Amazon EC2 is the preferred environment for this book/course, because it is simple and painless.
+Amazon EC2 is the preferred environment for this book/course, because it is simple and painless. Installation takes just a few moments using Amazon EC2. 
 
-Installation takes just a few moments using Amazon EC2. The script [ec2.sh](ec2.sh) uses the file [aws/ec2_bootstrap.sh](aws/ec2_bootstrap.sh) as `--user-data` to boot a single r3.xlarge EC2 instance in the us-east-1 region with all dependencies installed and running.
-
-**Note: You must have two things setup for this script to work!**
-
-1. You must alter the key setup to match your own keys. You can do this by having a key called agile_data_science.pem in the project directory AND in us-east-1. Or you can substitute a key that you do have in whatever zone, and you can change the zone in the command to the one you want.
-2. If you change zones, you need to change the image ID. Go to [https://cloud-images.ubuntu.com/locator/ec2/](https://cloud-images.ubuntu.com/locator/ec2/) and find a new image ID, or use the table below.
-
-The images for `yakkety Ubuntu hvm:ebs-ssd` by zone to substitute for the `--image-id` value are:
-
-| Zone           | Image ID     |
-|----------------|--------------|
-| us-east-1      | ami-4ae1fb5d |
-| ap-south-1     | ami-4d542222 |
-| ap-northeast-1 | ami-65750502 |
-| eu-west-1      | ami-cbfcd2b8 |
-| ap-southeast-1 | ami-93a800f0 |
-| us-west-1      | ami-818fdfe1 |
-| eu-central-1   | ami-5175b73e |
-| sa-east-1      | ami-1937ac75 |
-| ap-southeast-2 | ami-a87c79cb |
-| ap-northeast-2 | ami-9325f3fd |
-| us-west-2      | ami-a41eaec4 |
-| us-east-2      | ami-d5e7bdb0 |
-
-[<img src="images/ubuntu_images.png">](https://cloud-images.ubuntu.com/locator/ec2/)
-
-#### Amazon EC2 Launch Command
-
-This is the command to alter to match your zone and key setup.
+First you will need to install the Amazon CLI via:
 
 ```
-# Launch our instance, which ec2_bootstrap.sh will initialize
-aws ec2 run-instances \
-    --image-id ami-4ae1fb5d \
-    --key-name agile_data_science \
-    --user-data file://aws/ec2_bootstrap.sh \
-    --instance-type r3.xlarge \
-    --ebs-optimized \
-    --region us-east-1 \
-    --block-device-mappings '{"DeviceName":"/dev/sda1","Ebs":{"DeleteOnTermination":false,"VolumeSize":1024}}' \
-    --count 1
+pip install awscli
 ```
+
+Now you must authenticate into the AWS CLI via:
+
+```
+aws configure
+```
+
+Once you've provided it your AWS credentials, run the following command to bring up a machine pre-configured with the book's complete environment and source code:
+
+```
+./ec2.sh
+```
+
+#### How it Works
+
+The script [ec2.sh](ec2.sh) uses the file [aws/ec2_bootstrap.sh](aws/ec2_bootstrap.sh) as `--user-data` to boot a single r3.xlarge EC2 instance in the us-east-1 region with all dependencies installed and running. 
+
+In addition, it uses the AWS CLI to create a key-pair called `agile_data_science` (which then appears in this directory under [agile_data_science.pem](agile_data_science.pem)). It also creates a security group called `agile_data_science` with port 22 open only to your external IP address.
+
+Note: this script uses the utility [`jq`](https://stedolan.github.io/jq/) to parse the JSON returned by the AWS CLI. The script will detect whether `jq` is installed and will attempt to use the script [jq_install.sh](jq_install.sh) to install it locally if it is not present. If the install fails, you will be instructed to install it yourself.
+
+#### Next Steps
+
+When it succeeds, the ec2 script will print instructions on what to do next: how to ssh into the ec2 instance, and how to create an ssh tunnel to forward web applications run on the ec2 instance to your local port 5000 where you can view them at [http://localhost:5000](http://localhost:5000).
+
+The script to create an ssh tunnel is [ec2_create_tunnel.sh](ec2_create_tunnel.sh).
 
 Now jump ahead to "Downloading Data".
 
