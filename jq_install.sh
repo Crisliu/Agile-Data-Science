@@ -53,7 +53,7 @@ elif [ $PLATFORM == "Linux" ]; then
   echo "Detecting Debian/Ubuntu ..."
   if [ ! -z `python -mplatform | grep debian` ]; then
     echo "Debian/Ubuntu detected. Performing 'apt-get install jq' ..."
-    apt-get install jq
+    sudo apt-get install jq
   else
     echo "CentOS detected. Detecting 'dnf' ..."
     if [ -z `which dnf` ]; then
