@@ -105,6 +105,8 @@ echo "Awake! Using the reservation ID to get the public hostname ..."
 INSTANCE_PUBLIC_HOSTNAME=`aws ec2 describe-instances | jq -c ".Reservations[] | select(.ReservationId | contains(\"$RESERVATION_ID\"))| .Instances[0].PublicDnsName" | tr -d '"'`
 
 echo "The public hostname of the instance we just created is '$INSTANCE_PUBLIC_HOSTNAME' ..."
+echo "Writing hostname to '.ec2_hostname' ..."
+echo $INSTANCE_PUBLIC_HOSTNAME > .ec2_hostname
 echo ""
 echo "After a few minutes (for it to initialize), you may ssh to this machine via: "
 echo "ssh -i ./agile_data_science.pem ubuntu@$INSTANCE_PUBLIC_HOSTNAME"
