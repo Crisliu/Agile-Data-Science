@@ -25,6 +25,6 @@ def get_navigation_offsets(offset1, offset2, increment):
 def strip_place(url):
   try:
     p = re.match('(.+)\?start=.+&end=.+', url).group(1)
-  except AttributeError, e:
+  except AttributeError as e:
     return url
   return p
