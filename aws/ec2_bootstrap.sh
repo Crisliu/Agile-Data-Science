@@ -236,8 +236,9 @@ jupyter notebook --ip=0.0.0.0
 sudo apt-get install update-motd
 cat > /home/ubuntu/agile_data_science.message << END_HELLO
 
+
 ------------------------------------------------------------------------------------------------------------------------
-Welcome to Agile Data Science 2.0!\n\n
+Welcome to Agile Data Science 2.0!
 
 If the Agile_Data_Code_2 directory (and others for hadoop, spark, mongodb, elasticsearch, etc.) aren't present, please wait a few minutes for the install script to finish.
 
