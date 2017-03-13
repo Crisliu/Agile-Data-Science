@@ -269,12 +269,9 @@ echo "export SPARK_MASTER=local" >> zeppelin/conf/zeppelin-env.sh
 echo "export SPARK_CLASSPATH=" >> zeppelin/conf/zeppelin-env.sh
 
 # Jupyter server setup
-jupyter notebook --generate-config
+jupyter-notebook --generate-config
 cp /home/ubuntu/Agile_Data_Code_2/jupyter_notebook_config.py /home/ubuntu/.jupyter/
-mkdir /home/ubuntu/certs
-sudo openssl req -x509 -nodes -days 365 -newkey rsa:1024 -subj "/C=US" -keyout /home/ubuntu/certs/mycert.pem -out /home/ubuntu/certs/mycert.pem
-
-jupyter notebook --ip=0.0.0.0
+jupyter-notebook --ip=0.0.0.0 &
 
 #
 # Cleanup
