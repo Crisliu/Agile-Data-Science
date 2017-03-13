@@ -271,7 +271,9 @@ echo "export SPARK_CLASSPATH=" >> zeppelin/conf/zeppelin-env.sh
 # Jupyter server setup
 jupyter-notebook --generate-config
 cp /home/ubuntu/Agile_Data_Code_2/jupyter_notebook_config.py /home/ubuntu/.jupyter/
+cd /home/ubuntu/Agile_Data_Code_2
 jupyter-notebook --ip=0.0.0.0 &
+cd
 
 #
 # Cleanup
