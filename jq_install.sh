@@ -18,7 +18,7 @@ cp ~/.bash_profile ~/.bash_profile.jq_install.bak
 
 echo "Adding \$PROJECT_HOME/bin to ~/.bash_profile"
 echo "" >> ~/.bash_profile
-echo "Added by $PROJECT_HOME/jq_install.sh" >> ~/.bash_profile
+echo "# Added by $PROJECT_HOME/jq_install.sh" >> ~/.bash_profile
 echo "export PATH=$PATH:$PROJECT_HOME/bin" >> ~/.bash_profile
 echo "" >> ~/.bash_profile
 
