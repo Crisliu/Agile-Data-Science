@@ -127,7 +127,7 @@ echo "Once you ssh in, the exercise code is in the Agile_Data_Code_2 directory! 
 
 echo ""
 echo "Note: after a few minutes, now you will need to run ./ec2_create_tunnel.sh to forward ports 5000 and 8888 on the ec2 instance to your local ports 5000 and 8888. This way you can run the example web applications on the ec2 instance and browse them at http://localhost:5000 and you can view Jupyter notebooks at http://localhost:8888"
-
+echo "If you tire of the ssh tunnel port forwarding, you may end these connections by executing ./ec2_kill_tunnel.sh"
 echo ""
 echo "---------------------------------------------------------------------------------------------------------------------"
 echo ""
