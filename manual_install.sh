@@ -201,7 +201,7 @@ if [ -z `which elasticsearch` ] && [ ! -d elasticsearch ]; then
   tar -xvzf /tmp/elasticsearch-5.1.1.tar.gz -C elasticsearch --strip-components=1
 
   # Run elasticsearch
-  elasticsearch/bin/elasticsearch 2>1 > /dev/null & # re-run if you shutdown your computer
+  elasticsearch/bin/elasticsearch -d # re-run if you shutdown your computer
 else
   echo "Skipping elasticsearch, already installed..."
 fi
