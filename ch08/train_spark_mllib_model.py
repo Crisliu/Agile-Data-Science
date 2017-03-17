@@ -16,7 +16,7 @@ def main(base_path):
   # If there is no SparkSession, create the environment
   try:
     sc and spark
-  except NameError as e:
+  except (NameError, UnboundLocalError) as e:
     import findspark
     findspark.init()
     import pyspark
