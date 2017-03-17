@@ -167,9 +167,9 @@ curl -Lko lib/mongo-java-driver-3.4.0.jar http://central.maven.org/maven2/org/mo
 
 # Install the mongo-hadoop project in the mongo-hadoop directory in the root of our project.
 echo "Installing the mongo-hadoop project in $PROJECT_HOME/mongo-hadoop ..."
-curl -Lko /tmp/r1.5.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r1.5.2.tar.gz
+curl -Lko /tmp/mongo-hadoop-r2.0.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r2.0.2.tar.gz
 mkdir mongo-hadoop
-tar -xvzf /tmp/r1.5.2.tar.gz -C mongo-hadoop --strip-components=1
+tar -xvzf /tmp/mongo-hadoop-r2.0.2.tar.gz -C mongo-hadoop --strip-components=1
 
 # Now build the mongo-hadoop-spark jars
 echo "Building mongo-hadoop..."
