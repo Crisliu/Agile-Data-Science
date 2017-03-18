@@ -207,8 +207,8 @@ sudo chown -R vagrant /home/vagrant/kafka
 sudo chgrp -R vagrant /home/vagrant/kafka
 
 # Run zookeeper (which kafka depends on), then Kafka
-sudo -H -u ubuntu /home/vagrant/kafka/bin/zookeeper-server-start.sh -daemon /home/vagrant/kafka/config/zookeeper.properties
-sudo -H -u ubuntu /home/vagrant/kafka/bin/kafka-server-start.sh -daemon /home/vagrant/kafka/config/server.properties
+sudo -H -u vagrant /home/vagrant/kafka/bin/zookeeper-server-start.sh -daemon /home/vagrant/kafka/config/zookeeper.properties
+sudo -H -u vagrant /home/vagrant/kafka/bin/kafka-server-start.sh -daemon /home/vagrant/kafka/config/server.properties
 
 #
 # Install and setup Airflow
