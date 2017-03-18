@@ -222,6 +222,9 @@ airflow initdb
 airflow webserver -D
 airflow scheduler -D
 
+sudo chown -R vagrant /home/vagrant/airflow
+sudo chgrp -R vagrant /home/vagrant/airflow
+
 # Install Apache Zeppelin
 curl -Lko /tmp/zeppelin-0.7.0-bin-all.tgz http://www-us.apache.org/dist/zeppelin/zeppelin-0.7.0/zeppelin-0.7.0-bin-all.tgz
 mkdir zeppelin
