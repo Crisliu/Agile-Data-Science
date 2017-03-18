@@ -21,12 +21,18 @@ echo "First we will forward the port the web appliations use..."
 echo "Forwarding the remote machine's port 5000 to the local port 5000, which you can then access at http://localhost:5000"
 echo 'Executing: ssh -N -i ./agile_data_science.pem -o StrictHostKeyChecking=no -L 5000:localhost:5000 ubuntu@$EC2_HOSTNAME &'
 ssh -N -i ./agile_data_science.pem -o StrictHostKeyChecking=no -L 5000:localhost:5000 ubuntu@$EC2_HOSTNAME &
-
 echo ""
 
+# Create a tunnel for port 8888 for Jupyter notebooks
 echo "Next we will forward the port the Jupyter Notebooks use..."
 echo "Forwarding the remote machine's port 8888 to the local port 8888, which you can then access at http://localhost:8888"
 echo 'Executing: ssh -N -i ./agile_data_science.pem -o StrictHostKeyChecking=no -L 8888:localhost:8888 ubuntu@$EC2_HOSTNAME &'
 ssh -N -i ./agile_data_science.pem -o StrictHostKeyChecking=no -L 8888:localhost:8888 ubuntu@$EC2_HOSTNAME &
+echo ""
 
+# Create a tunnel for port 8080 for Airflow
+echo "Next we will forward the port that Airflow uses..."
+echo "Forwarding the remote machine's port 8080 to the local port 8080, which you can then access at http://localhost:8080"
+echo 'Executing: ssh -N -i ./agile_data_science.pem -o StrictHostKeyChecking=no -L 8080:localhost:8080 ubuntu@$EC2_HOSTNAME &'
+ssh -N -i ./agile_data_science.pem -o StrictHostKeyChecking=no -L 8080:localhost:8080 ubuntu@$EC2_HOSTNAME &
 echo ""
