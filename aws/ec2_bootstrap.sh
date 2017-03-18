@@ -241,6 +241,9 @@ rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 sudo chown -R ubuntu /home/ubuntu/kafka
 sudo chgrp -R ubuntu /home/ubuntu/kafka
 
+# Set the log dir to kafka/logs
+sed -i '/log.dirs=\/tmp\/kafka-logs/c\log.dirs=logs' /home/ubuntu/kafka/config/server.properties
+
 # Run zookeeper (which kafka depends on), then Kafka
 sudo -H -u ubuntu /home/ubuntu/kafka/bin/zookeeper-server-start.sh -daemon /home/ubuntu/kafka/config/zookeeper.properties
 sudo -H -u ubuntu /home/ubuntu/kafka/bin/kafka-server-start.sh -daemon /home/ubuntu/kafka/config/server.properties

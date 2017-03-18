@@ -199,6 +199,9 @@ cd /home/vagrant/
 tar -xvzf /tmp/kafka_2.11-0.10.1.1.tgz -C kafka --strip-components=1 && rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 
+# Set the log dir to kafka/logs
+sed -i '/log.dirs=\/tmp\/kafka-logs/c\log.dirs=logs' /home/vagrant/kafka/config/server.properties
+
 # Run zookeeper (which kafka depends on), then Kafka
 sudo -H -u ubuntu /home/vagrant/kafka/bin/zookeeper-server-start.sh -daemon /home/vagrant/kafka/config/zookeeper.properties
 sudo -H -u ubuntu /home/vagrant/kafka/bin/kafka-server-start.sh -daemon /home/vagrant/kafka/config/server.properties
