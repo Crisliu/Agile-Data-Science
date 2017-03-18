@@ -2,7 +2,7 @@
 # Note that this must be inserted IN your script. You can't import this, it won't work.
 try:
   sc and spark
-except NameError as e:
+except (NameError, UnboundLocalError) as e:
   
   import findspark
   
