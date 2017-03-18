@@ -4,11 +4,6 @@ import sys, os, re
 import json
 import datetime, iso8601
 
-import pymongo
-import pymongo_spark
-# Important: activate pymongo_spark.
-pymongo_spark.activate()
-
 # Pass date and base path to main() from airflow
 def main(iso_date, base_path):
   APP_NAME = "pyspark_task_two.py"
@@ -24,6 +19,11 @@ def main(iso_date, base_path):
     
     sc = pyspark.SparkContext()
     spark = pyspark.sql.SparkSession(sc).builder.appName(APP_NAME).getOrCreate()
+
+  import pymongo
+  import pymongo_spark
+  # Important: activate pymongo_spark.
+  pymongo_spark.activate()
   
   # Get today's date
   today_dt = iso8601.parse_date(iso_date)
