@@ -237,13 +237,13 @@ cd /home/ubuntu/
 tar -xvzf /tmp/kafka_2.11-0.10.1.1.tgz -C kafka --strip-components=1 && rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 
-# Run zookeeper (which kafka depends on), then Kafka
-/home/ubuntu/kafka/bin/zookeeper-server-start.sh -daemon /home/ubuntu/kafka/config/zookeeper.properties
-/home/ubuntu/kafka/bin/kafka-server-start.sh -daemon /home/ubuntu/kafka/config/server.properties
-
 # Give to ubuntu
 sudo chown -R ubuntu /home/ubuntu/kafka
 sudo chgrp -R ubuntu /home/ubuntu/kafka
+
+# Run zookeeper (which kafka depends on), then Kafka
+sudo -H -u ubuntu /home/ubuntu/kafka/bin/zookeeper-server-start.sh -daemon /home/ubuntu/kafka/config/zookeeper.properties
+sudo -H -u ubuntu /home/ubuntu/kafka/bin/kafka-server-start.sh -daemon /home/ubuntu/kafka/config/server.properties
 
 #
 # Install and setup Airflow

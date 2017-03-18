@@ -200,8 +200,8 @@ tar -xvzf /tmp/kafka_2.11-0.10.1.1.tgz -C kafka --strip-components=1 && rm -f /t
 rm -f /tmp/kafka_2.11-0.10.1.1.tgz
 
 # Run zookeeper (which kafka depends on), then Kafka
-/home/vagrant/kafka/bin/zookeeper-server-start.sh -daemon /home/vagrant/kafka/config/zookeeper.properties
-/home/vagrant/kafka/bin/kafka-server-start.sh -daemon /home/vagrant/kafka/config/server.properties
+sudo -H -u ubuntu /home/vagrant/kafka/bin/zookeeper-server-start.sh -daemon /home/vagrant/kafka/config/zookeeper.properties
+sudo -H -u ubuntu /home/vagrant/kafka/bin/kafka-server-start.sh -daemon /home/vagrant/kafka/config/server.properties
 
 # Give to vagrant
 sudo chown -R vagrant /home/vagrant/kafka
