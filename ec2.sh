@@ -111,6 +111,12 @@ echo "The public hostname of the instance we just created is '$INSTANCE_PUBLIC_H
 echo "Writing hostname to '.ec2_hostname' ..."
 echo $INSTANCE_PUBLIC_HOSTNAME > .ec2_hostname
 echo ""
+
+echo "Now we will tag this ec2 instance and name it 'agile_data_science_ec2' ..."
+INSTANCE_ID=`aws ec2 describe-instances | jq -c ".Reservations[] | select(.ReservationId | contains(\"$RESERVATION_ID\"))| .Instances[0].InstanceId" | tr -d '"'`
+aws ec2 create-tags --resources $INSTANCE_ID --tags Key=Name,Value=agile_data_science_ec2
+echo ""
+
 echo "After a few minutes (for it to initialize), you may ssh to this machine via the command in red: "
 # Make the ssh instructions red
 RED='\033[0;31m'
