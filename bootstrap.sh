@@ -24,7 +24,8 @@ echo "export JAVA_HOME=/usr/lib/jvm/java-8-oracle" | sudo tee -a /home/vagrant/.
 #
 # Install Miniconda
 #
-curl -Lko /tmp/Miniconda3-latest-Linux-x86_64.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+echo "curl -sLko /tmp/Miniconda3-latest-Linux-x86_64.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+curl -sLko /tmp/Miniconda3-latest-Linux-x86_64.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 chmod +x /tmp/Miniconda3-latest-Linux-x86_64.sh
 /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /home/vagrant/anaconda
 
@@ -55,7 +56,8 @@ cd /home/vagrant
 #
 # Install Hadoop
 #
-curl -Lko /tmp/hadoop-2.7.3.tar.gz http://apache.osuosl.org/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
+echo "curl -sLko /tmp/hadoop-2.7.3.tar.gz http://apache.osuosl.org/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz"
+curl -sLko /tmp/hadoop-2.7.3.tar.gz http://apache.osuosl.org/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
 mkdir -p /home/vagrant/hadoop
 cd /home/vagrant/
 tar -xvf /tmp/hadoop-2.7.3.tar.gz -C hadoop --strip-components=1
@@ -77,7 +79,8 @@ sudo chgrp -R vagrant /home/vagrant/hadoop
 #
 # Install Spark
 #
-curl -Lko /tmp/spark-2.1.0-bin-without-hadoop.tgz http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-without-hadoop.tgz
+echo "curl -sLko /tmp/spark-2.1.0-bin-without-hadoop.tgz http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-without-hadoop.tgz"
+curl -sLko /tmp/spark-2.1.0-bin-without-hadoop.tgz http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-without-hadoop.tgz
 mkdir -p /home/vagrant/spark
 cd /home/vagrant
 tar -xvf /tmp/spark-2.1.0-bin-without-hadoop.tgz -C spark --strip-components=1
@@ -125,10 +128,12 @@ sudo chgrp -R mongodb /data/db
 sudo /usr/bin/mongod --fork --logpath /var/log/mongodb.log
 
 # Get the MongoDB Java Driver
-curl -Lko /home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.2.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.2/mongo-java-driver-3.4.2.jar
+echo "curl -sLko /home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.2.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.2/mongo-java-driver-3.4.2.jar"
+curl -sLko /home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.2.jar http://central.maven.org/maven2/org/mongodb/mongo-java-driver/3.4.2/mongo-java-driver-3.4.2.jar
 
 # Install the mongo-hadoop project in the mongo-hadoop directory in the root of our project.
-curl -Lko /tmp/mongo-hadoop-r2.0.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r2.0.2.tar.gz
+echo "curl -sLko /tmp/mongo-hadoop-r2.0.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r2.0.2.tar.gz"
+curl -sLko /tmp/mongo-hadoop-r2.0.2.tar.gz https://github.com/mongodb/mongo-hadoop/archive/r2.0.2.tar.gz
 mkdir /home/vagrant/mongo-hadoop
 cd /home/vagrant
 tar -xvzf /tmp/mongo-hadoop-r2.0.2.tar.gz -C mongo-hadoop --strip-components=1
@@ -154,7 +159,8 @@ rm -rf /home/vagrant/mongo-hadoop
 #
 # Install ElasticSearch in the elasticsearch directory in the root of our project, and the Elasticsearch for Hadoop package
 #
-curl -Lko /tmp/elasticsearch-5.2.1.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.1.tar.gz
+echo "curl -sLko /tmp/elasticsearch-5.2.1.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.1.tar.gz"
+curl -sLko /tmp/elasticsearch-5.2.1.tar.gz https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.1.tar.gz
 mkdir /home/vagrant/elasticsearch
 cd /home/vagrant
 tar -xvzf /tmp/elasticsearch-5.2.1.tar.gz -C elasticsearch --strip-components=1
@@ -168,7 +174,8 @@ sudo chgrp -R vagrant /home/vagrant/elasticsearch/logs
 sudo -u vagrant /home/vagrant/elasticsearch/bin/elasticsearch -d # re-run if you shutdown your computer
 
 # Install Elasticsearch for Hadoop
-curl -Lko /tmp/elasticsearch-hadoop-5.2.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.2.1.zip
+echo "curl -sLko /tmp/elasticsearch-hadoop-5.2.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.2.1.zip"
+curl -sLko /tmp/elasticsearch-hadoop-5.2.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.2.1.zip
 unzip /tmp/elasticsearch-hadoop-5.2.1.zip
 mv /home/vagrant/elasticsearch-hadoop-5.2.1 /home/vagrant/elasticsearch-hadoop
 cp /home/vagrant/elasticsearch-hadoop/dist/elasticsearch-hadoop-5.2.1.jar /home/vagrant/Agile_Data_Code_2/lib/
@@ -183,17 +190,20 @@ rm -rf /home/vagrant/elasticsearch-hadoop/conf/spark-defaults.conf
 
 # Install and add snappy-java and lzo-java to our classpath below via spark.jars
 cd /home/vagrant/Agile_Data_Code_2
-curl -Lko lib/snappy-java-1.1.2.6.jar http://central.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.2.6/snappy-java-1.1.2.6.jar
-curl -Lko lib/lzo-hadoop-1.0.5.jar http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.0/lzo-hadoop-1.0.0.jar
+echo "curl -sLko lib/snappy-java-1.1.2.6.jar http://central.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.2.6/snappy-java-1.1.2.6.jar"
+curl -sLko lib/snappy-java-1.1.2.6.jar http://central.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.2.6/snappy-java-1.1.2.6.jar
+echo "curl -sLko lib/lzo-hadoop-1.0.5.jar http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.0/lzo-hadoop-1.0.0.jar"
+curl -sLko lib/lzo-hadoop-1.0.5.jar http://central.maven.org/maven2/org/anarres/lzo/lzo-hadoop/1.0.0/lzo-hadoop-1.0.0.jar
 cd /home/vagrant
 
 # Set the spark.jars path
-echo "spark.jars /home/vagrant/Agile_Data_Code_2/lib/mongo-hadoop-spark-2.0.2.jar,/home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.2.jar,/home/vagrant/Agile_Data_Code_2/lib/mongo-hadoop-2.0.2.jar,/home/vagrant/Agile_Data_Code_2/lib/elasticsearch-spark-20_2.10-5.1.1.jar,/home/vagrant/Agile_Data_Code_2/lib/snappy-java-1.1.2.6.jar,/home/vagrant/Agile_Data_Code_2/lib/lzo-hadoop-1.0.5.jar" | sudo tee -a /home/vagrant/spark/conf/spark-defaults.conf
+echo "spark.jars /home/vagrant/Agile_Data_Code_2/lib/mongo-hadoop-spark-2.0.2.jar,/home/vagrant/Agile_Data_Code_2/lib/mongo-java-driver-3.4.2.jar,/home/vagrant/Agile_Data_Code_2/lib/mongo-hadoop-2.0.2.jar,/home/vagrant/Agile_Data_Code_2/lib/elasticsearch-spark-20_2.10-5.2.1.jar,/home/vagrant/Agile_Data_Code_2/lib/snappy-java-1.1.2.6.jar,/home/vagrant/Agile_Data_Code_2/lib/lzo-hadoop-1.0.5.jar" | sudo tee -a /home/vagrant/spark/conf/spark-defaults.conf
 
 #
 # Kafka install and setup
 #
-curl -Lko /tmp/kafka_2.11-0.10.1.1.tgz http://www-us.apache.org/dist/kafka/0.10.1.1/kafka_2.11-0.10.1.1.tgz
+echo "curl -sLko /tmp/kafka_2.11-0.10.1.1.tgz http://www-us.apache.org/dist/kafka/0.10.1.1/kafka_2.11-0.10.1.1.tgz"
+curl -sLko /tmp/kafka_2.11-0.10.1.1.tgz http://www-us.apache.org/dist/kafka/0.10.1.1/kafka_2.11-0.10.1.1.tgz
 mkdir -p /home/vagrant/kafka
 cd /home/vagrant/
 tar -xvzf /tmp/kafka_2.11-0.10.1.1.tgz -C kafka --strip-components=1 && rm -f /tmp/kafka_2.11-0.10.1.1.tgz
@@ -214,19 +224,22 @@ sudo -H -u vagrant /home/vagrant/kafka/bin/kafka-server-start.sh -daemon /home/v
 # Install and setup Airflow
 #
 pip install airflow[hive]
+
 mkdir /home/vagrant/airflow
 mkdir /home/vagrant/airflow/dags
 mkdir /home/vagrant/airflow/logs
 mkdir /home/vagrant/airflow/plugins
-airflow initdb
-airflow webserver -D
-airflow scheduler -D
 
 sudo chown -R vagrant /home/vagrant/airflow
 sudo chgrp -R vagrant /home/vagrant/airflow
 
+airflow initdb
+airflow webserver -D &
+airflow scheduler -D &
+
 # Install Apache Zeppelin
-curl -Lko /tmp/zeppelin-0.7.0-bin-all.tgz http://www-us.apache.org/dist/zeppelin/zeppelin-0.7.0/zeppelin-0.7.0-bin-all.tgz
+echo "curl -sLko /tmp/zeppelin-0.7.0-bin-all.tgz http://www-us.apache.org/dist/zeppelin/zeppelin-0.7.0/zeppelin-0.7.0-bin-all.tgz"
+curl -sLko /tmp/zeppelin-0.7.0-bin-all.tgz http://www-us.apache.org/dist/zeppelin/zeppelin-0.7.0/zeppelin-0.7.0-bin-all.tgz
 mkdir zeppelin
 tar -xvzf /tmp/zeppelin-0.7.0-bin-all.tgz -C zeppelin --strip-components=1
 
@@ -240,12 +253,14 @@ echo "export SPARK_CLASSPATH=" >> zeppelin/conf/zeppelin-env.sh
 jupyter notebook --generate-config
 cp /home/vagrant/Agile_Data_Code_2/jupyter_notebook_config.py /home/vagrant/.jupyter/
 mkdir /home/vagrant/certs
-sudo openssl req -x509 -nodes -days 365 -newkey rsa:1024 -subj "/C=US" -keyout /home/ubuntu/certs/mycert.pem -out /home/ubuntu/certs/mycert.pem
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:1024 -subj "/C=US" -keyout /home/vagrant/certs/mycert.pem -out /home/vagrant/certs/mycert.pem
 
-jupyter notebook --ip=0.0.0.0
+jupyter notebook --ip=0.0.0.0 --allow-root --no-browser &
 
 #
 # Cleanup
 #
 sudo apt-get clean
 sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+echo "DONE!"
