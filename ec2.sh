@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-LOG_FILE = "/tmp/ec2.sh.log"
+LOG_FILE="/tmp/ec2.sh.log"
 echo "Logging operations to '$LOG_FILE' ..."
 
 echo "" | tee -$LOG_FILE # first echo replaces previous log output, other calls append
@@ -31,24 +31,49 @@ if [ -z `which jq` ]; then
   exit
 fi
 
-echo "Testing for security group 'agile_data_science ..." | tee -a $LOG_FILE
-echo "Creating security group 'agile_data_science' ..." | tee -a $LOG_FILE
-aws ec2 create-security-group --group-name agile_data_science --description "Security group for the book, Agile Data Science 2.0" | tee -a $LOG_FILE
+echo "Testing for security group 'agile_data_science' ..." | tee -a $LOG_FILE
+GROUP_NAME_FILTER=`aws ec2 describe-security-groups | jq '.SecurityGroups[] | select(.GroupName == "agile_data_science") | length'`
+
+if [ -z "$GROUP_NAME_FILTER" ]
+then
+  echo "Security group 'agile_data_science' not present ..." | tee -a $LOG_FILE
+  echo "Creating security group 'agile_data_science' ..." | tee -a $LOG_FILE
+  aws ec2 create-security-group --group-name agile_data_science --description "Security group for the book, Agile Data Science 2.0" | tee -a $LOG_FILE
+  AUTHORIZE_22=true
+else
+  echo "Security group 'agile_data_science' already exists, skipping creation ..." | tee -a $LOG_FILE
+fi
 
 echo ""
 echo "Detecting external IP address ..." | tee -a $LOG_FILE
 EXTERNAL_IP=`dig +short myip.opendns.com @resolver1.opendns.com`
 
-echo "Authorizing port 22 to your external IP ($EXTERNAL_IP) in security group 'agile_data_science' ..." | tee -a $LOG_FILE
-aws ec2 authorize-security-group-ingress --group-name agile_data_science --protocol tcp --cidr $EXTERNAL_IP/32 --port 22
+if [ "$AUTHORIZE_22" == true ]
+then
+  echo "Authorizing port 22 to your external IP ($EXTERNAL_IP) in security group 'agile_data_science' ..." | tee -a $LOG_FILE
+  aws ec2 authorize-security-group-ingress --group-name agile_data_science --protocol tcp --cidr $EXTERNAL_IP/32 --port 22
+else
+  echo "Skipping authorization of port 22 ..." tee -a $LOG_FILE
+fi
 
 echo ""
-echo "Generating keypair called 'agile_data_science' ..." | tee -a $LOG_FILE # Lose start "  # Lose end " # Make '\n' a newline
-aws ec2 create-key-pair --key-name agile_data_science|jq .KeyMaterial|sed -e 's/^"//' -e 's/"$//'| awk '{gsub(/\\n/,"\n")}1' > ./agile_data_science.pem
-echo "Changing permissions of 'agile_data_science.pem' to 0600 ..." | tee -a $LOG_FILE
-chmod 0600 ./agile_data_science.pem
+echo "Testing for existence of keypair 'agile_data_science' and key 'agile_data_science.pem' ..." | tee -a $LOG_FILE
+KEY_PAIR_RESULTS=`aws ec2 describe-key-pairs | jq '.KeyPairs[] | select(.KeyName == "agile_data_science") | length'`
 
-echo ""
+# If the key doesn't exist in EC2 or the file doesn't exist, create a new key called agile_data_science
+if [ -z "$KEY_PAIR_RESULTS" || ! -e "./agile_data_science.pem" ]
+then
+  echo "Key pair 'agile_data_science' not found ..." | tee -a $LOG_FILE
+  echo "Generating keypair called 'agile_data_science' ..." | tee -a $LOG_FILE
+
+  aws ec2 create-key-pair --key-name agile_data_science|jq .KeyMaterial|sed -e 's/^"//' -e 's/"$//'| awk '{gsub(/\\n/,"\n")}1' > ./agile_data_science.pem
+  echo "Changing permissions of 'agile_data_science.pem' to 0600 ..." | tee -a $LOG_FILE
+  chmod 0600 ./agile_data_science.pem
+else
+  echo "Existing key pair 'agile_data_science' detected, will not recreate ..." | tee -a $LOG_FILE
+fi
+
+echo "" | tee -a $LOG_FILE
 echo "Detecting the default region..." | tee -a $LOG_FILE
 DEFAULT_REGION=`aws configure get region`
 echo "The default region is '$DEFAULT_REGION'" | tee -a $LOG_FILE
