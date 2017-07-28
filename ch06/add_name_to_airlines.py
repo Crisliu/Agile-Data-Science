@@ -25,8 +25,7 @@ schema = StructType([
 ])
 
 airlines = spark.read.format('com.databricks.spark.csv')\
-  .options(header='false')\
-  .schema(schema)\
+  .options(header='false', nullValue='\\N')\
   .load('data/airlines.csv')
 airlines.show()
 
