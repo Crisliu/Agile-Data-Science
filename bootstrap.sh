@@ -173,6 +173,10 @@ sudo chgrp -R vagrant /home/vagrant/elasticsearch/logs
 # Run elasticsearch
 sudo -u vagrant /home/vagrant/elasticsearch/bin/elasticsearch -d # re-run if you shutdown your computer
 
+# Run a query to test - it will error but should return json
+echo "Testing Elasticsearch with a query ..." | tee -a $LOG_FILE
+curl 'localhost:9200/agile_data_science/on_time_performance/_search?q=Origin:ATL&pretty'
+
 # Install Elasticsearch for Hadoop
 echo "curl -sLko /tmp/elasticsearch-hadoop-5.2.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.2.1.zip"
 curl -sLko /tmp/elasticsearch-hadoop-5.2.1.zip http://download.elastic.co/hadoop/elasticsearch-hadoop-5.2.1.zip
