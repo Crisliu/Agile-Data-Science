@@ -31,6 +31,6 @@
   </div>
   {% import "macros.jnj" as common %}
   {% if nav_offsets and nav_path -%}
-    {{ common.display_nav(nav_offsets, nav_path, flight_count, query)|safe }}
+    {{ common.display_nav(nav_offsets, nav_path, flight_count)|safe }}
   {% endif -%}
 {% endblock %}
