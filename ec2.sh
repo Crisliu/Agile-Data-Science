@@ -61,16 +61,16 @@ echo "Testing for existence of keypair 'agile_data_science' and key 'agile_data_
 KEY_PAIR_RESULTS=`aws ec2 describe-key-pairs | jq '.KeyPairs[] | select(.KeyName == "agile_data_science") | length'`
 
 # If the key doesn't exist in EC2 or the file doesn't exist, create a new key called agile_data_science
-if [ -z "$KEY_PAIR_RESULTS" || ! -e "./agile_data_science.pem" ]
+if [ \( -n "$KEY_PAIR_RESULTS" \) -a \( -f "./agile_data_science.pem" \) ]
 then
+  echo "Existing key pair 'agile_data_science' detected, will not recreate ..." | tee -a $LOG_FILE
+else
   echo "Key pair 'agile_data_science' not found ..." | tee -a $LOG_FILE
   echo "Generating keypair called 'agile_data_science' ..." | tee -a $LOG_FILE
 
   aws ec2 create-key-pair --key-name agile_data_science|jq .KeyMaterial|sed -e 's/^"//' -e 's/"$//'| awk '{gsub(/\\n/,"\n")}1' > ./agile_data_science.pem
   echo "Changing permissions of 'agile_data_science.pem' to 0600 ..." | tee -a $LOG_FILE
   chmod 0600 ./agile_data_science.pem
-else
-  echo "Existing key pair 'agile_data_science' detected, will not recreate ..." | tee -a $LOG_FILE
 fi
 
 echo "" | tee -a $LOG_FILE
