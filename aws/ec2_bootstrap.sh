@@ -297,6 +297,10 @@ airflow initdb
 airflow webserver -D
 airflow scheduler -D
 
+echo "Giving airflow directory to user ubuntu yet again ..." | tee -a $LOG_FILE
+sudo chown -R ubuntu /home/ubuntu/airflow
+sudo chgrp -R ubuntu /home/ubuntu/airflow
+
 # Jupyter server setup
 echo "Starting Jupyter notebook server ..." | tee -a $LOG_FILE
 jupyter-notebook --generate-config
