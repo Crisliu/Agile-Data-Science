@@ -301,6 +301,10 @@ echo "Giving airflow directory to user ubuntu yet again ..." | tee -a $LOG_FILE
 sudo chown -R ubuntu /home/ubuntu/airflow
 sudo chgrp -R ubuntu /home/ubuntu/airflow
 
+echo "Adding chown airflow commands to /home/ubuntu/.bash_profile ..." | tee -a $LOG_FILE
+echo "sudo chown -R ubuntu /home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
+echo "sudo chgrp -R ubuntu /home/ubuntu/airflow" >> /home/ubuntu/.bash_profile
+
 # Jupyter server setup
 echo "Starting Jupyter notebook server ..." | tee -a $LOG_FILE
 jupyter-notebook --generate-config
