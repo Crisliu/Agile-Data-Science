@@ -31,7 +31,7 @@ pyspark_local_task_one = BashOperator(
   task_id = "pyspark_local_task_one",
   bash_command = """spark-submit \
   --master {{ params.master }}
-  {{ params.base_path }}/{{ params.filename }} {{ ds }} {{ params.base_path }}""",
+  {{ params.base_path }}/{{ params.filename }} {{ ts }} {{ params.base_path }}""",
   params = {
     "master": "local[8]",
     "filename": "ch02/pyspark_task_one.py",
@@ -45,7 +45,7 @@ pyspark_local_task_two = BashOperator(
   task_id = "pyspark_local_task_two",
   bash_command = """spark-submit \
   --master {{ params.master }}
-  {{ params.base_path }}/{{ params.filename }} {{ ds }} {{ params.base_path }}""",
+  {{ params.base_path }}/{{ params.filename }} {{ ts }} {{ params.base_path }}""",
   params = {
     "master": "local[8]",
     "filename": "ch02/pyspark_task_two.py",
