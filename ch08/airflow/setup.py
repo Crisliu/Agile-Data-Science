@@ -33,7 +33,7 @@ spark-submit --master {{ params.master }} \
 pyspark_date_bash_command = """
 spark-submit --master {{ params.master }} \
   {{ params.base_path }}/{{ params.filename }} \
-  {{ ds }} {{ params.base_path }}
+  {{ ts }} {{ params.base_path }}
 """
 
 
