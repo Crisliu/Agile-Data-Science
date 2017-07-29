@@ -53,7 +53,7 @@ then
   echo "Authorizing port 22 to your external IP ($EXTERNAL_IP) in security group 'agile_data_science' ..." | tee -a $LOG_FILE
   aws ec2 authorize-security-group-ingress --group-name agile_data_science --protocol tcp --cidr $EXTERNAL_IP/32 --port 22
 else
-  echo "Skipping authorization of port 22 ..." tee -a $LOG_FILE
+  echo "Skipping authorization of port 22 ..." | tee -a $LOG_FILE
 fi
 
 echo ""
