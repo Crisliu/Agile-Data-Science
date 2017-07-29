@@ -92,7 +92,7 @@ export PROJECT_HOME=/home/ubuntu/Agile_Data_Code_2
 echo "export PROJECT_HOME=/home/ubuntu/Agile_Data_Code_2" | sudo tee -a /home/ubuntu/.bash_profile
 conda install python=3.5
 conda install iso8601 numpy scipy scikit-learn matplotlib ipython jupyter
-pip install bs4 Flask beautifulsoup4 airflow frozendict geopy kafka-python py4j pymongo pyelasticsearch requests selenium tabulate tldextract wikipedia findspark
+pip install bs4 Flask beautifulsoup4 frozendict geopy kafka-python py4j pymongo pyelasticsearch requests selenium tabulate tldextract wikipedia findspark
 sudo chown -R ubuntu /home/ubuntu/Agile_Data_Code_2
 sudo chgrp -R ubuntu /home/ubuntu/Agile_Data_Code_2
 cd /home/ubuntu
@@ -288,13 +288,14 @@ mkdir /home/ubuntu/airflow
 mkdir /home/ubuntu/airflow/dags
 mkdir /home/ubuntu/airflow/logs
 mkdir /home/ubuntu/airflow/plugins
-airflow initdb
-airflow webserver -D
-airflow scheduler -D
 
 echo "Giving airflow directory to user ubuntu ..." | tee -a $LOG_FILE
 sudo chown -R ubuntu /home/ubuntu/airflow
 sudo chgrp -R ubuntu /home/ubuntu/airflow
+
+airflow initdb
+airflow webserver -D
+airflow scheduler -D
 
 # Jupyter server setup
 echo "Starting Jupyter notebook server ..." | tee -a $LOG_FILE
