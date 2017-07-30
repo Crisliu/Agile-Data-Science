@@ -23,3 +23,5 @@ models
 *.pem
 .reservation_id
 .ec2_hostname
+.ec2_deep_hostname
+.deep_reservation_id
