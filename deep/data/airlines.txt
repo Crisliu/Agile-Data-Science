@@ -1,0 +1,100 @@
+Emirates,emirates.com
+Qatar Airways,qatarairways.com
+Singapore Airlines,singaporeair.com
+Cathay Pacific,cathaypacific.com
+ANAs,ana.co.jp
+Etihad Airways,etihad.com
+Turkish Airlines,turkishairlines.com
+EVA Air,evaair.com
+Qantas Airways,qantas.com
+Lufthansa,lufthansa.com
+Garuda Indonesia,garuda-indonesia.com
+Hainan Airlines,hainanairlines.com
+Thai Airways,thaiairways.com
+Air France,airfrance.us
+Swiss International Air Lines,swiss.com
+Asiana Airlines,flyasiana.com
+Air New Zealand,airnewzealand.com
+Virgin Australia,virginaustralia.com
+Austrian Airlines,austrian.com
+Bangkok Airways,bangkokair.com
+Japan Airlines,jal.com
+Cathay Dragon,cathaypacific.com
+AirAsia,airasia.com
+KLM,klm.com
+Virgin America,virginamerica.com
+British Airways,britishairways.com
+Finnair,finnair.com
+Virgin Atlantic,virginatlantic.com
+Hong Kong Airlines,hongkongairlines.com
+Norwegian,norwegian.com
+Air Canada,aircanada.com
+China Southern,csair.com
+Aegean Airlines,aegeanair.com
+Malaysia Airlines,malaysiaairlines.com
+Delta Air Lines,delta.com
+Korean Air,koreanair.com
+China Airlines,china-airlines.com
+easyJet,easyjet.com
+SilkAir,silkair.com
+Aeroflot,aeroflot.com
+South African Airways,flysaa.com
+Oman Air,omanair.com
+Air Astana,airastana.com
+Vietnam Airlines,vietnamairlines.com
+LAN Airlines,latam.com
+Jetstar Airways,jetstar.com
+Porter Airlines,flyporter.com
+AirAsia,airasia.com
+Aer Lingus,aerlingus.com
+WestJet,westjet.com
+Indigo,oindigo.in
+Iberia,iberia.com
+jetBlue Airways,jetblue.com
+Jetstar Asia,jetstar.com
+Azul Airlines,voeazul.com.br
+Avianca,avianca.com
+LATAM Brasil,latam.com
+Alitalia,alitalia.com
+Brussels Airlines,brusselsairlines.com
+Alaska Airlines,alaskaair.com
+Scoot,flyscoot.com
+SAS Scandinavian,flysas.com
+Air Seychelles,airseychelles.com
+TAP Air Portugal,flytap.com
+Thomson Airways,thomson.co.uk
+Southwest Airlines,southwest.com
+SriLankan Airlines,srilankan.com
+United Airlines,united.com
+Copa Airlines,copaair.com
+Azerbaijan Airlines,azal.az
+Jet Airways,jetairways.com
+Hawaiian Airlines,hawaiianairlines.com
+Air Mauritius,airmauritius.com
+Air Berlin,airberlin.com
+Eurowings,eurowings.com
+Ethiopian Airlines,ethiopianairlines.com
+American Airlines,aa.com
+Peach,flypeach.com
+China Eastern,ceair.com
+Gulf Air,gulfair.com
+Icelandair,icelandair.us
+Saudi Arabian Airlines,saudia.com
+Philippine Airlines,philippineairlines.com
+American Eagle,aa.com
+Kenya Airways,kenya-airways.com
+TAAG Angola,taag.com
+Air China,airchina.us
+Air Transat,airtransat.com
+Air Nostrum,airnostrum.es
+Juneyao Airlines,juneyaoair.com
+Fiji Airways,fijiairways.com
+LOT Polish,lot.com
+Kulula,kulula.com
+Aeromexico,aeromexico.com
+Royal Brunei Airlines,flyroyalbrunei.com
+Tianjin Airlines,tianjinairlines.co.uk
+Tiger Airways,tigerair.com.au
+Mango,flymango.com
+Royal Jordanian,rj.com
+SpiceJet,spicejet.com
