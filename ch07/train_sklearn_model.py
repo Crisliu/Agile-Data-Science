@@ -10,7 +10,8 @@ print("Imports loaded...")
 
 # Load and check the size of our training data. May take a minute.
 print("Original JSON file size: {:,} Bytes".format(os.path.getsize("data/simple_flight_delay_features.jsonl")))
-training_data = utils.read_json_lines_file('data/simple_flight_delay_features.jsonl')
+#training_data = utils.read_json_lines_file('data/simple_flight_delay_features.jsonl')
+training_data = utils.read_json_lines_file('data/simple_flight_sample.jsonl')
 print("Training items: {:,}".format(len(training_data))) # 5,714,008
 print("Data loaded...")
 
@@ -19,7 +20,7 @@ print("Size of training data in RAM: {:,} Bytes".format(sys.getsizeof(training_d
 print(training_data[0])
 
 # # Sample down our training data at first...
-sampled_training_data = training_data#np.random.choice(training_data, 1000000)
+sampled_training_data = training_data#np.random.choice(training_data, 100000)
 print("Sampled items: {:,} Bytes".format(len(training_data)))
 print("Data sampled...")
 

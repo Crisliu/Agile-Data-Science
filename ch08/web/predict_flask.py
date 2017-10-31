@@ -450,7 +450,8 @@ def classify_flight_delays_realtime():
     {
       "DepDelay": float,
       "Carrier": str,
-      "FlightDate": str,
+      #"FlightDate": str,
+      "Date": str,
       "Dest": str,
       "FlightNum": str,
       "Origin": str
@@ -471,7 +472,7 @@ def classify_flight_delays_realtime():
     client, api_form_values['Origin'],
     api_form_values['Dest']
   )
-  
+  print("!!!!!!!(&(!*@&#(!&#(*!&#(!*@&#(*!&#(!"+api_form_values['FlightDate'])
   # Turn the date into DayOfYear, DayOfMonth, DayOfWeek
   date_features_dict = predict_utils.get_regression_date_args(
     api_form_values['FlightDate']
