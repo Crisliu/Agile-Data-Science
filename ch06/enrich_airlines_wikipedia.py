@@ -5,9 +5,33 @@ import utils
 import wikipedia
 from bs4 import BeautifulSoup
 import tldextract
+import codecs
+import json
+
+
+def write_json_lines_file(ary_of_objects, path):
+  '''Dump a list of objects out as a json lines file.'''
+  f = codecs.open(path, 'w', 'utf-8')
+  for row_object in ary_of_objects:
+    json_record = json.dumps(row_object, ensure_ascii=False)
+    f.write(json_record + "\n")
+  f.close()
+
+def read_json_file(path):
+  '''Turn a normal json file (no CRs per record) into an object.'''
+  text = codecs.open(path, 'r', 'utf-8').read()
+  return json.loads(text)
+
+def read_json_lines_file(path):
+  '''Turn a json cr file (CRs per record) into an array of objects'''
+  ary = []
+  f = codecs.open(path, "r", "utf-8")
+  for line in f:
+    record = json.loads(line.rstrip("\n|\r"))
+  return ary
 
 # Load our airlines...
-our_airlines = utils.read_json_lines_file('data/our_airlines.jsonl')
+our_airlines = read_json_lines_file('data/our_airlines.jsonl')
 
 # Build a new list that includes wikipedia data
 with_url = []
