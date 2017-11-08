@@ -450,7 +450,7 @@ def classify_flight_delays_realtime():
     {
       "DepDelay": float,
       "Carrier": str,
-      #"FlightDate": str,
+      "FlightDate": str,
       "Date": str,
       "Dest": str,
       "FlightNum": str,

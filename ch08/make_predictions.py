@@ -34,8 +34,9 @@ def main(iso_date, base_path):
   from pyspark.ml.feature import StringIndexerModel
   
   string_indexer_models = {}
-  for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-                 "Origin", "Dest", "Route"]:
+  #for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear","Origin", "Dest", "Route"]:
+  for column in ["Carrier", "Origin", "Dest", "Route"]:
+  
     string_indexer_model_path = "{}/models/string_indexer_model_{}.bin".format(
       base_path,
       column
@@ -67,10 +68,12 @@ def main(iso_date, base_path):
   iso_today = rounded_today.isoformat()
 
   # Build the day's input path: a date based primary key directory structure
-  today_input_path = "{}/data/prediction_tasks_daily.json/{}".format(
+  today_input_path = "{}/Agile_Data_Code_2/data/prediction_tasks_daily.json/{}.jsonl".format(
     base_path,
     iso_today
   )
+
+#/data/prediction_tasks_daily
 
   from pyspark.sql.types import StringType, IntegerType, DoubleType, DateType, TimestampType
   from pyspark.sql.types import StructType, StructField
@@ -108,18 +111,19 @@ def main(iso_date, base_path):
   prediction_requests_with_route.show(6)
   
   # Index string fields with the corresponding indexer for that column
-  for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear",
-                 "Origin", "Dest", "Route"]:
-    string_indexer_model = string_indexer_models[column]
-    prediction_requests_with_route = string_indexer_model.transform(prediction_requests_with_route)
+  #for column in ["Carrier", "DayOfMonth", "DayOfWeek", "DayOfYear","Origin", "Dest", "Route"]:
+  for column in ["Carrier","Origin", "Dest", "Route"]:
+      print(column)
+      string_indexer_model = string_indexer_models[column]
+      prediction_requests_with_route = string_indexer_model.transform(prediction_requests_with_route)
       
   # Vectorize numeric columns: DepDelay and Distance
   final_vectorized_features = vector_assembler.transform(prediction_requests_with_route)
   
   # Drop the indexes for the nominal fields
-  index_columns = ["Carrier_index", "DayOfMonth_index","DayOfWeek_index",
-                   "DayOfYear_index", "Origin_index", "Origin_index",
-                   "Dest_index", "Route_index"]
+  index_columns = ["Carrier_index","Origin_index","Dest_index","Route_index"]
+#"DayOfMonth_index","DayOfWeek_index","DayOfYear_index", "Origin_index"
+                   
   for column in index_columns:
     final_vectorized_features = final_vectorized_features.drop(column)
 
